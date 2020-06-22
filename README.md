@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 14:54:22
- * @LastEditTime: 2020-06-17 09:39:17
+ * @LastEditTime: 2020-06-22 14:27:25
 --> 
 ## 安装依赖
 + 在项目根目录先执行：yarn
@@ -26,3 +26,5 @@
 ```
 # umi-base-product
 基于umi2.0搭建的react架构，支持dva&amp;antd，支持路由校验和配置，支持多环境打包
+# auditSystem
+内容审核系统：支持权限管理、队列审核.....
