@@ -205,7 +205,7 @@
         }
     };
 
-    new editTable;
+    new editTable();
 
     dialog.onok = function () {
         editor.__hasEnterExecCommand = true;

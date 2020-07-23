@@ -378,7 +378,7 @@ var utils = UE.utils = {
     makeInstance:function (obj) {
         var noop = new Function();
         noop.prototype = obj;
-        obj = new noop;
+        obj = new noop();
         noop.prototype = null;
         return obj;
     },
@@ -4219,7 +4219,7 @@ var domUtils = dom.domUtils = {
      */
     filterNodeList : function(nodelist,filter,forAll){
         var results = [];
-        if(!utils .isFunction(filter)){
+        if(!utils.isFunction(filter)){
             var str = filter;
             filter = function(n){
                 return utils.indexOf(utils.isArray(str) ? str:str.split(' '), n.tagName.toLowerCase()) != -1
@@ -8229,7 +8229,7 @@ UE.ajax = function() {
         }, ajaxOpts.timeout);
 
         var method = ajaxOpts.method.toUpperCase();
-        var str = url + (url.indexOf("?")==-1?"?":"&") + (method=="POST"?"":submitStr+ "&noCache=" + +new Date);
+        var str = url + (url.indexOf("?")==-1?"?":"&") + (method=="POST"?"":submitStr+ "&noCache=" + +new Date());
         xhr.open(method, str, ajaxOpts.async);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
@@ -13038,7 +13038,7 @@ UE.plugins['horizontal'] = function(){
  */
 UE.commands['time'] = UE.commands["date"] = {
     execCommand : function(cmd, format){
-        var date = new Date;
+        var date = new Date();
 
         function formatTime(date, format) {
             var hh = ('0' + date.getHours()).slice(-2),

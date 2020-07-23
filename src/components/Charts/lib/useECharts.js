@@ -41,7 +41,7 @@ function useECharts(chartRef, config) {
     return () => {
       chartIS && chartIS.dispose();
     }
-  }, [config])
+  }, [chartIS, config, renderChart])
 
   return 
 }

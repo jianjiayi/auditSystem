@@ -4866,7 +4866,7 @@
                     {
                         for (var col = 0; col < 8; col++)
                         {
-                            fdtbl_Y[k]  = (1.0 / (YTable [ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
+                            fdtbl_Y[k]  = (1.0 / (YTable[ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
                             fdtbl_UV[k] = (1.0 / (UVTable[ZigZag[k]] * aasf[row] * aasf[col] * 8.0));
                             k++;
                         }

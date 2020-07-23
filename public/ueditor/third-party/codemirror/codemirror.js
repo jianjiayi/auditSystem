@@ -327,7 +327,7 @@ var CodeMirror = (function() {
 
             if (!focused) onFocus();
 
-            var now = +new Date;
+            var now = +new Date();
             if (lastDoubleClick && lastDoubleClick.time > now - 400 && posEq(lastDoubleClick.pos, start)) {
                 e_preventDefault(e);
                 setTimeout(focusInput, 20);
@@ -392,7 +392,7 @@ var CodeMirror = (function() {
                 if (n.parentNode == gutterText) return e_preventDefault(e);
             var start = posFromMouse(e);
             if (!start) return;
-            lastDoubleClick = {time: +new Date, pos: start};
+            lastDoubleClick = {time: +new Date(), pos: start};
             e_preventDefault(e);
             selectWordAt(start);
         }
@@ -402,7 +402,7 @@ var CodeMirror = (function() {
             if (!pos || options.readOnly) return;
             if (files && files.length && window.FileReader && window.File) {
                 function loadFile(file, i) {
-                    var reader = new FileReader;
+                    var reader = new FileReader();
                     reader.onload = function() {
                         text[i] = reader.result;
                         if (++read == n) {
@@ -1611,7 +1611,7 @@ var CodeMirror = (function() {
             });
         }
         function highlightWorker() {
-            var end = +new Date + options.workTime;
+            var end = +new Date() + options.workTime;
             var foundWork = work.length;
             while (work.length) {
                 if (!getLine(showingFrom).stateAfter) var task = showingFrom;
@@ -1625,7 +1625,7 @@ var CodeMirror = (function() {
                     i = start, bail = false;
                 doc.iter(i, doc.size, function(line) {
                     var hadState = line.stateAfter;
-                    if (+new Date > end) {
+                    if (+new Date() > end) {
                         work.push(i);
                         startWorker(options.workDelay);
                         if (realChange) changes.push({from: task, to: i + 1});
@@ -2514,7 +2514,7 @@ var CodeMirror = (function() {
     History.prototype = {
         addChange: function(start, added, old) {
             this.undone.length = 0;
-            var time = +new Date, last = this.done[this.done.length - 1];
+            var time = +new Date(), last = this.done[this.done.length - 1];
             if (time - this.time > 400 || !last ||
                 last.start > start + added || last.start + last.added < start - last.added + last.old.length)
                 this.done.push({start: start, added: added, old: old});

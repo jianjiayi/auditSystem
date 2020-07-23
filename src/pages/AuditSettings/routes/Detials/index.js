@@ -72,7 +72,7 @@ function QueueDetails(props) {
     return ()=>{
       formOptions =  [];//组件销毁时候，清空配置数组
     }
-  }, []);
+  }, [dispatch, location.query.action]);
   
   
   /**添加要创建的表单项*/ 

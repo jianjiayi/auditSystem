@@ -510,7 +510,7 @@ function syncTableData () {
 
         for ( var j = 1, cell; cell = row.cells[ j ]; j++ ) {
 
-            cell.innerHTML = tableData[ i ] [ j ];
+            cell.innerHTML = tableData[ i ][ j ];
 
         }
 

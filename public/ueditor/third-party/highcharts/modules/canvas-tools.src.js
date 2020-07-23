@@ -406,7 +406,7 @@ if(!Array.prototype.indexOf){
 					if (d == 'y') return this.height();
 					return Math.sqrt(Math.pow(this.width(), 2) + Math.pow(this.height(), 2)) / Math.sqrt(2);			
 				}
-			});
+			})();
 		}
 		svg.init();
 		
@@ -621,7 +621,7 @@ if(!Array.prototype.indexOf){
 				} if (ff != '') f.fontFamily = ff;
 				return f;
 			}
-		});
+		})();
 		
 		// points and paths
 		svg.ToNumberArray = function(s) {
@@ -817,21 +817,21 @@ if(!Array.prototype.indexOf){
 				this.base(s);
 				this.angle = new svg.Property('angle', s);
 			}
-			this.Type.SkewBase.prototype = new this.Type.matrix;
+			this.Type.SkewBase.prototype = new this.Type.matrix();
 			
 			this.Type.skewX = function(s) {
 				this.base = that.Type.SkewBase;
 				this.base(s);
 				this.m = [1, 0, Math.tan(this.angle.Angle.toRadians()), 1, 0, 0];
 			}
-			this.Type.skewX.prototype = new this.Type.SkewBase;
+			this.Type.skewX.prototype = new this.Type.SkewBase();
 			
 			this.Type.skewY = function(s) {
 				this.base = that.Type.SkewBase;
 				this.base(s);
 				this.m = [1, Math.tan(this.angle.Angle.toRadians()), 0, 1, 0, 0];
 			}
-			this.Type.skewY.prototype = new this.Type.SkewBase;
+			this.Type.skewY.prototype = new this.Type.SkewBase();
 		
 			this.transforms = [];
 			
@@ -1104,7 +1104,7 @@ if(!Array.prototype.indexOf){
 				}
 			}		
 		}
-		svg.Element.RenderedElementBase.prototype = new svg.Element.ElementBase;
+		svg.Element.RenderedElementBase.prototype = new svg.Element.ElementBase();
 		
 		svg.Element.PathElementBase = function(node) {
 			this.base = svg.Element.RenderedElementBase;
@@ -1148,7 +1148,7 @@ if(!Array.prototype.indexOf){
 				return null;
 			}
 		}
-		svg.Element.PathElementBase.prototype = new svg.Element.RenderedElementBase;
+		svg.Element.PathElementBase.prototype = new svg.Element.RenderedElementBase();
 		
 		// svg element
 		svg.Element.svg = function(node) {
@@ -1223,7 +1223,7 @@ if(!Array.prototype.indexOf){
 				}				
 			}
 		}
-		svg.Element.svg.prototype = new svg.Element.RenderedElementBase;
+		svg.Element.svg.prototype = new svg.Element.RenderedElementBase();
 
 		// rect element
 		svg.Element.rect = function(node) {
@@ -1257,7 +1257,7 @@ if(!Array.prototype.indexOf){
 				return new svg.BoundingBox(x, y, x + width, y + height);
 			}
 		}
-		svg.Element.rect.prototype = new svg.Element.PathElementBase;
+		svg.Element.rect.prototype = new svg.Element.PathElementBase();
 		
 		// circle element
 		svg.Element.circle = function(node) {
@@ -1278,7 +1278,7 @@ if(!Array.prototype.indexOf){
 				return new svg.BoundingBox(cx - r, cy - r, cx + r, cy + r);
 			}
 		}
-		svg.Element.circle.prototype = new svg.Element.PathElementBase;	
+		svg.Element.circle.prototype = new svg.Element.PathElementBase();	
 
 		// ellipse element
 		svg.Element.ellipse = function(node) {
@@ -1305,7 +1305,7 @@ if(!Array.prototype.indexOf){
 				return new svg.BoundingBox(cx - rx, cy - ry, cx + rx, cy + ry);
 			}
 		}
-		svg.Element.ellipse.prototype = new svg.Element.PathElementBase;			
+		svg.Element.ellipse.prototype = new svg.Element.PathElementBase();			
 		
 		// line element
 		svg.Element.line = function(node) {
@@ -1336,7 +1336,7 @@ if(!Array.prototype.indexOf){
 				return [[points[0], a], [points[1], a]];
 			}
 		}
-		svg.Element.line.prototype = new svg.Element.PathElementBase;		
+		svg.Element.line.prototype = new svg.Element.PathElementBase();		
 				
 		// polyline element
 		svg.Element.polyline = function(node) {
@@ -1366,7 +1366,7 @@ if(!Array.prototype.indexOf){
 				return markers;
 			}			
 		}
-		svg.Element.polyline.prototype = new svg.Element.PathElementBase;				
+		svg.Element.polyline.prototype = new svg.Element.PathElementBase();				
 				
 		// polygon element
 		svg.Element.polygon = function(node) {
@@ -1383,7 +1383,7 @@ if(!Array.prototype.indexOf){
 				return bb;
 			}
 		}
-		svg.Element.polygon.prototype = new svg.Element.polyline;
+		svg.Element.polygon.prototype = new svg.Element.polyline();
 
 		// path element
 		svg.Element.path = function(node) {
@@ -1696,7 +1696,7 @@ if(!Array.prototype.indexOf){
 				return markers;
 			}
 		}
-		svg.Element.path.prototype = new svg.Element.PathElementBase;
+		svg.Element.path.prototype = new svg.Element.PathElementBase();
 		
 		// pattern element
 		svg.Element.pattern = function(node) {
@@ -1720,7 +1720,7 @@ if(!Array.prototype.indexOf){
 				return ctx.createPattern(c, 'repeat');
 			}
 		}
-		svg.Element.pattern.prototype = new svg.Element.ElementBase;
+		svg.Element.pattern.prototype = new svg.Element.ElementBase();
 		
 		// marker element
 		svg.Element.marker = function(node) {
@@ -1752,7 +1752,7 @@ if(!Array.prototype.indexOf){
 				ctx.translate(-point.x, -point.y);
 			}
 		}
-		svg.Element.marker.prototype = new svg.Element.ElementBase;
+		svg.Element.marker.prototype = new svg.Element.ElementBase();
 		
 		// definitions element
 		svg.Element.defs = function(node) {
@@ -1763,7 +1763,7 @@ if(!Array.prototype.indexOf){
 				// NOOP
 			}
 		}
-		svg.Element.defs.prototype = new svg.Element.ElementBase;
+		svg.Element.defs.prototype = new svg.Element.ElementBase();
 		
 		// base for gradients
 		svg.Element.GradientBase = function(node) {
@@ -1826,7 +1826,7 @@ if(!Array.prototype.indexOf){
 				return g;				
 			}
 		}
-		svg.Element.GradientBase.prototype = new svg.Element.ElementBase;
+		svg.Element.GradientBase.prototype = new svg.Element.ElementBase();
 		
 		// linear gradient element
 		svg.Element.linearGradient = function(node) {
@@ -1852,7 +1852,7 @@ if(!Array.prototype.indexOf){
 				return ctx.createLinearGradient(x1, y1, x2, y2);
 			}
 		}
-		svg.Element.linearGradient.prototype = new svg.Element.GradientBase;
+		svg.Element.linearGradient.prototype = new svg.Element.GradientBase();
 		
 		// radial gradient element
 		svg.Element.radialGradient = function(node) {
@@ -1889,7 +1889,7 @@ if(!Array.prototype.indexOf){
 				return ctx.createRadialGradient(fx, fy, 0, cx, cy, r);
 			}
 		}
-		svg.Element.radialGradient.prototype = new svg.Element.GradientBase;
+		svg.Element.radialGradient.prototype = new svg.Element.GradientBase();
 		
 		// gradient stop element
 		svg.Element.stop = function(node) {
@@ -1902,7 +1902,7 @@ if(!Array.prototype.indexOf){
 			if (this.style('stop-opacity').hasValue()) stopColor = stopColor.Color.addOpacity(this.style('stop-opacity').value);
 			this.color = stopColor.value;
 		}
-		svg.Element.stop.prototype = new svg.Element.ElementBase;
+		svg.Element.stop.prototype = new svg.Element.ElementBase();
 		
 		// animation base element
 		svg.Element.AnimateBase = function(node) {
@@ -1979,7 +1979,7 @@ if(!Array.prototype.indexOf){
 				return ((this.duration - this.begin) / (this.maxDuration - this.begin));
 			}			
 		}
-		svg.Element.AnimateBase.prototype = new svg.Element.ElementBase;
+		svg.Element.AnimateBase.prototype = new svg.Element.ElementBase();
 		
 		// animate element
 		svg.Element.animate = function(node) {
@@ -1994,7 +1994,7 @@ if(!Array.prototype.indexOf){
 				return from + (to - from) * this.progress(); 
 			};
 		}
-		svg.Element.animate.prototype = new svg.Element.AnimateBase;
+		svg.Element.animate.prototype = new svg.Element.AnimateBase();
 			
 		// animate color element
 		svg.Element.animateColor = function(node) {
@@ -2015,14 +2015,14 @@ if(!Array.prototype.indexOf){
 				return this.attribute('from').value;
 			};
 		}
-		svg.Element.animateColor.prototype = new svg.Element.AnimateBase;
+		svg.Element.animateColor.prototype = new svg.Element.AnimateBase();
 		
 		// animate transform element
 		svg.Element.animateTransform = function(node) {
 			this.base = svg.Element.animate;
 			this.base(node);
 		}
-		svg.Element.animateTransform.prototype = new svg.Element.animate;
+		svg.Element.animateTransform.prototype = new svg.Element.animate();
 		
 		// font element
 		svg.Element.font = function(node) {
@@ -2058,7 +2058,7 @@ if(!Array.prototype.indexOf){
 				}
 			}	
 		}
-		svg.Element.font.prototype = new svg.Element.ElementBase;
+		svg.Element.font.prototype = new svg.Element.ElementBase();
 		
 		// font-face element
 		svg.Element.fontface = function(node) {
@@ -2069,7 +2069,7 @@ if(!Array.prototype.indexOf){
 			this.descent = this.attribute('descent').value;
 			this.unitsPerEm = this.attribute('units-per-em').numValue();				
 		}
-		svg.Element.fontface.prototype = new svg.Element.ElementBase;
+		svg.Element.fontface.prototype = new svg.Element.ElementBase();
 		
 		// missing-glyph element
 		svg.Element.missingglyph = function(node) {
@@ -2078,7 +2078,7 @@ if(!Array.prototype.indexOf){
 			
 			this.horizAdvX = 0;
 		}
-		svg.Element.missingglyph.prototype = new svg.Element.path;
+		svg.Element.missingglyph.prototype = new svg.Element.path();
 		
 		// glyph element
 		svg.Element.glyph = function(node) {
@@ -2089,7 +2089,7 @@ if(!Array.prototype.indexOf){
 			this.unicode = this.attribute('unicode').value;
 			this.arabicForm = this.attribute('arabic-form').value;
 		}
-		svg.Element.glyph.prototype = new svg.Element.path;
+		svg.Element.glyph.prototype = new svg.Element.path();
 		
 		// text element
 		svg.Element.text = function(node) {
@@ -2158,7 +2158,7 @@ if(!Array.prototype.indexOf){
 				}
 			}
 		}
-		svg.Element.text.prototype = new svg.Element.RenderedElementBase;
+		svg.Element.text.prototype = new svg.Element.RenderedElementBase();
 		
 		// text base
 		svg.Element.TextElementBase = function(node) {
@@ -2252,7 +2252,7 @@ if(!Array.prototype.indexOf){
 				return width;
 			}
 		}
-		svg.Element.TextElementBase.prototype = new svg.Element.RenderedElementBase;
+		svg.Element.TextElementBase.prototype = new svg.Element.RenderedElementBase();
 		
 		// tspan 
 		svg.Element.tspan = function(node) {
@@ -2266,7 +2266,7 @@ if(!Array.prototype.indexOf){
 				return this.text;
 			}
 		}
-		svg.Element.tspan.prototype = new svg.Element.TextElementBase;
+		svg.Element.tspan.prototype = new svg.Element.TextElementBase();
 		
 		// tref
 		svg.Element.tref = function(node) {
@@ -2278,7 +2278,7 @@ if(!Array.prototype.indexOf){
 				if (element != null) return element.children[0].getText();
 			}
 		}
-		svg.Element.tref.prototype = new svg.Element.TextElementBase;		
+		svg.Element.tref.prototype = new svg.Element.TextElementBase();		
 		
 		// a element
 		svg.Element.a = function(node) {
@@ -2321,7 +2321,7 @@ if(!Array.prototype.indexOf){
 				svg.ctx.canvas.style.cursor = 'pointer';
 			}
 		}
-		svg.Element.a.prototype = new svg.Element.TextElementBase;		
+		svg.Element.a.prototype = new svg.Element.TextElementBase();		
 		
 		// image element
 		svg.Element.image = function(node) {
@@ -2357,7 +2357,7 @@ if(!Array.prototype.indexOf){
 				ctx.restore();
 			}
 		}
-		svg.Element.image.prototype = new svg.Element.RenderedElementBase;
+		svg.Element.image.prototype = new svg.Element.RenderedElementBase();
 		
 		// group element
 		svg.Element.g = function(node) {
@@ -2372,7 +2372,7 @@ if(!Array.prototype.indexOf){
 				return bb;
 			};
 		}
-		svg.Element.g.prototype = new svg.Element.RenderedElementBase;
+		svg.Element.g.prototype = new svg.Element.RenderedElementBase();
 
 		// symbol element
 		svg.Element.symbol = function(node) {
@@ -2404,7 +2404,7 @@ if(!Array.prototype.indexOf){
 				}
 			}			
 		}
-		svg.Element.symbol.prototype = new svg.Element.RenderedElementBase;		
+		svg.Element.symbol.prototype = new svg.Element.RenderedElementBase();		
 			
 		// style element
 		svg.Element.style = function(node) { 
@@ -2456,7 +2456,7 @@ if(!Array.prototype.indexOf){
 				}
 			}
 		}
-		svg.Element.style.prototype = new svg.Element.ElementBase;
+		svg.Element.style.prototype = new svg.Element.ElementBase();
 		
 		// use element 
 		svg.Element.use = function(node) {
@@ -2487,7 +2487,7 @@ if(!Array.prototype.indexOf){
 				if (element != null) element.render(ctx);
 			}
 		}
-		svg.Element.use.prototype = new svg.Element.RenderedElementBase;
+		svg.Element.use.prototype = new svg.Element.RenderedElementBase();
 		
 		// mask element
 		svg.Element.mask = function(node) {
@@ -2531,7 +2531,7 @@ if(!Array.prototype.indexOf){
 				// NO RENDER
 			}
 		}
-		svg.Element.mask.prototype = new svg.Element.ElementBase;
+		svg.Element.mask.prototype = new svg.Element.ElementBase();
 		
 		// clip element
 		svg.Element.clipPath = function(node) {
@@ -2551,7 +2551,7 @@ if(!Array.prototype.indexOf){
 				// NO RENDER
 			}
 		}
-		svg.Element.clipPath.prototype = new svg.Element.ElementBase;
+		svg.Element.clipPath.prototype = new svg.Element.ElementBase();
 
 		// filters
 		svg.Element.filter = function(node) {
@@ -2606,7 +2606,7 @@ if(!Array.prototype.indexOf){
 				// NO RENDER
 			}		
 		}
-		svg.Element.filter.prototype = new svg.Element.ElementBase;
+		svg.Element.filter.prototype = new svg.Element.ElementBase();
 		
 		svg.Element.feGaussianBlur = function(node) {
 			this.base = svg.Element.ElementBase;
@@ -2678,22 +2678,22 @@ if(!Array.prototype.indexOf){
 				blur(ctx, width, height, this.attribute('stdDeviation').numValue());
 			}
 		}
-		svg.Element.filter.prototype = new svg.Element.feGaussianBlur;
+		svg.Element.filter.prototype = new svg.Element.feGaussianBlur();
 		
 		// title element, do nothing
 		svg.Element.title = function(node) {
 		}
-		svg.Element.title.prototype = new svg.Element.ElementBase;
+		svg.Element.title.prototype = new svg.Element.ElementBase();
 
 		// desc element, do nothing
 		svg.Element.desc = function(node) {
 		}
-		svg.Element.desc.prototype = new svg.Element.ElementBase;		
+		svg.Element.desc.prototype = new svg.Element.ElementBase();		
 		
 		svg.Element.MISSING = function(node) {
 			console.log('ERROR: Element \'' + node.nodeName + '\' not yet implemented.');
 		}
-		svg.Element.MISSING.prototype = new svg.Element.ElementBase;
+		svg.Element.MISSING.prototype = new svg.Element.ElementBase();
 		
 		// element factory
 		svg.CreateElement = function(node) {	
@@ -2888,7 +2888,7 @@ if(!Array.prototype.indexOf){
 				this.events = []; 
 				this.eventElements = [];
 			}
-		});
+		})();
 		
 		return svg;
 	}

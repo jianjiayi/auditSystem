@@ -426,9 +426,9 @@
                     }
                 } else {
                     stats = uploader.getStats();
-                    text = lang.updateStatusFinish.replace('_', fileCount).
-                        replace('_KB', WebUploader.formatSize(fileSize)).
-                        replace('_', stats.successNum);
+                    text = lang.updateStatusFinish.replace('_', fileCount)
+                        .replace('_KB', WebUploader.formatSize(fileSize))
+                        .replace('_', stats.successNum);
 
                     if (stats.uploadFailNum) {
                         text += lang.updateStatusError.replace('_', stats.uploadFailNum);

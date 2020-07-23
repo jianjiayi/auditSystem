@@ -222,13 +222,13 @@ seriesTypes.funnel = Highcharts.extendClass(seriesTypes.pie, {
 				shapeArgs = point.shapeArgs;
 
 			if (!graphic) { // Create the shapes
-				point.graphic = renderer.path(shapeArgs).
-					attr({
+				point.graphic = renderer.path(shapeArgs)
+					.attr({
 						fill: point.color,
 						stroke: options.borderColor,
 						'stroke-width': options.borderWidth
-					}).
-					add(series.group);
+					})
+					.add(series.group);
 					
 			} else { // Update the shapes
 				graphic.animate(shapeArgs);

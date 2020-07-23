@@ -33,7 +33,7 @@ function ScalePage(props) {
     return () => {
        window.removeEventListener('resize', setScaleFun)
     }
-  },[])
+  },[setScaleFun])
 
 
   return (
