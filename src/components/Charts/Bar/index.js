@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-10 13:51:24
- * @LastEditTime: 2020-06-11 17:26:34
+ * @LastEditTime: 2020-06-29 16:00:33
  */ 
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -14,7 +14,7 @@ import getOption from './getOptions';
 
 
 function BarChart(data) {
-  console.log(data)
+  // console.log(data)
   const chartRef = useRef(null)
   const config = {option, getOption, data}
   

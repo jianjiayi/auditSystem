@@ -19,7 +19,7 @@ function seriesCreator(series) {
 }
 
 export default function(option, data) {
-  console.log(data)
+  // console.log(data)
   const { tooltip, xAxis, yAxis, yCategory, series = [], ...rest } = data;
 
   return {

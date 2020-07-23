@@ -1,0 +1,36 @@
+.btn{
+  width: 100%;
+}
+.header{
+  display: flex;
+  height: 40px;
+}
+.img-container{
+  display: flex;
+  min-height: 120px;
+  .img-list{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: flex-start;
+    margin-right: 15px;
+    .item{
+      position: relative;
+      height: 104px;
+      width: 104px;
+      margin-left: 15px;
+      overflow: hidden;
+      border-radius: 4px;
+      background-color: #f2f2f2;
+      img{
+        width: 104px;
+        height: 104px;
+        object-fit: cover;
+        vertical-align: bottom;
+      }
+    }
+    .item:first-child{
+      margin-left: 0;
+    }
+  }
+}

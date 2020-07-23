@@ -3,10 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 14:15:45
- * @LastEditTime: 2020-06-09 16:01:08
+ * @LastEditTime: 2020-07-21 16:36:16
  */ 
 
 const type = process.env.BUILD_TYPE;
+
+console.log(process.env)
 
 // 设置请求统一路径
 let URL = ''

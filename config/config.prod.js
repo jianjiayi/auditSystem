@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 14:03:39
- * @LastEditTime: 2020-06-01 14:34:00
+ * @LastEditTime: 2020-07-21 09:30:14
  */ 
 let type = process.argv.slice(3)[0];
 

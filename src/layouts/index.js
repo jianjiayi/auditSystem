@@ -3,31 +3,30 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 09:41:13
- * @LastEditTime: 2020-06-11 15:02:51
+ * @LastEditTime: 2020-07-22 16:10:56
  */ 
-import styles from './index.css';
-import ScalePage from '@components/ScalePage/index.js'
+
+import { connect } from 'dva';
+import Redirect from 'umi/redirect';
+import BaseLayout from './BaseLayout';
+import LoginLayout from './LoginLayout';
 
 function BasicLayout(props) {
+  // console.log(props)
+  const {App} = props;
+
   // 登录页面
   if(props.location.pathname === '/login'){
-    return <div>{props.children}</div>
-  }
-
-  const ScaleProps = {
-    // width: 1920,
-    // height: 1080,
+    return <LoginLayout {...props}></LoginLayout>
   }
 
   return (
-    <ScalePage {...ScaleProps}>
-      <div className={styles.normal}>
-        <h1 className={styles.title}>Yay! Welcome to umi!</h1>
-        {props.children}
-      </div>
-    </ScalePage>
-    
+    App.isLogin ? <BaseLayout {...props}></BaseLayout> : <Redirect to="/login" />
   );
 }
 
-export default BasicLayout;
+function mapStateToProps({App}){
+  return {App}
+}
+
+export default connect(mapStateToProps)(BasicLayout);

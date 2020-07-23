@@ -1,0 +1,24 @@
+.img-container{
+  min-height: 200px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-content: flex-start;
+  .item{
+    position: relative;
+    flex-grow: 1;
+    margin: 5px;
+    min-width: 60px;
+    max-width: 200px;
+    background-color: #f2f2f2;
+    height: 150px;
+    overflow: hidden;
+    img{
+      height: 150px;
+      object-fit: cover;
+      max-width: 100%;
+      min-width: 100%;
+      vertical-align: bottom;
+    }
+  }
+}

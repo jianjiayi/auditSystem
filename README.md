@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 14:54:22
- * @LastEditTime: 2020-06-22 14:27:25
+ * @LastEditTime: 2020-06-23 17:21:08
 --> 
 ## 安装依赖
 + 在项目根目录先执行：yarn
@@ -24,6 +24,10 @@
 ```
 "umi": "^2.7.7",
 ```
+
+## 基于umi-plugin-antd-theme插件，支持自由切换主题
+
+
 # umi-base-product
 基于umi2.0搭建的react架构，支持dva&amp;antd，支持路由校验和配置，支持多环境打包
 # auditSystem

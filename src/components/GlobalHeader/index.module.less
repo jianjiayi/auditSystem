@@ -1,0 +1,58 @@
+.container{
+  padding: 0;
+  display: flex;
+  height: 47px !important;
+  line-height: 47px !important;
+  transition: width .2s;
+  justify-content: space-between;
+  box-shadow: 4px 4px 40px 0 rgba(0,0,0,.05);
+  .trigger{
+    width: 47px;
+    height: 47px;
+    font-size: 16px;
+    line-height: 47px;
+  }
+  .right-menu{
+    padding-right: 10px;
+    display: flex;
+    align-items: center;
+    .auth{
+      display: flex;
+      align-items: center;
+      z-index: 999;
+      .name_text{
+        display: flex;
+        line-height: 14px;
+        font-size: 12px;
+        flex-direction: column;
+        text-align: right;
+        span{
+          padding-right: 10px;
+        }
+        span.name{
+          padding-right: 0;
+          text-align: left;
+          height: 18px;
+          overflow: hidden;
+          max-width: 80px;
+          color: #000000;
+          font-size: 16px;
+        }
+      }
+      .avatar{
+        width: 40px;
+        height: 40px;
+        margin-left: 5px;
+      }
+    }
+  }
+}
+.light{
+  background: #ffffff !important;
+}
+.fixed{
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 9;
+}
