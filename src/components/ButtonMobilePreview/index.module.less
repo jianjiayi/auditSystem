@@ -1,16 +1,35 @@
 .btn{
   width: 100%;
 }
-.mobile{
-  display: flex;
+.container{
+  position: relative;
   width: 375px;
   height: 812px;
-  padding: 60px 32px 43px 32px;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  .body-box{
-    width: 100%;
-    height: 100%;
-    border: 1px solid red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .bg_box{
+    width: 340px;
+    height: 770px;
+    background: #fcfcfb;
+  }
+  .dark{
+    background: #000;
+  }
+  .mobile{
+    position: absolute;
+    top: 0;
+    display: flex;
+    width: 375px;
+    height: 812px;
+    padding: 60px 32px 43px 32px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    .body-box{
+      width: 100%;
+      height: 100%;
+      border: 1px solid red;
+    }
   }
 }
+

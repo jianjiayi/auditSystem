@@ -3,9 +3,9 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-14 09:06:08
- * @LastEditTime: 2020-07-23 15:33:39
+ * @LastEditTime: 2020-07-24 14:47:27
  */
-import {message, Modal, Tag, Select, Input, InputNumber, Button, Row, Col } from 'antd';
+import {message, Modal, Tag, Select, Input, InputNumber, Button, Row, Col, Icon } from 'antd';
 import { renderSelect, renderCheckBoxGroup } from '@components/BasicForm/BaseForm'; 
 const { Option } = Select;
 const InputGroup = Input.Group;
@@ -14,8 +14,20 @@ let formValues = {};
 
 // 违禁词、敏感词、热词、人物词、抓取来源、内容来源
 export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
-  const {getFieldDecorator, getFieldValue} = formRef.current;
-  let values = getFieldValue(ItemName) || []
+  const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
+  // 获取tags
+  let values = getFieldValue(ItemName) || [];
+  // 删除tag
+  const handleTagClose = removedTag =>{
+    values.splice(values.findIndex(tag =>  tag === removedTag), 0);
+
+    // 设置form中的name值
+    let obj = {};
+    obj[ItemName]= values;
+    setFieldsValue(obj)
+  }
+
+  // render
   return getFieldDecorator(ItemName, {
     // rules: [{ required: true, message: `请选择` }],
     // initialValue: 'all',
@@ -23,10 +35,12 @@ export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
     <div>
       {
         values.map((item, index)=>{
-          return <Tag key={index}>{item.name}</Tag>
+          return <Tag key={index} closable onClose={() => handleTagClose(item)}>{item.name + index}</Tag>
         })
       }
-      {values.length == 0 && <Button type="link" onClick={()=>{onOpenModal(ItemName, label)}}>全部</Button>}
+      <Button type="link" onClick={()=>onOpenModal(ItemName, label)}>
+        {values.length == 0 ? '全部' : '+ 新增'}
+      </Button>
     </div>
   );
 }
@@ -34,7 +48,7 @@ export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
 // 内容分值
 export const getContentNumber = (getFieldDecorator,ItemName) =>{
   return getFieldDecorator(ItemName, {
-    // rules: [{ required: true, message: `请选择` }],
+    rules: [{ required: true, message: `请输入内容分值` }],
     // initialValue: formValues.name5,
   })(
     <InputGroup compact>
@@ -57,7 +71,7 @@ export const getContentNumber = (getFieldDecorator,ItemName) =>{
 // 媒体权重
 export const getMediaWeight = (getFieldDecorator, ItemName) => {
   return getFieldDecorator(ItemName, {
-    // rules: [{ required: true, message: `请选择` }],
+    rules: [{ required: true, message: `请输入媒体权重` }],
     // initialValue: formValues.name5,
   })(<InputNumber min={1} max={10}></InputNumber>)
 }
@@ -66,7 +80,17 @@ export const getMediaWeight = (getFieldDecorator, ItemName) => {
 export const getMediaType = (getFieldDecorator, ItemName) =>{
   const map = { 1: '公众媒体', 2: '自媒体(机构)', 3: '自媒体(个人)'};
   return getFieldDecorator(ItemName, {
-    // rules: [{ required: true, message: `请选择` }],
+    rules: [{ required: true, message: `请选择媒体类型` }],
+    // initialValue: formValues.name5,
+  })(renderCheckBoxGroup(map));
+}
+
+// 媒体分类
+export const getMediaClassify = (formRef, ItemName) =>{
+  const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
+  const map = { 1: '公众媒体', 2: '自媒体(机构)', 3: '自媒体(个人)'};
+  return getFieldDecorator(ItemName, {
+    rules: [{ required: true, message: `请选择媒体分类` }],
     // initialValue: formValues.name5,
   })(renderCheckBoxGroup(map));
 }
@@ -75,7 +99,7 @@ export const getMediaType = (getFieldDecorator, ItemName) =>{
 export const getMediaAttr = (getFieldDecorator, ItemName) =>{
   const map = { 1: '白名单', 2: '非白名单'}
   return  getFieldDecorator(ItemName, {
-    // rules: [{ required: true, message: `请选择` }],
+    rules: [{ required: true, message: `请选择媒体属性` }],
     // initialValue: formValues.name5,
   })(renderCheckBoxGroup(map));
 }
@@ -84,7 +108,7 @@ export const getMediaAttr = (getFieldDecorator, ItemName) =>{
 export const getMediaData = (getFieldDecorator, ItemName) =>{
   const map= { 1: '人民系', 2: '非人民系'}
   return  getFieldDecorator(ItemName, {
-    // rules: [{ required: true, message: `请选择` }],
+    rules: [{ required: true, message: `请选择媒体数据` }],
     // initialValue: formValues.name5,
   })(renderCheckBoxGroup(map));
 }
@@ -102,7 +126,7 @@ export const getBreakRules = (getFieldDecorator, ItemName, label) =>{
 // 特定词
 export const getSpecificText = (getFieldDecorator, ItemName) =>{
   return  getFieldDecorator(ItemName, {
-    // rules: [{ required: true, message: `请选择` }],
+    rules: [{ required: true, message: `请输入特定词` }],
     // initialValue: formValues.name5,
   })(<Input placeholder='输入框输用","隔开或是"||"隔开，仅支持一种模式'/>);
 }
@@ -111,7 +135,7 @@ export const getSpecificText = (getFieldDecorator, ItemName) =>{
 export const getTimeLiness = (getFieldDecorator, ItemName) =>{
   const map= { 1: '高时效', 2: '中时效', 3:'低时效', 4: '无时效'}
   return  getFieldDecorator(ItemName, {
-    // rules: [{ required: true, message: `请选择` }],
+    rules: [{ required: true, message: `请选择时效性` }],
     // initialValue: formValues.name5,
   })(renderCheckBoxGroup(map));
 }
@@ -120,7 +144,7 @@ export const getTimeLiness = (getFieldDecorator, ItemName) =>{
 export const getAuditType = (getFieldDecorator, ItemName) =>{
   const map= { 1: '先审后发', 2: '先发后审', 3:'免审'}
   return  getFieldDecorator(ItemName, {
-    // rules: [{ required: true, message: `请选择` }],
+    rules: [{ required: true, message: `请选择审核机制` }],
     // initialValue: formValues.name5,
   })(renderCheckBoxGroup(map));
 }

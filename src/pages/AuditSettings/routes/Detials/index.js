@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-23 17:26:15
+ * @LastEditTime: 2020-07-24 14:49:49
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -19,6 +19,7 @@ import {
   getContentNumber, 
   getMediaWeight, 
   getMediaType, 
+  getMediaClassify,
   getMediaAttr, 
   getMediaData,
   getBreakRules, 
@@ -26,6 +27,8 @@ import {
   getTimeLiness, 
   getAuditType
 } from './option';
+
+import { listRemoveRepeat } from '@utils/utils.js';
 
 import styles from './index.module.less';
 
@@ -103,6 +106,7 @@ function QueueDetails(props) {
             {itemKey == 5 && getContentNumber(getFieldDecorator,ItemName)}
             {itemKey == 6 && getMediaWeight(getFieldDecorator,ItemName)}
             {itemKey == 7 && getMediaType(getFieldDecorator,ItemName)}
+            {itemKey == 8 && getMediaClassify(formRef,ItemName)}
             {itemKey == 9 && getMediaAttr(getFieldDecorator,ItemName)}
             {itemKey == 10 && getMediaData(getFieldDecorator,ItemName)}
             {
@@ -114,7 +118,7 @@ function QueueDetails(props) {
             {itemKey == 17 && getAuditType(getFieldDecorator,ItemName)}
             { 
               (itemKey >= 18 && itemKey <= 19 )  && 
-              getModelSelect(getFieldDecorator,ItemName,item.label,onOpenModal)
+              getModelSelect(formRef,ItemName,item.label,onOpenModal)
             }
           </Col>
           <Col span={1}>
@@ -166,6 +170,7 @@ function QueueDetails(props) {
   const searchFormProps = {
     className: styles['form-contaner'],
     layout: 'horizontal',
+     okText: "保存",
     dataSource: [
       {
         label: '业务线',
@@ -204,15 +209,19 @@ function QueueDetails(props) {
         placeholder:'选择状态',
         itemRender: getFieldDecorator => (
           <div  type="flex">
-            {getFieldDecorator('params5', {
-              rules: [{ required: true, message: `请选择` }],
-            })(renderSelect(getRules(), { 
-              style: {width: '160px'},
-              onChange: (e)=>{
-                console.log('change',e);
-                setItemKey(e)
-              }
-            }))}
+            {
+              getFieldDecorator('params5', {
+                rules: [{ required: true, message: `请选择` }],
+              })(
+                renderSelect(getRules(), { 
+                  style: {width: '160px'},
+                  onChange: (e)=>{
+                    // console.log('change',e);
+                    setItemKey(e)
+                  }
+                })
+              )
+            }
             {
               isShowInclude(itemKey) && 
               getFieldDecorator('isInclude', {
@@ -271,12 +280,18 @@ function QueueDetails(props) {
         label
       }
     });
+    // 临时保存已存在数据
+    let oldData= formRef.current.getFieldValue(name) || [];
+
     setModalProps({
       name,
       title: label,
       handleSubmit: (name,data)=>{
+        // 合并新老数据
+        let newData = listRemoveRepeat([...oldData, ...data]);
+        // 设置form中的name数据
         let obj = {};
-        obj[name]= data;
+        obj[name]= newData;
         formRef.current.setFieldsValue(obj)
       }
     });
