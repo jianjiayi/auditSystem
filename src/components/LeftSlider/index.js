@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 16:54:36
- * @LastEditTime: 2020-07-24 09:00:59
+ * @LastEditTime: 2020-07-24 09:14:30
  */ 
 import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Icon, Button } from 'antd';
@@ -58,7 +58,12 @@ function LeftSlider(props) {
 
   useEffect(()=>{
     getRouteOpenKeys(menuRoutes, [], props.selectedKeys);
-  }, [getRouteOpenKeys, menuRoutes, props.selectedKeys])
+    
+    return () =>{
+      setOpenKeys([])
+      setSelectedKeys([])
+    }
+  }, [menuRoutes, props.selectedKeys])
 
   //生成路由
   const renderMenuItem = (route) => {
