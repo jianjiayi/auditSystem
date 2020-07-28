@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-13 15:50:18
+ * @LastEditTime: 2020-07-28 09:06:54
  */ 
 import React from 'react';
 import { connect } from 'dva';
@@ -21,11 +21,9 @@ function ContentDetails(props) {
 
   const contentProps = {
     className: styles.content,
-    ...props,
   }
   const operateProps = {
     className: styles.action,
-    ...props,
   }
   return (
     <div className={styles.container}  onClick={()=> updateLife()}>

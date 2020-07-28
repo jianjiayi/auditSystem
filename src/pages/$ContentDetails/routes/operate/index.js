@@ -3,9 +3,10 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-07-07 17:31:00
+ * @LastEditTime: 2020-07-28 09:16:36
  */ 
 import React, { useRef } from 'react';
+import { connect } from 'dva';
 import { Button} from 'antd';
 import classNames from 'classnames';
 import SectionCover from './sectionCover';
@@ -60,4 +61,8 @@ function Operate(props) {
   )
 }
 
-export default Operate;
+function mapStateToProps({CDetails}){
+  return {CDetails}
+}
+
+export default connect(mapStateToProps)(Operate);

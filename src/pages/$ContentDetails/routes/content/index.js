@@ -3,9 +3,10 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-07-08 14:24:39
+ * @LastEditTime: 2020-07-28 09:21:04
  */ 
 import React, {useState} from 'react';
+import { connect } from 'dva';
 import classNames from 'classnames';
 import {Form, Input, DatePicker, Button, Row, Col,} from 'antd';
 import {Audio, Video } from '@components/Media';
@@ -37,7 +38,9 @@ const formItemLayout = {
 
 function Content(props) {
   const [isEdit, setIsEdit] = useState(false);
-  const {className, curArt={}, form: {getFieldDecorator}} = props;
+  const {className, CDetails, form: {getFieldDecorator}} = props;
+  console.log(props)
+  const { curArt } = CDetails
 
   const onChange = (val)=>{
     if(!val){
@@ -106,15 +109,15 @@ function Content(props) {
     return (
       <div className={styles['content-text']}>
 
-        {curArt.type !== 'audio' && <Audio {...audioProps}></Audio>}
+        {/* {curArt.type !== 'audio' && <Audio {...audioProps}></Audio>}
 
-        {curArt.type !== 'video' && <Video {...videoProps}></Video>}
+        {curArt.type !== 'video' && <Video {...videoProps}></Video>} */}
 
         {
           curArt.type !== '' && 
           <div className="">
             <div style={{'display': isEdit ? 'block' : 'none'}}>
-              <Ueditor></Ueditor>
+              <Ueditor initialContent={curArt.text}></Ueditor>
             </div>
             {
               !isEdit && <div dangerouslySetInnerHTML={textHtml}></div>
@@ -134,4 +137,8 @@ function Content(props) {
   )
 }
 
-export default Form.create({})(Content)
+function mapStateToProps({CDetails}){
+  return {CDetails}
+}
+
+export default Form.create({})(connect(mapStateToProps)(Content))
