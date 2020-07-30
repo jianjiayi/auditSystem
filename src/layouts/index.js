@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 09:41:13
- * @LastEditTime: 2020-07-22 16:10:56
+ * @LastEditTime: 2020-07-30 17:13:30
  */ 
 
 import { connect } from 'dva';
@@ -21,7 +21,7 @@ function BasicLayout(props) {
   }
 
   return (
-    App.isLogin ? <BaseLayout {...props}></BaseLayout> : <Redirect to="/login" />
+    App.token ? <BaseLayout {...props}></BaseLayout> : <Redirect to="/login" />
   );
 }
 

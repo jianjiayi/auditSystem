@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-30 09:35:29
- * @LastEditTime: 2020-07-22 14:41:31
+ * @LastEditTime: 2020-07-30 17:09:22
  */ 
 import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import classNames from 'classnames';
@@ -25,7 +25,7 @@ function BaseTable(props, ref) {
   })
 
   
-  const {className, columns, dataSource, selectionType, pagination,...rest} = props;
+  const {className, columns, dataSource, selectionType, pagination, onPageChg, ...rest} = props;
 
   // table 单选、多选配置
   const rowSelection = {
@@ -77,6 +77,7 @@ function BaseTable(props, ref) {
     pagination,
     rowKey: (record, index) => index,
     rowSelection: rowLelection ? rowSelection : null,
+    onChange: onPageChg,
     ...rest
   }
 

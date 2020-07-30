@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 14:55:34
- * @LastEditTime: 2020-07-24 09:08:55
+ * @LastEditTime: 2020-07-30 17:14:21
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
@@ -49,7 +49,7 @@ function BaseLayout(props) {
     fixedHeader,
     userSetMenu,
     ...collapsedProps,
-    userinfo: {},
+    userinfo: App.user,
     userClick: (val) => {
       console.log(val)
       switch(val.key){
@@ -57,6 +57,14 @@ function BaseLayout(props) {
           router.push({pathname:'/user'});
           break;
         case '1':
+          dispatch({
+            type: 'App/logout',
+            payload: {},
+            callback: (res) => {
+              console.log(res)
+              router.push({pathname:'/login'});
+            }
+          })
           console.log('退出登录')
           break;
         default:

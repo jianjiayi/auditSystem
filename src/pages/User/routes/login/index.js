@@ -3,13 +3,13 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:51:25
- * @LastEditTime: 2020-07-23 17:00:13
+ * @LastEditTime: 2020-07-30 17:20:26
  */ 
 import React from 'react';
 import { connect } from 'dva';
 import Link from 'umi/link';
 import router from 'umi/router';
-import { Form, Icon, Input, Button, Checkbox} from 'antd';
+import {message, Form, Icon, Input, Button, Checkbox} from 'antd';
 import ReactCanvasNest from 'react-canvas-nest';
 
 import { appConfig } from '@config/default.config.js';
@@ -42,9 +42,12 @@ function Login(props) {
         console.log('Received values of form: ', values);
         dispatch({
           type: 'App/login',
-          payload: {},
+          payload: values,
           callback: (res) => {
-            console.log(res)
+            if(res == 1){
+              message.error('用户名或密码错误');
+              return;
+            }
             router.push({pathname:'/'});
           }
         })
