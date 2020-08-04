@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-07-09 16:44:42
+ * @LastEditTime: 2020-08-04 11:20:51
  */ 
 import React, {useState, useImperativeHandle, forwardRef, useRef} from 'react';
 import {Modal, Button} from 'antd';
@@ -20,7 +20,7 @@ function SectionCover(props, ref) {
   const coverModal = useRef(null);
   const [coverImg, setCoverImg] = useState('');
   
-  const {className} = props;
+  const {className, curArt} = props;
   // 向父组件暴露的方法
   useImperativeHandle(ref, () => {
     return coverImg
@@ -78,7 +78,7 @@ function SectionCover(props, ref) {
     title: '预览效果',
     footer: null,
     width: 420,
-    curArt: {},//当前文章
+    curArt,//当前文章
   }
 
   return (

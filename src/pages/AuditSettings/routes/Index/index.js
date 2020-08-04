@@ -3,9 +3,9 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-22 15:37:01
+ * @LastEditTime: 2020-08-03 10:29:23
  */ 
-import React, {useRef} from 'react';
+import React, {Fragment, useRef } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import { Button } from 'antd';
@@ -28,7 +28,7 @@ function AuditSettings(props) {
         type: 'SELECT',
         name:'params1',
         initialValue: '0',
-        map: { 0: '全部', 1: '选项1', 2: '选项2' }
+        map: { 0: '全部', 1: '选项1', 2: '选项2',0: '全部', 1: '选项1', 2: '选项2'  }
       },
       {
         label: '内容类型',
@@ -146,12 +146,12 @@ function AuditSettings(props) {
 
   
   return (
-    <div>
+    <Fragment>
       <BaseForm {...searchFormProps}>
         <Button  ghost type="primary" onClick={()=>goDetails({action: 'create'})}>创建队列</Button>
       </BaseForm>
       <BaseTable {...tableProps}></BaseTable>
-    </div>
+    </Fragment>
   )
 }
 

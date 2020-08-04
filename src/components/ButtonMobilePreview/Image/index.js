@@ -3,38 +3,27 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-24 15:09:31
- * @LastEditTime: 2020-07-24 16:43:47
+ * @LastEditTime: 2020-08-04 13:41:26
  */ 
 import React, {useState, useEffect} from 'react';
 import classNames from 'classnames';
 import Swiper from "swiper";
 import "swiper/swiper.less";
+// 图片懒加载
+import LazyImgComponent from '@components/LazyImgComponent';
 
 import styles from './index.module.less';
 
-function ImagePage(props) {
+const imgsrc = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1596514082715&di=3cad8a79128c2fea129106b17ad1640e&imgtype=0&src=http%3A%2F%2Fa0.att.hudong.com%2F56%2F12%2F01300000164151121576126282411.jpg';
 
+function ImagePage(props) {
+  const { images=[] } = props;
+  const [showImgDesc, setShowImgDesc] = useState(false);
   
   const initSwiper = () =>{
     new Swiper ('.swiper-container', {
       direction: 'horizontal', // 垂直切换选项
       loop: true, // 循环模式选项
-
-      // 如果需要分页器
-      pagination: {
-        el: '.swiper-pagination',
-      },
-
-      // 如果需要前进后退按钮
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-      },
-
-      // 如果需要滚动条
-      scrollbar: {
-        el: '.swiper-scrollbar',
-      },
     })
   };
 
@@ -44,15 +33,18 @@ function ImagePage(props) {
 
   return (
     <div className={classNames('swiper-container', styles.container)}>
-      <div className={classNames("swiper-wrapper")}>
-        <div className={classNames("swiper-slide", styles.slider)}>
-          Slide 1
-        </div>
+      <div className={classNames("swiper-wrapper")}  onClick={()=>{setShowImgDesc(!showImgDesc)}}>
+        {
+          images.length && images.map((item, index) => {
+            return  <div key={index} className={classNames("swiper-slide", styles.slider)}>
+                      <img src = {item.src}/>
+                    </div>
+          })
+        }
       </div>
-      <div class={classNames("content-detail")}>
-        <div>
-          {/* <p class="content-text">{{item.text}}</p> */}
-        </div>
+      <div className={styles["content-text"]}>
+        {showImgDesc && <p className={styles.text}>{'111111'}</p>}
+        {!showImgDesc && <p className={styles.number}>1/5</p>}
       </div>
       {/* 如果需要分页器 */}
       <div className={classNames("swiper-pagination")}></div>

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-07-28 09:16:36
+ * @LastEditTime: 2020-08-04 11:22:09
  */ 
 import React, { useRef } from 'react';
 import { connect } from 'dva';
@@ -16,9 +16,12 @@ import SectionAction from './sectionAction';
 import styles from './index.module.less';
 
 function Operate(props) {
+  const {className, CDetails} = props;
+  console.log(props)
+  const { curArt } = CDetails
+
   const coverRef = useRef();
   const actonRef = useRef();
-  const {className, curArt={}} = props;
 
   const handleSubmit = () => {
     let cover = coverRef.current;
@@ -34,15 +37,18 @@ function Operate(props) {
   };
 
   const sectionImgProps = {
+    curArt,
     ref: coverRef,
     className: styles.section,
   }
 
   const sectionInfoProps = {
+    curArt,
     className: styles.section,
   }
   
   const sectionActionProps = {
+    curArt,
     ref: actonRef,
     className: styles.section,
   }

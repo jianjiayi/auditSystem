@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-24 14:49:49
+ * @LastEditTime: 2020-07-31 14:32:29
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -28,7 +28,7 @@ import {
   getAuditType
 } from './option';
 
-import { listRemoveRepeat } from '@utils/utils.js';
+import { ExArray } from '@utils/utils.js';
 
 import styles from './index.module.less';
 
@@ -288,7 +288,7 @@ function QueueDetails(props) {
       title: label,
       handleSubmit: (name,data)=>{
         // 合并新老数据
-        let newData = listRemoveRepeat([...oldData, ...data]);
+        let newData = ExArray.listRemoveRepeat([...oldData, ...data]);
         // 设置form中的name数据
         let obj = {};
         obj[name]= newData;

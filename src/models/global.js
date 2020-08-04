@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-07-30 17:12:19
+ * @LastEditTime: 2020-08-03 14:58:31
  */ 
 import * as api from '../service/index.js';
 import {setStorage, getStorage} from '@utils/localStorage';
@@ -14,6 +14,7 @@ export default {
   state: {
     token: sessionStorage.getItem('$token') || '',//验证用户登录
     user : sessionStorage.getItem('$user') != '' ? JSON.parse(sessionStorage.getItem('$user')) || {} : {},//保存用户登录后基本信息
+    roles: sessionStorage.getItem('$roles') != '' ? JSON.parse(sessionStorage.getItem('$roles')) || {} : {},//用户权限
   },
 
   effects: {

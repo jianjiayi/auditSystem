@@ -3,14 +3,13 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:06:57
- * @LastEditTime: 2020-07-17 15:43:47
+ * @LastEditTime: 2020-08-03 11:25:24
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
 import {Button} from 'antd';
-
+import PageLoading from '@components/PageLoading';
 import TextCountUp from '@components/TextCountUp';
-
 import Bar from '@components/Charts/Bar';
 
 import styles from './index.module.less';
@@ -170,10 +169,12 @@ function HomePage(props) {
   };
   console.log(option)
   return (
-    <div className={styles.container}>
-      <TextCountUp {...TextCountUpProps}></TextCountUp>
-      <Bar {...option}></Bar>
-    </div>
+    <PageLoading loading={true}>
+      <div className={styles.container}>
+        <TextCountUp {...TextCountUpProps}></TextCountUp>
+        <Bar {...option}></Bar>
+      </div>
+    </PageLoading>
   )
 }
 

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-20 17:19:27
+ * @LastEditTime: 2020-08-03 16:12:55
  */ 
 import React, {useRef} from 'react';
 import { connect } from 'dva';
@@ -75,13 +75,13 @@ function RoleRights(props) {
       {
         title: '更新人',
         align: 'center',
-        dataIndex: 'age',
+        dataIndex: 'age11',
       },
       {
         title: '状态',
         align: 'center',
         width: '160px',
-        dataIndex: 'address',
+        dataIndex: 'address11',
       },
       {
         title: '操作',
@@ -117,7 +117,7 @@ function RoleRights(props) {
          {
           label: '业务线',
           type: 'SELECT',
-          name:'params2',
+          name:'params211',
           required: true,
           placeholder:'请选择',
           map: { all: '聚合分发', key1: '选项1', key2: '选项2' }
@@ -131,36 +131,41 @@ function RoleRights(props) {
         {
           label: '审核设置',
           type: 'CHECKBOX',
-          name:'params4',
+          name:'setting',
           required: true,
-          map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
+          initialValue: ["list"],
+          map: { 'list': '查询', 'add': '新增', 'change': '修改', 'del': '删除'}
         },
         {
           label: '审核队列',
           type: 'CHECKBOX',
-          name:'params5',
+          name:'/queue',
           required: true,
+          initialValue: ["1"],
           map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
         },
         {
           label: '审核检索',
           type: 'CHECKBOX',
-          name:'params6',
+          name:'/search',
           required: true,
+          initialValue: ["1"],
           map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
         },
         {
           label: '审核统计',
           type: 'CHECKBOX',
-          name:'params7',
+          name:'/statistics',
           required: true,
+          initialValue: ["1"],
           map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
         },
         {
           label: '权限管理',
           type: 'CHECKBOX',
-          name:'params8',
+          name:'/rights',
           required: true,
+          initialValue: ["1"],
           map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
         },
       ],

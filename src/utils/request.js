@@ -48,7 +48,7 @@ function checkStatus(response) {
 export default function request(url, options) {
   console.log(BASEURL)
   const defaultOptions = {
-    credentials: 'include',
+    // credentials: 'include', //是否携带cookie
   };
   const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
@@ -67,6 +67,7 @@ export default function request(url, options) {
       };
     }
   }
+  // console.log(`${BASEURL}${url}`)
 
   return fetch(`${BASEURL}${url}`, newOptions)
     .then(checkStatus)

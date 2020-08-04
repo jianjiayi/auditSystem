@@ -3,14 +3,18 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-07-28 09:21:04
+ * @LastEditTime: 2020-08-04 10:54:07
  */ 
 import React, {useState} from 'react';
 import { connect } from 'dva';
 import classNames from 'classnames';
 import {Form, Input, DatePicker, Button, Row, Col,} from 'antd';
+import moment from 'moment';
+
 import {Audio, Video } from '@components/Media';
 import Ueditor from '@components/Editor';
+
+
 import styles from './index.module.less';
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
@@ -60,14 +64,14 @@ function Content(props) {
                 initialValue: curArt.title
             })(
                 isEdit? <Input placeholder="请输入标题"/> :
-                <h2 className={styles.title}>测试文章测试文章</h2>
+                <h2 className={styles.title}>{curArt.title}</h2>
             )}
           </Form.Item>
           <Form.Item label="ID">
             {getFieldDecorator('id', {
-                initialValue: curArt.id
+                initialValue: curArt.cardId
             })(
-                <span>123456789</span>
+                <span>{curArt.cardId}</span>
             )}
           </Form.Item>
           <Row>
@@ -77,17 +81,17 @@ function Content(props) {
                     initialValue: curArt.source
                 })(
                     isEdit? <Input placeholder="请输入来源"/> :
-                    <span className={styles.title}>人民网</span>
+                    <span className={styles.title}>{curArt.source}</span>
                 )}
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item label="时间" {...layout1}>
                 {getFieldDecorator('date', {
-                    initialValue: curArt.date
+                    initialValue: moment(curArt.pubTime)
                 })(
                     isEdit? <DatePicker showTime format={dateFormat}/> :
-                    <span className={styles.title}>2020-07-06  14:01:53</span>
+                    <span className={styles.title}>{curArt.pubTime}</span>
                 )}
               </Form.Item>
             </Col>
@@ -107,7 +111,7 @@ function Content(props) {
   const videoProps = {};
   const getContentTpl = () => {
     return (
-      <div className={styles['content-text']}>
+      <div className={styles['content-container']}>
 
         {/* {curArt.type !== 'audio' && <Audio {...audioProps}></Audio>}
 
@@ -120,7 +124,7 @@ function Content(props) {
               <Ueditor initialContent={curArt.text}></Ueditor>
             </div>
             {
-              !isEdit && <div dangerouslySetInnerHTML={textHtml}></div>
+              !isEdit && <div className={styles['content-text']} dangerouslySetInnerHTML={textHtml}></div>
             }
           </div>
         }

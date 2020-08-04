@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-17 14:06:45
+ * @LastEditTime: 2020-08-03 15:29:38
  */ 
 import React, {useRef} from 'react';
 import { connect } from 'dva';
@@ -69,7 +69,7 @@ function UserRights(props) {
       {
         title: '业务线',
         align: 'center',
-        dataIndex: 'age',
+        dataIndex: 'age1',
       },
       {
         title: '真实姓名',
@@ -79,28 +79,28 @@ function UserRights(props) {
       {
         title: '角色',
         align: 'center',
-        dataIndex: 'age',
+        dataIndex: 'age2',
       },
       {
         title: '登陆时间',
         align: 'center',
-        dataIndex: 'address',
+        dataIndex: 'address2',
       },
       {
         title: '登录IP',
         align: 'center',
-        dataIndex: 'age',
+        dataIndex: 'age3',
       },
       {
         title: '登出时间',
         align: 'center',
-        dataIndex: 'age',
+        dataIndex: 'age4',
       },
       {
         title: '状态',
         align: 'center',
         width: '160px',
-        dataIndex: 'address',
+        dataIndex: 'address5',
       },
       {
         title: '操作',

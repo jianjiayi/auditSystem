@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 14:55:34
- * @LastEditTime: 2020-07-30 17:14:21
+ * @LastEditTime: 2020-08-03 15:07:10
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
@@ -34,7 +34,7 @@ const {logo, homePath, title, copyRight} = appConfig;
 
 function BaseLayout(props) {
   const {theme, theme: { navTheme, fixedHeader}, App, dispatch, location, history} = props;
-  // console.log(props)
+  console.log(sliderMenus)
   
   // 导航折叠
   const [collapsed, setCollapsed] = useState(false);
