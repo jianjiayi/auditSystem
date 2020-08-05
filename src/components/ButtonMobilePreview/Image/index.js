@@ -3,14 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-24 15:09:31
- * @LastEditTime: 2020-08-04 13:41:26
+ * @LastEditTime: 2020-08-04 13:50:41
  */ 
 import React, {useState, useEffect} from 'react';
 import classNames from 'classnames';
 import Swiper from "swiper";
 import "swiper/swiper.less";
-// 图片懒加载
-import LazyImgComponent from '@components/LazyImgComponent';
 
 import styles from './index.module.less';
 
@@ -37,7 +35,7 @@ function ImagePage(props) {
         {
           images.length && images.map((item, index) => {
             return  <div key={index} className={classNames("swiper-slide", styles.slider)}>
-                      <img src = {item.src}/>
+                      <img src = {item.pic_url}/>
                     </div>
           })
         }

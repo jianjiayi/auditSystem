@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-07-07 17:20:37
+ * @LastEditTime: 2020-08-05 14:34:58
  */ 
 import React, {useImperativeHandle, forwardRef} from 'react';
 import {Form, Checkbox, Radio, Input, Tag, Button} from 'antd';
@@ -71,32 +71,35 @@ function SectionAction(props, ref) {
       <div className="">
         <Form.Item label="违禁词">
             <p className={styles}>
-              <Tag color="magenta">magenta</Tag>
+              <Tag color="red">magenta</Tag>
               <Tag color="red">red</Tag>
-              <Tag color="volcano">volcano</Tag>
-              <Tag color="orange">orange</Tag>
-              <Tag color="gold">gold</Tag>
-              <Tag color="lime">lime</Tag>
-              <Tag color="green">green</Tag>
-              <Tag color="cyan">cyan</Tag>
-              <Tag color="blue">blue</Tag>
-              <Tag color="geekblue">geekblue</Tag>
-              <Tag color="purple">purple</Tag>
+              <Tag color="red">volcano</Tag>
+              <Tag color="red">orange</Tag>
             </p>
         </Form.Item>
         <Form.Item label="敏感词">
             <p className={styles}>
-              <Tag color="magenta">magenta</Tag>
-              <Tag color="red">red</Tag>
+              <Tag color="volcano">magenta</Tag>
+              <Tag color="volcano">red</Tag>
               <Tag color="volcano">volcano</Tag>
-              <Tag color="orange">orange</Tag>
-              <Tag color="gold">gold</Tag>
-              <Tag color="lime">lime</Tag>
+            </p>
+        </Form.Item>
+        <Form.Item label="人物次">
+            <p className={styles}>
               <Tag color="green">green</Tag>
-              <Tag color="cyan">cyan</Tag>
+              <Tag color="green">cyan</Tag>
+              <Tag color="green">blue</Tag>
+              <Tag color="green">geekblue</Tag>
+              <Tag color="green">purple</Tag>
+            </p>
+        </Form.Item>
+        <Form.Item label="热词">
+            <p className={styles}>
+              <Tag color="blue">gold</Tag>
+              <Tag color="blue">lime</Tag>
+              <Tag color="blue">green</Tag>
+              <Tag color="blue">cyan</Tag>
               <Tag color="blue">blue</Tag>
-              <Tag color="geekblue">geekblue</Tag>
-              <Tag color="purple">purple</Tag>
             </p>
         </Form.Item>
       </div>

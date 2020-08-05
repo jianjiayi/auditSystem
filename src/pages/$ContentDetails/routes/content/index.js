@@ -3,13 +3,14 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-04 10:54:07
+ * @LastEditTime: 2020-08-05 17:05:31
  */ 
-import React, {useState} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
 import classNames from 'classnames';
 import {Form, Input, DatePicker, Button, Row, Col,} from 'antd';
 import moment from 'moment';
+import _ from 'lodash';
 
 import {Audio, Video } from '@components/Media';
 import Ueditor from '@components/Editor';
@@ -42,16 +43,29 @@ const formItemLayout = {
 
 function Content(props) {
   const [isEdit, setIsEdit] = useState(false);
-  const {className, CDetails, form: {getFieldDecorator}} = props;
+  const {className, CDetails, form: {getFieldDecorator, validateFields}, dispatch} = props;
   console.log(props)
-  const { curArt } = CDetails
+  const { curArt } = CDetails;
+  
+  // 临时保存编辑器修改后的文章详情
+  const [editorText, setEditorText] = useState(curArt.text || '');
 
-  const onChange = (val)=>{
-    if(!val){
-      setIsEdit(!val)
-    }else{
-      // 确定修改
-    }
+
+  // 保存函数
+  const handelSaveArt = e => {
+    e.preventDefault();
+    validateFields((err, values) => {
+      if (!err) {
+        console.log('Received values of form: ', values);
+        values.text  = editorText;
+        dispatch({
+          type: '',
+          payload: {
+            
+          }
+        })
+      }
+    });
   }
 
   // 表头
@@ -61,54 +75,110 @@ function Content(props) {
         <div className={styles['form-box']}>
           <Form.Item label="标题">
             {getFieldDecorator('title', {
-                initialValue: curArt.title
+              initialValue: curArt.title,
+              rules: [{ required: true, message: `请输入标题` }],
             })(
-                isEdit? <Input placeholder="请输入标题"/> :
-                <h2 className={styles.title}>{curArt.title}</h2>
+              isEdit? <Input placeholder="请输入标题"/> :
+              <h2 className={styles.title}>{curArt.title}</h2>
             )}
           </Form.Item>
           <Form.Item label="ID">
             {getFieldDecorator('id', {
-                initialValue: curArt.cardId
+              initialValue: curArt.cardId,
+              rules: [{ required: true}],
             })(
-                <span>{curArt.cardId}</span>
+              <span>{curArt.cardId}</span>
             )}
           </Form.Item>
           <Row>
             <Col span={6}>
               <Form.Item label="来源" {...layout}>
                 {getFieldDecorator('source', {
-                    initialValue: curArt.source
+                  initialValue: curArt.source,
+                   rules: [{ required: true, message: `请输入来源` }],
                 })(
-                    isEdit? <Input placeholder="请输入来源"/> :
-                    <span className={styles.title}>{curArt.source}</span>
+                  isEdit? <Input placeholder="请输入来源"/> :
+                  <span className={styles.title}>{curArt.source}</span>
                 )}
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item label="时间" {...layout1}>
                 {getFieldDecorator('date', {
-                    initialValue: moment(curArt.pubTime)
+                  initialValue: moment(curArt.pubTime),
+                  rules: [{ required: true, message: `请选择时间` }],
                 })(
-                    isEdit? <DatePicker showTime format={dateFormat}/> :
-                    <span className={styles.title}>{curArt.pubTime}</span>
+                  isEdit? <DatePicker showTime format={dateFormat}/> :
+                  <span className={styles.title}>{curArt.pubTime}</span>
                 )}
               </Form.Item>
             </Col>
           </Row>
         </div>
         <div className={styles['button-box']}>
-          <Button type="primary" size="small" onClick={()=>onChange(isEdit)}>{!isEdit ? '修改' : '确定'}</Button>
-          {isEdit && <Button size="small" onClick={()=>{setIsEdit(!isEdit)}}>取消</Button>}
+          {!isEdit && <Button type="primary" size="small" onClick={()=>{setIsEdit(!isEdit)}}>修改</Button>}
+          {isEdit && 
+            <div className={styles['button-group']}>
+              <Button type="primary" size="small" type="primary" htmlType="submit">确定</Button>
+              <Button size="small" onClick={()=>{setIsEdit(!isEdit)}}>取消</Button>
+            </div>
+          }
         </div>
       </div>
     )
   }
 
+  /**
+   * @name: 高亮单词
+   * @test: test font
+   * @msg: 
+   * @param {string, object} 
+   * @return {string} 
+   */
+  const getContentHtml = (textHtml, List) =>{
+    // let textHtml = _.cloneDeep(html);
+    if(!textHtml) return;
+
+    List.forEach((item, index) => {
+      if (item.value.length > 0) {
+        let data = item.value.split(',');
+        // 模糊匹配修改样式
+        data.map((v, i) => {
+          let reg = "/" + v + "/g";
+          textHtml = textHtml.replace(
+            eval(reg),
+            '<span style="background:' +
+              item.color +
+              ';color:#ffffff;padding:0 5px;margin:0 2px;">' +
+              v +
+              "</span>"
+          );
+        });
+      }
+    });
+    return textHtml;
+  }
+
+  const list = [
+    {
+      name: 'hot',
+      color: '#000000',
+      value: '据路透,微软,TikTok,美国'
+    }
+  ]
+
   // 正文
-  const textHtml = {__html:curArt.text};
+  const textHtml = {__html:getContentHtml(curArt.text,list)};
   const audioProps = {};
   const videoProps = {};
+  
+  const UeditorProps = {
+    initialContent: curArt.text || '',
+    onContentChange: (values) => {
+      // console.log(values)
+      setEditorText(values);
+    }
+  }
   const getContentTpl = () => {
     return (
       <div className={styles['content-container']}>
@@ -120,11 +190,12 @@ function Content(props) {
         {
           curArt.type !== '' && 
           <div className="">
-            <div style={{'display': isEdit ? 'block' : 'none'}}>
-              <Ueditor initialContent={curArt.text}></Ueditor>
-            </div>
-            {
-              !isEdit && <div className={styles['content-text']} dangerouslySetInnerHTML={textHtml}></div>
+            <h2 className={styles.title}>文章详情 : </h2>
+            {isEdit && <div><Ueditor {...UeditorProps}></Ueditor></div>}
+            {!isEdit && 
+              <div className={styles['content-box']}>
+                <div className={styles['content-text']} dangerouslySetInnerHTML={textHtml}></div>
+              </div>
             }
           </div>
         }
@@ -134,7 +205,7 @@ function Content(props) {
 
 
   return (
-    <Form {...formItemLayout} className={classNames(className, styles.container)}>
+    <Form {...formItemLayout}  onSubmit={handelSaveArt} className={classNames(className, styles.container)}>
       {getHaderTpl()}
       {getContentTpl()}
     </Form>

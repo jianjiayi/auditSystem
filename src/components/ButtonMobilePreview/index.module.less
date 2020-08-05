@@ -28,7 +28,26 @@
     .body-box{
       width: 100%;
       height: 100%;
-      border: 1px solid red;
+      overflow-y: auto;
+    }
+    /* 处理页面滚动条 */
+    .body-box::-webkit-scrollbar {
+      width: 2px;
+      height: 10px;
+    }
+    .body-box::-webkit-scrollbar-button {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+    .body-box::-webkit-scrollbar-corner {
+      background-color: transparent;
+    }
+
+    .body-box::-webkit-scrollbar-thumb {
+      width: 2px;
+      background-color: rgba(0,0,0,.2);
+      border-radius: 10px;
     }
   }
 }

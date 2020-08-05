@@ -7,21 +7,56 @@
       flex: 1;
     }
     .button-box{
-      display: flex;
-      height: 100%;
-      flex-direction: column;
-      align-items: center;
-      justify-content: end;
+      
+      .button-group{
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: end;
+        flex-direction: column;
+      }
       button{
         margin-top: 20px;
       }
     }
   }
   .content-container{
-    margin-top: 20px;
-    .content-text{
-      img{
-        max-width: 100%;
+    .title{
+      line-height: 60px;
+    }
+    p{
+      margin-bottom: 10px;
+    }
+    .content-box{
+      position: relative;
+      .content-text{
+        padding: 0 10px 10px 10px;
+        overflow-y: auto;
+        line-height: 30px;
+        max-height: 1000px;
+        img{
+          max-width: 100%;
+          height: auto;
+        }
+      }
+      /* 处理页面滚动条 */
+      .content-text::-webkit-scrollbar {
+        width: 4px;
+        height: 10px;
+      }
+      .content-text::-webkit-scrollbar-button {
+        width: 0;
+        height: 0;
+        display: none;
+      }
+      .content-text::-webkit-scrollbar-corner {
+        background-color: transparent;
+      }
+
+      .content-text::-webkit-scrollbar-thumb {
+        width: 4px;
+        background-color: rgba(0,0,0,.2);
+        border-radius: 10px;
       }
     }
   }

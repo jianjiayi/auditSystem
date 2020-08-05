@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-02 09:59:55
- * @LastEditTime: 2020-08-04 11:21:33
+ * @LastEditTime: 2020-08-04 14:06:57
  */ 
 import React, {useState} from 'react';
 import {Modal, Button} from 'antd';
@@ -14,7 +14,7 @@ import Image from './Image';
 // import Video from './Video';
 import styles from './index.module.less';
 
-const iphoneBg = require('./static/iPhone_bg9.png');
+const iphoneBg = require('@assets/iPhone_bg9.png');
 
 function ButtonMobilePreview(props) {
   const [visible, setVisible] = useState(false);
@@ -36,8 +36,8 @@ function ButtonMobilePreview(props) {
           <div className={classNames(styles.bg_box, curArt.type == 'images' ? styles.dark : '')}></div>
           <div className={styles['mobile']}  style={{'backgroundImage':'url('+iphoneBg+')'}}>
             <div className={styles['body-box']}>
-              {/* <Normal></Normal> */}
-              <Image></Image>
+              <Normal curArt={curArt}></Normal>
+              {/* <Image images={curArt.oppoPics}></Image> */}
             </div>
           </div>
         </div>
