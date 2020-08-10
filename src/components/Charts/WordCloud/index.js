@@ -3,17 +3,17 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-10 13:51:24
- * @LastEditTime: 2020-08-10 15:26:18
+ * @LastEditTime: 2020-08-10 15:51:20
  */ 
 
 import React, { useState, useEffect, useRef } from 'react';
 import useECharts from '../lib/useECharts';
 
 import options from './option';
-import getOption from './getOptions';
+import getOption from './getOption';
 
 
-function BarChart(props) {
+function WordCloud(props) {
   const {option = options, width = '300px', height = '200px',} = props;
   // console.log(data)
   const chartRef = useRef(null)
@@ -28,7 +28,7 @@ function BarChart(props) {
   )
 }
 
-export default BarChart
+export default WordCloud;
 
 
 

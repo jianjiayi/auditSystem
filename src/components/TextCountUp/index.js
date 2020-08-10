@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-30 15:16:18
- * @LastEditTime: 2020-07-03 17:22:33
+ * @LastEditTime: 2020-08-10 14:28:46
  */ 
 import React from 'react';
 import { Countup } from 'count-up-react';
@@ -14,7 +14,7 @@ function TextCountUp(props) {
 
   const countupProps = {
     className: styles.countup,
-    itemHeight: 20,
+    itemHeight: 40,
     symbol: ',',
     scrollTime: 2000,
     initStatus: true,

@@ -2,10 +2,9 @@
  * @Descripttion: 
  * @version: 
  * @Author: big bug
- * @Date: 2020-06-10 14:39:10
- * @LastEditTime: 2020-08-10 15:22:42
- */ 
-
+ * @Date: 2020-08-10 14:49:47
+ * @LastEditTime: 2020-08-10 15:39:26
+ */
 export default function(option, data) {
 
   return {

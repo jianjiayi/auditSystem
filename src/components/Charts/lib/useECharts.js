@@ -3,12 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-10 10:50:40
- * @LastEditTime: 2020-06-29 16:00:23
+ * @LastEditTime: 2020-08-10 15:16:06
  */ 
  // useECharts.js
 
 import React, { useEffect } from 'react';
-
+import 'echarts/map/js/china';
 import echarts from 'echarts/lib/echarts';
 // 词云
 import 'echarts-wordcloud';
@@ -16,6 +16,11 @@ import 'echarts-wordcloud';
 import 'echarts/lib/chart/bar';
 // 饼状图
 import 'echarts/lib/chart/pie';
+// 线图
+import 'echarts/lib/chart/line';
+import 'echarts/lib/chart/lines';
+// 地图
+import 'echarts/lib/chart/map';
 // 标题
 import 'echarts/lib/component/title';
 
@@ -32,7 +37,7 @@ function useECharts(chartRef, config) {
       chartIS = echarts.init(chartRef.current)
     }
     const finalOption = getOption(option, data);
-    // console.log(finalOption)
+    console.log(finalOption)
     chartIS.setOption(finalOption);
   }
 
