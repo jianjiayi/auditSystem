@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 14:55:34
- * @LastEditTime: 2020-08-03 15:07:10
+ * @LastEditTime: 2020-08-10 10:34:43
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
@@ -34,7 +34,7 @@ const {logo, homePath, title, copyRight} = appConfig;
 
 function BaseLayout(props) {
   const {theme, theme: { navTheme, fixedHeader}, App, dispatch, location, history} = props;
-  console.log(sliderMenus)
+  // console.log(sliderMenus)
   
   // 导航折叠
   const [collapsed, setCollapsed] = useState(false);
@@ -75,7 +75,7 @@ function BaseLayout(props) {
   
   // 定义额外的高亮条件
   let pathname = location.pathname;
-  const hightPath = ['/setting','/queue','/statistics','/search'];
+  const hightPath = ['/setting','/queue','/statistics/personnel','/search'];
   let selectedKeys = [];
   for(let i in hightPath){
     if(pathname.includes(hightPath[i]) ){

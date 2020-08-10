@@ -3,13 +3,13 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-01 10:07:19
- * @LastEditTime: 2020-07-08 14:20:44
+ * @LastEditTime: 2020-08-10 09:39:48
  */ 
 import React, {useState} from 'react';
 import classNames from 'classnames';
 import styles from './index.module.less';
 
-function Audio(props) {
+function AudioPlayer(props) {
   const {className, name, url} = props;
 
   return (
@@ -19,4 +19,4 @@ function Audio(props) {
   )
 }
 
-export default Audio
+export default AudioPlayer

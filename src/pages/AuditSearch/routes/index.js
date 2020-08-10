@@ -3,11 +3,10 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-21 17:27:35
+ * @LastEditTime: 2020-08-10 11:01:28
  */ 
 import React, {useState, useEffect} from 'react';
 import { connect } from 'dva';
-import Link from 'umi/link';
 import router from 'umi/router';
 import { Select, Input, Button } from 'antd';
 import { BaseForm, MoreSelect } from '@components/BasicForm';
@@ -218,7 +217,7 @@ function AuditSearch(props) {
           return (
             <div className={styles.tableaction}>
               <Button type="primary" size="small" onClick={()=>goDetails(r.id)}>领审</Button>
-              <Button size="small" onClick={()=>{console.log(r.id)}}>加队列</Button>
+              <Button size="small" type="dashed" onClick={()=>{console.log(r.id)}}>加队列</Button>
               <Button size="small" onClick={()=>{console.log(r.id)}}>操作记录</Button>
             </div>);
         }
@@ -230,8 +229,12 @@ function AuditSearch(props) {
   return (
     <div>
       <BaseForm {...searchFormProps}></BaseForm>
-      <BaseTable {...tableProps}></BaseTable>
-      <Link to={`/search/cdetails`}>详情页23563</Link>
+      <BaseTable {...tableProps}>
+        <div className={styles['right-button']}>
+          <Button type="primary" onClick={()=>{}}>通过</Button>
+          <Button type="danger" onClick={() =>{}}>未通过</Button>
+        </div>
+      </BaseTable>
     </div>
   )
 }

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-17 16:49:51
+ * @LastEditTime: 2020-08-10 10:26:06
  */ 
 import React, {useState, useRef} from 'react';
 import { connect } from 'dva';
@@ -91,133 +91,39 @@ function AuditStatistics(props) {
     // 表头
     columns: [
       {
-        title: '角色名',
+        title: '时间',
         dataIndex: 'name',
         render: text => <a>{text}</a>,
       },
       {
-        title: '业务线',
+        title: '分类',
         align: 'center',
         dataIndex: 'age1',
       },
       {
-        title: '更新时间',
+        title: '入审量',
         align: 'center',
         dataIndex: 'address',
       },
       {
-        title: '更新人',
+        title: '审核量',
         align: 'center',
         dataIndex: 'age2',
       },
       {
-        title: '状态',
+        title: '审核通过量',
         align: 'center',
         width: '160px',
         dataIndex: 'address3',
-      },
-      {
-        title: '操作',
-        width: '100px',
-        align: 'center',
-        render(r) {
-          return (<Button type="primary" size="small" onClick={()=>goDetails(r.id)}>明细</Button>);
-        }
       },
     ],
     ...table,
   }
 
-  // 审核详情页
-  const goDetails = (id)=>{
-    router.push(
-      {
-        pathname:'/statistics/details',
-        query:{
-          id: id,
-        }
-      }
-    );
-  }
-
-  // 点击创建用户
-  const addUser = () =>{
-    modalFormRef.current.setVisible(true);
-  }
-  // 创建modal配置
-  const modalFormProps = {
-    title: '创建角色',
-    footer: null,
-    /**表单参数*/ 
-    formProps: {
-      className: styles['form-contaner'],
-      layout: 'horizontal',
-      okText: "保存",
-      dataSource: [
-        { label: '角色名', name: 'params1', required: true},
-         {
-          label: '业务线',
-          type: 'SELECT',
-          name:'params2',
-          required: true,
-          placeholder:'请选择',
-          map: { all: '聚合分发', key1: '选项1', key2: '选项2' }
-        },
-        {
-          label: '审核设置',
-          type: 'CHECKBOX',
-          name:'params3',
-          required: true,
-          map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        },
-        {
-          label: '审核设置',
-          type: 'CHECKBOX',
-          name:'params4',
-          required: true,
-          map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        },
-        {
-          label: '审核队列',
-          type: 'CHECKBOX',
-          name:'params5',
-          required: true,
-          map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        },
-        {
-          label: '审核检索',
-          type: 'CHECKBOX',
-          name:'params6',
-          required: true,
-          map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        },
-        {
-          label: '审核统计',
-          type: 'CHECKBOX',
-          name:'params7',
-          required: true,
-          map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        },
-        {
-          label: '权限管理',
-          type: 'CHECKBOX',
-          name:'params8',
-          required: true,
-          map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        },
-      ],
-      onSearch: (formValues)=>{
-        console.log('formValues', formValues)
-      }
-    }
-  }
-
-
   return (
     <div>
       <BaseForm {...searchFormProps}></BaseForm>
       <BaseTable {...tableProps}></BaseTable>
-      <ModalForm {...modalFormProps} ref={modalFormRef}></ModalForm>
     </div>
   )
 }

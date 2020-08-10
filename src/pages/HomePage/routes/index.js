@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:06:57
- * @LastEditTime: 2020-08-03 11:25:24
+ * @LastEditTime: 2020-08-10 11:31:24
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
@@ -169,7 +169,7 @@ function HomePage(props) {
   };
   console.log(option)
   return (
-    <PageLoading loading={true}>
+    <PageLoading loading={false}>
       <div className={styles.container}>
         <TextCountUp {...TextCountUpProps}></TextCountUp>
         <Bar {...option}></Bar>

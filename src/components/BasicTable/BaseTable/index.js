@@ -3,11 +3,11 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-30 09:35:29
- * @LastEditTime: 2020-08-03 10:33:56
+ * @LastEditTime: 2020-08-10 10:56:07
  */ 
 import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import classNames from 'classnames';
-import { Table } from 'antd';
+import { Table, Button } from 'antd';
 import styles from './index.module.less';
 
 function BaseTable(props, ref) {
@@ -25,7 +25,7 @@ function BaseTable(props, ref) {
   })
 
   
-  const {className, columns, dataSource, selectionType, pagination, onPageChg, ...rest} = props;
+  const {className, columns, dataSource, selectionType, pagination, onPageChg, children, ...rest} = props;
 
   // table 单选、多选配置
   const rowSelection = {
@@ -84,6 +84,9 @@ function BaseTable(props, ref) {
   return (
     <div className={classNames(styles.container, className)}>
       <Table {...tableProps}/>
+      <div className={styles['right-btn']}>
+        {children}
+      </div>
     </div>
   )
 }

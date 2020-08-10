@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-05 17:05:31
+ * @LastEditTime: 2020-08-10 09:44:08
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -12,7 +12,7 @@ import {Form, Input, DatePicker, Button, Row, Col,} from 'antd';
 import moment from 'moment';
 import _ from 'lodash';
 
-import {Audio, Video } from '@components/Media';
+import {AudioPlayer, VideoPlayer } from '@components/Media';
 import Ueditor from '@components/Editor';
 
 
@@ -169,9 +169,6 @@ function Content(props) {
 
   // 正文
   const textHtml = {__html:getContentHtml(curArt.text,list)};
-  const audioProps = {};
-  const videoProps = {};
-  
   const UeditorProps = {
     initialContent: curArt.text || '',
     onContentChange: (values) => {
@@ -179,16 +176,31 @@ function Content(props) {
       setEditorText(values);
     }
   }
+  // 音频
+  const audioProps = {};
+  // 视频
+  const videoProps = {
+    source: 'http://luckyvideo.peopletech.cn/production/mp4/20200603/lucky_cms05b31d0f-82c1-4273-a4c5-02f01e2fad9b.mp4',
+    poster: 'http://luckyimgs.peopletech.cn/image/20200603/ZXB-ORIGIN-4364976/lucky_cms57e028c6-8302-42e5-9c86-53786b27703d.jpg',
+    duration: '02:15',
+  };
+  
+  
   const getContentTpl = () => {
     return (
       <div className={styles['content-container']}>
 
-        {/* {curArt.type !== 'audio' && <Audio {...audioProps}></Audio>}
+        {curArt.type == '4' && <AudioPlayer {...audioProps}></AudioPlayer>}
 
-        {curArt.type !== 'video' && <Video {...videoProps}></Video>} */}
+        {curArt.type == '3' && 
+          <div>
+            <h2 className={styles.title}>视频详情 : </h2>
+            <VideoPlayer {...videoProps}></VideoPlayer>
+          </div>
+        }
 
         {
-          curArt.type !== '' && 
+          curArt.type == '2' && 
           <div className="">
             <h2 className={styles.title}>文章详情 : </h2>
             {isEdit && <div><Ueditor {...UeditorProps}></Ueditor></div>}

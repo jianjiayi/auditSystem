@@ -3,12 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-01 10:06:45
- * @LastEditTime: 2020-07-01 10:23:26
+ * @LastEditTime: 2020-08-10 09:39:40
  */ 
-import Audio from './Audio';
-import Video from './Video';
+import AudioPlayer from './Audio';
+import VideoPlayer from './Video';
 
 export {
-  Audio,
-  Video
+  AudioPlayer,
+  VideoPlayer
 }

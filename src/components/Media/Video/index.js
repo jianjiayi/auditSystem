@@ -3,27 +3,51 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-01 10:07:19
- * @LastEditTime: 2020-07-08 14:20:13
+ * @LastEditTime: 2020-08-10 09:47:33
  */ 
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import classNames from 'classnames';
 import styles from './index.module.less';
 
-function Video(props) {
-  const {className, name, url, poster} = props;
+function VideoPlayer(props) {
+  const videoRef = useRef(null)
+  const [showOverlay, setShowOverlay] = useState(true);
+  const [hasControls, setHasControls] = useState(false)
+  const {className, name, source, poster, duration} = props;
 
-  const videoProps = {
-    src: url,
-    controlslist: "nodownload",
-    autoplay: false,
-    poster,
-    style: {'position': 'relative', 'zIndex': 9}
+  const onPlay = () =>{
+      const video = videoRef.current;
+      video.play();
+      setShowOverlay(false);
+      setHasControls(true)
   }
+  const onEnded = () =>{
+      setShowOverlay(true);
+  }
+
   return (
-    <div className={classNames(className, styles.container)}>
-      <video {...videoProps}>浏览器版本过低，不支持video标签</video>
+    <div className={styles["video-player"]}>
+      <video
+        ref={videoRef}
+        controls={hasControls}
+        controlsList="nodownload"
+        src={source}
+        poster={poster}
+        // ended={()=>onEnded()}
+      >
+      </video>
+      {
+        showOverlay &&
+        <div className={styles["video-overlay"]} style={{backgroundImage: `url(${poster})`}}>
+          <a className={styles["btn-play"]} onClick={()=>onPlay()}></a>
+          <span className={styles["duration-wrap"]}>
+            <i className={styles["icon"]}></i><span className={styles["duration"]}>{duration}</span>
+          </span>
+        </div>
+      }
+      
     </div>
   )
 }
 
-export default Video;
+export default VideoPlayer;
