@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-07-23 17:28:17
+ * @LastEditTime: 2020-08-12 09:58:33
  */ 
 import * as api from '../service/index.js';
 
@@ -33,7 +33,7 @@ export default {
   subscriptions: {
     setup ({dispatch, history}) {
       // 初始化
-      console.log('2222',dispatch, history)
+      // console.log('2222',dispatch, history)
       // dispatch({type: 'effect:init'});
     }
   },

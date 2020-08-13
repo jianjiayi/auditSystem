@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:51:25
- * @LastEditTime: 2020-07-30 17:20:26
+ * @LastEditTime: 2020-08-11 10:58:43
  */ 
 import React from 'react';
 import { connect } from 'dva';
@@ -55,6 +55,10 @@ function Login(props) {
     });
   };
 
+  const register = () => {
+    
+  }
+
   return (
     <div className={styles.container} style={{backgroundImage: `url('${loginBg}')`}}>
         {/* <ReactCanvasNest className={styles.canvasNest} config = {config} style={{zIndex: 999}}/> */}
@@ -91,7 +95,7 @@ function Login(props) {
                 <Link to="/">忘记密码？</Link>
               </div>
               <Button className={`${styles.login_button} ${styles.item_button}`} type="primary" htmlType="submit"> 登录</Button>
-              <Button className={styles.item_button}> 注册</Button>
+              <Button className={styles.item_button} onClick={()=>register()}> 注册</Button>
             </Form>
           </div>
           <div className={styles.footer}>

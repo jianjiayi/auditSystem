@@ -46,9 +46,13 @@ function checkStatus(response) {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, options) {
-  console.log(BASEURL)
+  // console.log(BASEURL)
   const defaultOptions = {
     // credentials: 'include', //是否携带cookie
+    // mode: 'no-cors'
+    headers: {
+      Authorization: sessionStorage.getItem('$AUTHORIZATION') || ''
+    }
   };
   const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
@@ -67,6 +71,8 @@ export default function request(url, options) {
       };
     }
   }
+
+  // console.log(newOptions)
   // console.log(`${BASEURL}${url}`)
 
   return fetch(`${BASEURL}${url}`, newOptions)

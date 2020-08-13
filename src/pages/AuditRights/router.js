@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:46:34
- * @LastEditTime: 2020-07-22 09:31:50
+ * @LastEditTime: 2020-08-11 17:04:37
  */ 
  
 module.exports= [
@@ -21,6 +21,7 @@ module.exports= [
         key:'/rights/user',
         path: '/rights/user',
         component: '../pages/AuditRights/routes/user',
+        Routes: ['./src/router/PrivateRoute.js'],
       },
       {
         icon: 'bars',
@@ -28,6 +29,7 @@ module.exports= [
         key:'/rights/role',
         path: '/rights/role',
         component: '../pages/AuditRights/routes/role',
+        Routes: ['./src/router/PrivateRoute.js'],
       },
     ]
   }

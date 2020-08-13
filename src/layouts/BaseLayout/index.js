@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 14:55:34
- * @LastEditTime: 2020-08-10 10:34:43
+ * @LastEditTime: 2020-08-11 16:31:13
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
@@ -17,6 +17,7 @@ import { routesConfig } from '../..//router';
 import { sliderMenus }  from '../../router/slidermenus';
 import { appConfig } from '@config/default.config.js';
 import { userSetMenu } from '@config/constants.js';
+import { ExArray } from '@utils/utils';
 import styles from './index.module.less';
 
 // import ProLayout, {
@@ -34,7 +35,9 @@ const {logo, homePath, title, copyRight} = appConfig;
 
 function BaseLayout(props) {
   const {theme, theme: { navTheme, fixedHeader}, App, dispatch, location, history} = props;
-  // console.log(sliderMenus)
+
+  // let routes = ExArray.flatten(sliderMenus);
+  // console.log('routes',routes)
   
   // 导航折叠
   const [collapsed, setCollapsed] = useState(false);

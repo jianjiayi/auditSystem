@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-10 10:50:40
- * @LastEditTime: 2020-08-10 15:16:06
+ * @LastEditTime: 2020-08-11 16:30:03
  */ 
  // useECharts.js
 
@@ -37,7 +37,7 @@ function useECharts(chartRef, config) {
       chartIS = echarts.init(chartRef.current)
     }
     const finalOption = getOption(option, data);
-    console.log(finalOption)
+    // console.log(finalOption)
     chartIS.setOption(finalOption);
   }
 

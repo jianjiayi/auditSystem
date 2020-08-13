@@ -3,14 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 17:29:00
- * @LastEditTime: 2020-06-29 11:01:43
- */ 
-/*
- * @Descripttion: 
- * @version: 
- * @Author: big bug
- * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-06-09 15:56:44
+ * @LastEditTime: 2020-08-11 10:17:12
  */ 
 import { themeConfig }  from '../config/default.config';
 import { changeColor } from '@utils/theme.js';

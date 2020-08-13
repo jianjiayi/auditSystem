@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:46:34
- * @LastEditTime: 2020-08-10 10:49:07
+ * @LastEditTime: 2020-08-11 17:04:21
  */ 
 const errorRoutes = require('../../pages/Error/router');
 
@@ -22,6 +22,7 @@ module.exports= [
         key:'/statistics/classify',
         path: '/statistics/classify',
         component: '../pages/AuditStatistics/routes/Classify',
+        Routes: ['./src/router/PrivateRoute.js'],
       },
       {
         icon: 'bars',
@@ -37,6 +38,7 @@ module.exports= [
             key:'/statistics/personnel',
             path: '/statistics/personnel',
             component: '../pages/AuditStatistics/routes/Personnel',
+            Routes: ['./src/router/PrivateRoute.js'],
           },
           {
             icon: 'bars',
@@ -44,6 +46,7 @@ module.exports= [
             key:'/statistics/personnel/details',
             path: '/statistics/personnel/details',
             component: '../pages/AuditStatistics/routes/Personnel/details',
+            Routes: ['./src/router/PrivateRoute.js'],
           },
         ]
       },

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-24 10:51:22
- * @LastEditTime: 2020-07-31 14:38:45
+ * @LastEditTime: 2020-08-11 16:30:14
  */ 
 
 
@@ -11,6 +11,26 @@
  * @name: 数组扩展
  */
 export const ExArray = {
+  // 数组扁平化
+  flatten(sliderMenus) {
+    let newArr = []
+    const renderMenuItem = (sliderMenus) => {
+      sliderMenus.map(route => {
+        if(!route.routes){
+          newArr.push(route)
+        }else{
+          const {routes, ...rest} = route;
+          newArr.push(rest);
+
+          renderMenuItem(routes);
+        }
+      })
+    };
+    renderMenuItem(sliderMenus)
+    return newArr;
+  },
+  // 数组多维化
+  
   // 数组去重
   listRemoveRepeat(x) {
     let result = [];
