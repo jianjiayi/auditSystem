@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-13 09:30:05
+ * @LastEditTime: 2020-08-13 10:11:39
  */ 
 import React, {useRef} from 'react';
 import { connect } from 'dva';
@@ -65,6 +65,11 @@ const treeData = [
         key: '10033',
       },
     ],
+  },
+  {
+    title: '审核详情页',
+    value: '10003',
+    key: '10003',
   },
   {
     title: '审核统计',

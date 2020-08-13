@@ -3,9 +3,9 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-08 10:57:04
- * @LastEditTime: 2020-08-13 10:01:13
+ * @LastEditTime: 2020-08-13 10:10:00
  */ 
-import React, {useState, useImperativeHandle, forwardRef, useRef} from 'react';
+import React, {useState, useImperativeHandle, forwardRef} from 'react';
 import {Modal, Button} from 'antd';
 import classNames from 'classnames';
 
@@ -36,7 +36,7 @@ function ModalForm(props, ref) {
     ...rest,
   }
   return (
-    <div>
+    <div className={classNames(styles.container)}>
       <Modal {...modalProps}>
         <BaseForm {...formProps}>
           <Button onClick={()=>{setVisible(!visible)}}>取消</Button>

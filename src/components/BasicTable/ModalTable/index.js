@@ -3,10 +3,10 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-15 16:10:41
- * @LastEditTime: 2020-08-13 09:02:01
+ * @LastEditTime: 2020-08-13 10:14:41
  */ 
 import React, {useState, useImperativeHandle, forwardRef, useRef} from 'react';
-import {Modal, Button} from 'antd';
+import {Modal} from 'antd';
 import classNames from 'classnames';
 import BaseTable from '../BaseTable';
 
@@ -45,7 +45,7 @@ function ModalTable(props, ref) {
   }
 
   const tableProps = {
-    className: styles['modal-table'],
+    className: classNames(styles['modal-table']),
     ...rest,
   }
 
