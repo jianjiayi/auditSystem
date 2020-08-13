@@ -3,9 +3,9 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 16:54:36
- * @LastEditTime: 2020-07-24 09:14:30
+ * @LastEditTime: 2020-08-13 10:37:01
  */ 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Layout, Menu, Icon, Button } from 'antd';
 import Link from 'umi/link';
 import classNames from 'classnames';
@@ -27,7 +27,7 @@ function LeftSlider(props) {
    * @param {type} 第一个参数：总路由，第二个参数：将要被菜单展开路由，第三个参数：高亮的路由
    * @return: 
    */
-  const getRouteOpenKeys = (routes, parentRoute, selectedKeys) => {
+  const getRouteOpenKeys = useCallback((routes, parentRoute, selectedKeys) => {
     for (const route of routes) {
       // 处理嵌套路由中的子路由展示问题
       let selectedKeysArr = selectedKeys[0].split('/');
@@ -54,7 +54,7 @@ function LeftSlider(props) {
     //在整个路由里没有找着要被高亮的路由，即关闭所有菜单
     setOpenKeys([])
     setSelectedKeys([])
-  };
+  });
 
   useEffect(()=>{
     getRouteOpenKeys(menuRoutes, [], props.selectedKeys);
@@ -63,7 +63,7 @@ function LeftSlider(props) {
       setOpenKeys([])
       setSelectedKeys([])
     }
-  }, [menuRoutes, props.selectedKeys])
+  }, [getRouteOpenKeys, menuRoutes, props.selectedKeys])
 
   //生成路由
   const renderMenuItem = (route) => {
