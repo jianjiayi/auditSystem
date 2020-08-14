@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 14:55:34
- * @LastEditTime: 2020-08-11 16:31:13
+ * @LastEditTime: 2020-08-14 16:24:39
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
@@ -61,7 +61,7 @@ function BaseLayout(props) {
           break;
         case '1':
           dispatch({
-            type: 'App/logout',
+            type: 'User/logout',
             payload: {},
             callback: (res) => {
               console.log(res)
@@ -145,8 +145,8 @@ function BaseLayout(props) {
   )
 }
 
-function mapStateToProps({App, theme}) {
-  return {App, theme}
+function mapStateToProps({App, User, theme}) {
+  return {App, User, theme}
 }
 
 export default connect(mapStateToProps)(BaseLayout);

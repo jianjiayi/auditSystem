@@ -91,24 +91,24 @@ export default function request(url, options) {
       return res
     })
     .catch((e) => {
-      const status = e.name;
+      const status = e.code;
       if (status === 401) {
         window.g_app._store.dispatch({
-          type: 'login/logout',
+          type: 'App/logout',
         });
         return;
       }
-      if (status === 403) {
-        router.push('/403');
-        return;
-      }
-      if (status <= 504 && status >= 500) {
-        router.push('/500');
-        return;
-      }
-      if (status >= 404 && status < 422) {
-        router.push('/404');
-        return;
-      }
+      // if (status === 403) {
+      //   router.push('/403');
+      //   return;
+      // }
+      // if (status <= 504 && status >= 500) {
+      //   router.push('/500');
+      //   return;
+      // }
+      // if (status >= 404 && status < 422) {
+      //   router.push('/404');
+      //   return;
+      // }
     });
 }

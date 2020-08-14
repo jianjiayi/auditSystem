@@ -3,89 +3,151 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-07 10:21:51
- * @LastEditTime: 2020-07-13 15:18:18
+ * @LastEditTime: 2020-08-14 17:25:31
  */ 
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Form, Select, Row, Col} from 'antd';
 import styles from './index.module.less';
+import _ from 'lodash';
 
 const { Option } = Select;
 
 
 function MoreSelect(props) {
-  const [firstCategory, setFirstCategory] = useState(props.firstCategory || []);
-  const [secondCategory, setSecondCategory] = useState(props.secondCategory ||[]);
-  const [thirdCategory, setThirdCategory] = useState(props.thirdCategory ||[]);
-  
   const {
     style = {},
+    category = '',
+    onSelect,
+    firstCategory = [],
+    secondCategory = [],
+    thirdCategory = [],
     selectFirstCategory, 
     selectSecondCategory, 
-    form:{getFieldDecorator, resetFields}
+    form:{getFieldDecorator, setFieldsValue,getFieldsValue, resetFields}
   } = props;
+
+  useEffect(()=>{
+    initSelect()
+  },[initSelect])
+
+  const initSelect = () => {
+    let categoryArr = category && category.split('/') || [];
+    for(var i in categoryArr){
+      (function(i){
+        switch(i){
+          case '0':
+            setFieldsValue({'firstCategoryId':categoryArr[i]});
+            onSelectFirstCategory(categoryArr[i])
+            break;
+          case '1':
+            setFieldsValue({'secondCategoryId':categoryArr[i]});
+            onSelectSecondCategory(categoryArr[i])
+            break;
+          case '2':
+            setFieldsValue({'thirdCategoryId':categoryArr[i]})
+            break;
+        }
+      })(i);
+    }
+    console.log(getFieldsValue())
+  }
 
   const selectProps = {
     size: props.size || 'small',
-    allowClear: true,
-    showSearch: true,
+    // allowClear: true,
+    // showSearch: true,
     notFoundContent: null,
     filterOption: false,
   }
   
   const handleSearch = (type, value) =>{console.log(type, value)}
 
+  // 一级分类
   const onSelectFirstCategory = (value) =>{
     if (value) {
       selectFirstCategory(value);
+      resetFields(['secondCategoryId', 'thirdCategoryId']);
+      onSelect(getFieldsValue())
     }
-    resetFields(['secondCategoryId', 'thirdCategoryId']);
+    
   }
+  // 二级分类
   const onSelectSecondCategory = (value) =>{
     if (value) {
       selectSecondCategory(value);
+      resetFields(['thirdCategoryId']);
+      onSelect(getFieldsValue())
     }
-    resetFields(['thirdCategoryId']);
+  }
+  // 三级分类
+  const onSelectThirdCategory = (value) => {
+    if (value) {
+      onSelect(getFieldsValue())
+    }
   }
 
   return (
     <Row type="flex" justify="space-between" style={style}>
       <Col span={7}>
-        <Select 
-          {...selectProps}
-          onSearch={handleSearch.bind(this, 'firstCategory')}
-          placeholder="一级分类内容"
-          onChange={() => {onSelectFirstCategory()}}>
-          {
-            firstCategory.length>0 && firstCategory.map((item, index) => {
-              return <Option key={index} value={item.treeCode}>{item.treeName}</Option>
-            })
-          }
-        </Select>
+        {
+          getFieldDecorator('firstCategoryId', {
+            // rules: [{ required: true, message: `请选择媒体类型` }],
+            // initialValue: firstCategoryId,
+          })(
+            <Select 
+              {...selectProps}
+              onSearch={handleSearch.bind(this, 'firstCategory')}
+              placeholder="一级分类内容"
+              onSelect={(value) => {onSelectFirstCategory(value)}}>
+              {
+                !_.isEmpty(firstCategory) && firstCategory.map((item, index) => {
+                  return <Option key={item.id} value={item.id}>{item.name}</Option>
+                })
+              }
+            </Select>
+          )
+        }
+        
       </Col>
       <Col span={7}>
-        <Select 
-          {...selectProps}
-          onSearch={handleSearch.bind(this, 'secondCategory')}
-          placeholder="二级分类内容"
-          onChange={onSelectSecondCategory.bind(this)}>
-          {
-            secondCategory.length>0 && secondCategory.map((item, index) => {
-                return <Option key={index} value={item.treeCode}>{item.treeName}</Option>
-            })
-          }
-        </Select>
+        {
+          getFieldDecorator('secondCategoryId', {
+            // rules: [{ required: true, message: `请选择媒体类型` }],
+            // initialValue: secondCategoryId,
+          })(
+            <Select 
+              {...selectProps}
+              onSearch={handleSearch.bind(this, 'secondCategory')}
+              placeholder="二级分类内容"
+              onSelect={(value) => onSelectSecondCategory(value)}>
+              {
+                !_.isEmpty(secondCategory) && secondCategory.map((item, index) => {
+                    return <Option key={item.id} value={item.id}>{item.name}</Option>
+                })
+              }
+            </Select>
+          )
+        } 
       </Col>
       <Col span={7}>
-        <Select 
-          {...selectProps}
-          onSearch={handleSearch.bind(this, 'thirdCategory')}
-          placeholder="三级分类内容">
-          {
-            thirdCategory.map((item, index) => {
-                return <Option key={index} value={item.treeCode}>{item.treeName}</Option>
-            })
-          }
-        </Select>
+        {
+          getFieldDecorator('thirdCategoryId', {
+            // rules: [{ required: true, message: `请选择媒体类型` }],
+            // initialValue: thirdCategoryId,
+          })(
+            <Select 
+              {...selectProps}
+              onSearch={handleSearch.bind(this, 'thirdCategory')}
+              placeholder="三级分类内容"
+              onSelect={(value) => onSelectThirdCategory(value)}>
+              {
+                !_.isEmpty(thirdCategory) && thirdCategory.map((item, index) => {
+                    return <Option key={item.id} value={item.id}>{item.name}</Option>
+                })
+              }
+            </Select>
+          )
+        }
       </Col>
     </Row>
   )

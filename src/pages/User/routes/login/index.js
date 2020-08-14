@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:51:25
- * @LastEditTime: 2020-08-11 10:58:43
+ * @LastEditTime: 2020-08-14 16:19:36
  */ 
 import React from 'react';
 import { connect } from 'dva';
@@ -41,7 +41,7 @@ function Login(props) {
       if (!err) {
         console.log('Received values of form: ', values);
         dispatch({
-          type: 'App/login',
+          type: 'User/login',
           payload: values,
           callback: (res) => {
             if(res == 1){
@@ -106,8 +106,8 @@ function Login(props) {
   )
 }
 
-function mapStateToProps({App, user}){
-  return {App, user}
+function mapStateToProps({User}){
+  return {User}
 }
 
 export default Form.create({})(connect(mapStateToProps)(Login))

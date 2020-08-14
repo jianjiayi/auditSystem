@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-31 14:32:29
+ * @LastEditTime: 2020-08-14 17:47:13
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -12,8 +12,9 @@ import debounce from 'lodash.debounce';
 import { renderSelect } from '@components/BasicForm/BaseForm'; 
 import { BaseForm, MoreSelect } from '@components/BasicForm';
 import { ModalTable } from '@components/BasicTable';
+import PageLoading from '@components/PageLoading';
 
-import {getRulesItem, getRules} from './config';
+import {getRulesItem, getRules, getDenyWordsKey, isShowInclude} from './config';
 import {
   getModelSelect, 
   getContentNumber, 
@@ -36,7 +37,7 @@ const { Option } = Select;
 const InputGroup = Input.Group;
 
 /**
-formOptions改变量用于辅助动态创建表单用
+* formOptions改变量用于辅助动态创建表单用
 */ 
 let formOptions =  [];
 
@@ -57,11 +58,27 @@ function QueueDetails(props) {
   const {
     dispatch,
     location,
+    User: {
+      business
+    },
+    Global: {
+      firstCategory,  // 一级分类
+      secondCategory, // 二级分类
+      thirdCategory,  // 三级分类
+    },
     QDetails: {
-      table, 
+      loading,
+      configRule,
+      mediaInfo,
+      mediaInfoList,
+      category,
+      dataSource, 
+      pagination,
       art
     }, 
   } = props;
+
+  // console.log(props)
 
   // 组件销毁时候
   useEffect(() => {
@@ -80,7 +97,8 @@ function QueueDetails(props) {
   
   /**添加要创建的表单项*/ 
   const addItemOption = (item, isInclude) => {
-    let ItemName = item.name +'_'+ isInclude;
+    console.log(item)
+    let ItemName = item.id +'_'+ isInclude;
 
     // 判断是否存在该表单项
     let isExist = itemOptions.find((v)=>{
@@ -93,7 +111,7 @@ function QueueDetails(props) {
     // const getFieldDecorator = formRef.current.getFieldDecorator;
 
     let options = {
-      label: isShowInclude(itemKey) ? `${item.label}(${( isInclude == 0 ? '包含': '不包含')})` : item.label,
+      label: isShowInclude(itemKey) ? `${item.name}(${( isInclude == 0 ? '包含': '不包含')})` : item.name,
       name: ItemName,
       isInclude,
       itemRender:  getFieldDecorator => (
@@ -101,11 +119,11 @@ function QueueDetails(props) {
           <Col span={18}>
             {
               (itemKey >= 1 && itemKey <= 4) && 
-              getModelSelect(formRef,ItemName,item.label,onOpenModal)
+              getModelSelect(formRef,ItemName,item.name,onOpenModal)
             }
-            {itemKey == 5 && getContentNumber(getFieldDecorator,ItemName)}
+            {itemKey == 5 && getContentNumber(formRef,ItemName)}
             {itemKey == 6 && getMediaWeight(getFieldDecorator,ItemName)}
-            {itemKey == 7 && getMediaType(getFieldDecorator,ItemName)}
+            {itemKey == 7 && getMediaType(formRef,ItemName,mediaInfo, mediaInfoList)}
             {itemKey == 8 && getMediaClassify(formRef,ItemName)}
             {itemKey == 9 && getMediaAttr(getFieldDecorator,ItemName)}
             {itemKey == 10 && getMediaData(getFieldDecorator,ItemName)}
@@ -118,7 +136,7 @@ function QueueDetails(props) {
             {itemKey == 17 && getAuditType(getFieldDecorator,ItemName)}
             { 
               (itemKey >= 18 && itemKey <= 19 )  && 
-              getModelSelect(formRef,ItemName,item.label,onOpenModal)
+              getModelSelect(formRef,ItemName,item.name,onOpenModal)
             }
           </Col>
           <Col span={1}>
@@ -138,66 +156,70 @@ function QueueDetails(props) {
     setItemOptions([...formOptions])
   }
 
-  /**是否展示包含选项*/
-  const isShowInclude = (key) => {
-    const arr = ['1','2','3','4','7','8','9','10','15','16','17','18','19'];
-    if(arr.includes(key)){
-      return true;
-    }else{
-      return false;
-    }
-  }
 
   /**三级分类参数*/ 
-  const moreSelectPrtops = {
+  const moreSelectProps = {
     size: 'default',
     style: { width: '420px' },
-    firstCategoryId: '',
-    secondCategoryId: '',
-    thirdCategoryId: '',
-    firstCategory: [],
-    secondCategory: [],
-    thirdCategory: [],
-    selectFirstCategory: () =>{
-
+    category, //分类
+    firstCategory,
+    secondCategory,
+    thirdCategory,
+    onSelect: (values) => {
+      let arr = Object.values(values);
+      arr = arr.filter((item,index)=>item != undefined)
+      formRef.current.setFieldsValue({'category':arr.join('/')})
     },
-    selectSecondCategory: ()=>{
-
-    }
+    selectFirstCategory: (id) =>{
+      dispatch({
+        type: 'Global/getSecondCategory',
+        payload: {
+          id: id
+        }
+      })
+    },
+    selectSecondCategory: (id)=>{
+      dispatch({
+        type: 'Global/getThirdCategory',
+        payload: {
+          id: id
+        }
+      })
+    },
   }
 
   /**表单参数*/ 
   const searchFormProps = {
     className: styles['form-contaner'],
     layout: 'horizontal',
-     okText: "保存",
+    okText: "保存",
     dataSource: [
       {
         label: '业务线',
         type: 'SELECT',
-        name:'params1',
+        name:'bid',
+        initialValue: '3001004',
         placeholder:'选择业务线',
-        map: { all: '聚合分发', key1: '选项1', key2: '选项2' }
+        map: { '3001004': '聚合分发', key1: '选项1', key2: '选项2' }
       },
       {
         label: '内容类型',
         type: 'SELECT',
-        name:'params2',
+        name:'type',
         required: true,
         placeholder:'选择类型',
         map: { noraml: '图文', video: '视频', audio: '音频', images: '图集' }
       },
-      { label: '队列名称', name: 'params3', required: true,},
+      { label: '队列名称', name: 'name', required: true,},
       {
         label: '对应分类',
-        name:'params4',
-        required: true,
+        name:'category',
         itemRender: getFieldDecorator => (
-          <div className="">
+          <div>
             {
-              getFieldDecorator('params4', {
-                // rules: [{ required: true, message: `请选择分类` }],
-              })(<MoreSelect {...moreSelectPrtops}></MoreSelect>)
+              getFieldDecorator('category', {
+                rules: [{ required: true, message: `请选择分类` }],
+              })(<MoreSelect {...moreSelectProps}></MoreSelect>)
             }
           </div>
         )
@@ -213,7 +235,7 @@ function QueueDetails(props) {
               getFieldDecorator('params5', {
                 rules: [{ required: true, message: `请选择` }],
               })(
-                renderSelect(getRules(), { 
+                renderSelect(getRules(configRule), { 
                   style: {width: '160px'},
                   onChange: (e)=>{
                     // console.log('change',e);
@@ -239,7 +261,7 @@ function QueueDetails(props) {
             <Button 
               type='link' 
               disabled={itemKey ==null || itemKey ==0} 
-              onClick={()=>addItemOption(getRulesItem(itemKey), include)}
+              onClick={()=>addItemOption(getRulesItem(itemKey,configRule), include)}
             >添加</Button>
           </div>
         )
@@ -248,14 +270,14 @@ function QueueDetails(props) {
       {
         label: '队列机制',
         type: 'RADIO',
-        name:'params6',
+        name:'queueType',
         required: true,
         map: { 1: '免审', 2: '先发后审', 3: '先审后发'}
       },
       {
         label: '保存时长',
         type: 'RADIO',
-        name:'params7',
+        name:'keepDays',
         required: true,
         map: { 1: '1天', 3: '3天', 7: '7天', 15: '15天', 30: '30天', 60: '60天', 90: '90天' }
       },
@@ -274,11 +296,11 @@ function QueueDetails(props) {
   const onOpenModal = (name, label)=>{
     // 获取词库
     dispatch({
-      type: 'QDetails/getTextBase',
+      type: 'QDetails/getDenyWords',
       payload: {
-        name,
-        label
-      }
+        type: getDenyWordsKey(label).key,
+        id: formRef.current.getFieldValue('bid')
+      },
     });
     // 临时保存已存在数据
     let oldData= formRef.current.getFieldValue(name) || [];
@@ -311,24 +333,37 @@ function QueueDetails(props) {
       {
         title: '名称',
         align: 'center',
-        dataIndex: 'name',
+        dataIndex: 'word',
         render: text => <a>{text}</a>,
       },
     ],
-    ...table,
+    onPageChg: (page) => {
+      // console.log(page)
+      dispatch({
+        type:'Methods/getDenyWords',
+        payload:{
+          pageNo: page.current,
+          pageSize: page.pageSize
+        }
+      })
+    },
+    dataSource,
+    pagination,
     ...modalProps
   }
 
   return (
-    <div className={styles.container}>
-      <BaseForm {...searchFormProps} wrappedComponentRef={formRef}></BaseForm>
-      <ModalTable {...ModalTableProps} ref={rulesModal}></ModalTable>
-    </div>
+    <PageLoading loading = {loading}>
+      <div className={styles.container}>
+        <BaseForm {...searchFormProps} wrappedComponentRef={formRef}></BaseForm>
+        <ModalTable {...ModalTableProps} ref={rulesModal}></ModalTable>
+      </div>
+    </PageLoading>
   )
 }
 
-function mapStateToProps({QDetails}){
-  return {QDetails}
+function mapStateToProps({User, Global, QDetails}){
+  return {User, Global, QDetails}
 }
 
 export default Form.create({})(connect(mapStateToProps)(QueueDetails));

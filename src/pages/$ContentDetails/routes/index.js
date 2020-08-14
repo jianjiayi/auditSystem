@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-04 11:31:05
+ * @LastEditTime: 2020-08-14 16:29:32
  */ 
 import React, { useEffect } from 'react';
 import { connect } from 'dva';
@@ -19,7 +19,7 @@ function ContentDetails(props) {
 
   useEffect(()=>{
     dispatch({
-      type: 'CDetails/queryArt',
+      type: 'CDetails/init',
       payload: {}
     })
   }, [dispatch])

@@ -3,8 +3,10 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-14 09:06:08
- * @LastEditTime: 2020-07-24 14:47:27
+ * @LastEditTime: 2020-08-14 15:20:53
  */
+import React, {useState} from 'react';
+import _ from 'lodash';
 import {message, Modal, Tag, Select, Input, InputNumber, Button, Row, Col, Icon } from 'antd';
 import { renderSelect, renderCheckBoxGroup } from '@components/BasicForm/BaseForm'; 
 const { Option } = Select;
@@ -15,6 +17,7 @@ let formValues = {};
 // 违禁词、敏感词、热词、人物词、抓取来源、内容来源
 export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
   const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
+  
   // 获取tags
   let values = getFieldValue(ItemName) || [];
   // 删除tag
@@ -35,7 +38,7 @@ export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
     <div>
       {
         values.map((item, index)=>{
-          return <Tag key={index} closable onClose={() => handleTagClose(item)}>{item.name + index}</Tag>
+          return <Tag key={item.id} closable onClose={() => handleTagClose(item)}>{item.word}</Tag>
         })
       }
       <Button type="link" onClick={()=>onOpenModal(ItemName, label)}>
@@ -46,24 +49,39 @@ export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
 }
 
 // 内容分值
-export const getContentNumber = (getFieldDecorator,ItemName) =>{
+export const getContentNumber = (formRef,ItemName) =>{
+  const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
+
+  let minName = ItemName+'min';
+  let maxName = ItemName+'max';
+  const onChange = (type, value) =>{
+    console.log(type, value)
+    if(type == 'min'){
+      let max = getFieldValue(maxName) || 100;
+      if(value>=max) setFieldsValue({minName: max})
+    }else{
+      let min = getFieldValue(minName) || 0;
+      if(value<=min) setFieldsValue({maxName: min})
+    }
+  }
+
   return getFieldDecorator(ItemName, {
     rules: [{ required: true, message: `请输入内容分值` }],
     // initialValue: formValues.name5,
   })(
     <InputGroup compact>
-      <Input style={{ width: 100, textAlign: 'center' }} placeholder="Minimum" />
-      <Input
-        style={{
-          width: 30,
-          borderLeft: 0,
-          pointerEvents: 'none',
-          backgroundColor: '#fff',
-        }}
-        placeholder="~"
-        disabled
-      />
-      <Input style={{ width: 100, textAlign: 'center', borderLeft: 0 }} placeholder="Maximum" />
+      {
+        getFieldDecorator(minName, {
+          // rules: [{ required: true, message: `请输入内容分值` }],
+          // initialValue: formValues.name5,
+        })(<InputNumber min={0} onBlur={e=>onChange('min', e.currentTarget.value)}></InputNumber>)
+      }
+      {
+        getFieldDecorator(maxName, {
+          // rules: [{ required: true, message: `请输入内容分值` }],
+          // initialValue: formValues.name5,
+        })(<InputNumber max={100} onBlur={e=>onChange('max', e.currentTarget.value)}></InputNumber>)
+      }
     </InputGroup>
   )
 }
@@ -77,12 +95,34 @@ export const getMediaWeight = (getFieldDecorator, ItemName) => {
 }
 
 // 媒体类型
-export const getMediaType = (getFieldDecorator, ItemName) =>{
-  const map = { 1: '公众媒体', 2: '自媒体(机构)', 3: '自媒体(个人)'};
-  return getFieldDecorator(ItemName, {
-    rules: [{ required: true, message: `请选择媒体类型` }],
-    // initialValue: formValues.name5,
-  })(renderCheckBoxGroup(map));
+export const getMediaType = (formRef, ItemName, mediaInfo = [], mediaInfoList={}) =>{
+  const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
+  // 获取选择的媒体类型
+  let values = getFieldValue(ItemName) || [];
+  console.log(values)
+  
+  let map = {};
+  !_.isEmpty(mediaInfo) && mediaInfo.map(item => {
+    map[item.code] = item.name;
+  })
+  return <div className="">
+    {
+      getFieldDecorator(ItemName, {
+        rules: [{ required: true, message: `请选择媒体类型` }],
+        // initialValue: formValues.name5,
+      })(renderCheckBoxGroup(map))
+    }
+    {
+      values.map((item,index) => {
+        console.log(mediaInfoList[item])
+        return !_.isEmpty(mediaInfoList[item]) && <div key={index}>
+          {getFieldDecorator(item, {
+            // initialValue: formValues.name5,
+          })(renderCheckBoxGroup(mediaInfoList[item]))}
+        </div> 
+      })
+    }
+  </div>
 }
 
 // 媒体分类

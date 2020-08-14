@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-06 13:57:48
+ * @LastEditTime: 2020-08-14 17:48:18
  */ 
 import React, {useImperativeHandle, forwardRef} from 'react';
 import {Form, Checkbox, Radio, Input, Tag, Button} from 'antd';
@@ -32,21 +32,47 @@ const options = [
 
 
 function SectionAction(props, ref) {
-  const {className, form: {getFieldDecorator, getFieldValue, setFieldsValue}} = props;
-
-  const moreSelectPrtops = {
-    firstCategoryId: '',
-    secondCategoryId: '',
-    thirdCategoryId: '',
-    firstCategory: [],
-    secondCategory: [],
-    thirdCategory: [],
-    selectFirstCategory: () =>{
-
+  const {
+    className, 
+    dispatch,
+    category, //分类
+    Global: {
+      firstCategory,
+      secondCategory,
+      thirdCategory,
     },
-    selectSecondCategory: ()=>{
+    form: {getFieldDecorator, getFieldValue, setFieldsValue}, 
+  } = props;
 
-    }
+  /**三级分类参数*/ 
+  const moreSelectProps = {
+    size: 'default',
+    style: { width: '420px' },
+    category, //分类
+    firstCategory,
+    secondCategory,
+    thirdCategory,
+    onSelect: (values) => {
+      let arr = Object.values(values);
+      arr = arr.filter((item,index)=>item != undefined)
+      setFieldsValue({'category':arr.join('/')})
+    },
+    selectFirstCategory: (id) =>{
+      dispatch({
+        type: 'Global/getSecondCategory',
+        payload: {
+          id: id
+        }
+      })
+    },
+    selectSecondCategory: (id)=>{
+      dispatch({
+        type: 'Global/getThirdCategory',
+        payload: {
+          id: id
+        }
+      })
+    },
   }
   // 文章分类
   const getMoreSelectTpl = () =>{
@@ -57,7 +83,7 @@ function SectionAction(props, ref) {
         })(
           <div className={styles.category}>
             <div className={styles['more-select']}>
-              <MoreSelect></MoreSelect>
+              <MoreSelect {...moreSelectProps}></MoreSelect>
             </div>
             <Button icon='delete' type="link">删除</Button>
           </div>
