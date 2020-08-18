@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-14 09:06:08
- * @LastEditTime: 2020-08-14 15:20:53
+ * @LastEditTime: 2020-08-17 09:59:03
  */
 import React, {useState} from 'react';
 import _ from 'lodash';
@@ -22,11 +22,11 @@ export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
   let values = getFieldValue(ItemName) || [];
   // 删除tag
   const handleTagClose = removedTag =>{
-    values.splice(values.findIndex(tag =>  tag === removedTag), 0);
-
+    values.splice(values.findIndex(tag =>  tag === removedTag), 1);
     // 设置form中的name值
     let obj = {};
     obj[ItemName]= values;
+
     setFieldsValue(obj)
   }
 
@@ -38,7 +38,7 @@ export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
     <div>
       {
         values.map((item, index)=>{
-          return <Tag key={item.id} closable onClose={() => handleTagClose(item)}>{item.word}</Tag>
+          return <Tag key={item.id+index} closable onClose={() => handleTagClose(item)}>{item.word}</Tag>
         })
       }
       <Button type="link" onClick={()=>onOpenModal(ItemName, label)}>

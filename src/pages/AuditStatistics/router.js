@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:46:34
- * @LastEditTime: 2020-08-11 17:04:21
+ * @LastEditTime: 2020-08-17 20:07:48
  */ 
 const errorRoutes = require('../../pages/Error/router');
 
@@ -27,16 +27,16 @@ module.exports= [
       {
         icon: 'bars',
         title: '人员统计',
-        key:'/statistics/personnel',
-        path: '/statistics/personnel',
+        key:'/statistics/personnel/',
+        path: '/statistics/personnel/',
         notOpen: true,
         component: '../pages/Dashboard/index',
         routes:[
           {
             icon: 'bars',
             title: '人员统计',
-            key:'/statistics/personnel',
-            path: '/statistics/personnel',
+            key:'/statistics/personnel/',
+            path: '/statistics/personnel/',
             component: '../pages/AuditStatistics/routes/Personnel',
             Routes: ['./src/router/PrivateRoute.js'],
           },

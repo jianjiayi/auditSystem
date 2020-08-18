@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:51:25
- * @LastEditTime: 2020-08-14 16:19:36
+ * @LastEditTime: 2020-08-17 17:09:31
  */ 
 import React from 'react';
 import { connect } from 'dva';
@@ -48,6 +48,7 @@ function Login(props) {
               message.error('用户名或密码错误');
               return;
             }
+            alert(111111)
             router.push({pathname:'/'});
           }
         })

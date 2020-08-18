@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-24 10:51:22
- * @LastEditTime: 2020-08-11 16:30:14
+ * @LastEditTime: 2020-08-17 14:51:49
  */ 
 
 
@@ -14,19 +14,22 @@ export const ExArray = {
   // 数组扁平化
   flatten(sliderMenus) {
     let newArr = []
-    const renderMenuItem = (sliderMenus) => {
+    let i = 0;
+    const renderMenuItem = (sliderMenus,parentId) => {
       sliderMenus.map(route => {
+        route['id'] = i++;
+        route['parentId'] = parentId;
         if(!route.routes){
           newArr.push(route)
         }else{
           const {routes, ...rest} = route;
           newArr.push(rest);
 
-          renderMenuItem(routes);
+          renderMenuItem(routes, i-1);
         }
       })
     };
-    renderMenuItem(sliderMenus)
+    renderMenuItem(sliderMenus,0)
     return newArr;
   },
   // 数组多维化

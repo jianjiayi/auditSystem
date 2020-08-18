@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:46:34
- * @LastEditTime: 2020-08-12 11:03:19
+ * @LastEditTime: 2020-08-17 20:12:34
  */ 
  
 module.exports= [
@@ -26,7 +26,7 @@ module.exports= [
       {
         icon: 'bars',
         title: '队列详情',
-        key:'/setting/',
+        key:'/setting/details/',
         path: '/setting/details/',
         component: '../pages/AuditSettings/routes/Detials',
         Routes: ['./src/router/PrivateRoute.js'],

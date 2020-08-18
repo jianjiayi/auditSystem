@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-10 10:26:06
+ * @LastEditTime: 2020-08-17 20:39:17
  */ 
 import React, {useState, useRef} from 'react';
 import { connect } from 'dva';
@@ -13,6 +13,9 @@ import { BaseForm, ModalForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable'
 
 import styles from './index.module.less';
+
+import wrapAuth from '@components/WrapAuth';
+const AuthButton = wrapAuth(Button);
 
 const { Option } = Select;
 
@@ -27,7 +30,15 @@ function AuditStatistics(props) {
   const searchFormProps = {
     className: styles['form-contaner'],
     layout: 'inline',
+    okPerms: 'statistics:classify:select',
     dataSource: [
+      {
+        label: '业务线',
+        type: 'SELECT',
+        name:'params0',
+        initialValue: '0',
+        map: { 0: '图文', 1: '选项1', 2: '选项2' }
+      },
       {
         label: '类型',
         type: 'SELECT',

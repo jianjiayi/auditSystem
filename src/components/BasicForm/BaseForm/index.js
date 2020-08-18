@@ -3,7 +3,7 @@
  * @version:
  * @Author: big bug
  * @Date: 2019-11-19 10:39:54
- * @LastEditTime: 2020-07-30 17:10:33
+ * @LastEditTime: 2020-08-17 20:36:06
  */
 import React, {useImperativeHandle, useRef, forwardRef} from 'react';
 import { Form,Button } from 'antd';
@@ -12,6 +12,9 @@ import { renderFormItem, fillFormItems, submitForm } from './extra';
 import classNames from 'classnames';
 
 import styles from './index.module.less';
+
+import wrapAuth from '@components/WrapAuth';
+const AuthButton = wrapAuth(Button);
 
 const defaultFormLayout = {labelAlign: 'left', labelCol: { span: 5 }, wrapperCol: { span: 15 } };
 const formItemLayout = {
@@ -26,6 +29,7 @@ function BaseForm(props, ref) {
   const {
     className,
     children,
+    okPerms,
     okText,
     okTextType,
     isReset = true,
@@ -99,7 +103,7 @@ function BaseForm(props, ref) {
       }
       <Form.Item>
         <div className={styles['button-group']}>
-          <Button type={okTextType ? okTextType : 'primary'} htmlType="submit">{okText? okText : '查询'}</Button>
+          <AuthButton perms={okPerms} type={okTextType ? okTextType : 'primary'} htmlType="submit">{okText? okText : '查询'}</AuthButton>
           {isReset && <Button onClick={()=>reset()}>重置</Button>}
           { children }
         </div>

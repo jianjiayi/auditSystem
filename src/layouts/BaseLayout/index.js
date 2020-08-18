@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 14:55:34
- * @LastEditTime: 2020-08-14 16:24:39
+ * @LastEditTime: 2020-08-17 20:12:16
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
@@ -18,6 +18,7 @@ import { sliderMenus }  from '../../router/slidermenus';
 import { appConfig } from '@config/default.config.js';
 import { userSetMenu } from '@config/constants.js';
 import { ExArray } from '@utils/utils';
+import {getSliderMenusList} from '@utils/rights';
 import styles from './index.module.less';
 
 // import ProLayout, {
@@ -34,10 +35,22 @@ const {Content } = Layout;
 const {logo, homePath, title, copyRight} = appConfig;
 
 function BaseLayout(props) {
-  const {theme, theme: { navTheme, fixedHeader}, App, dispatch, location, history} = props;
+  const {
+    theme, 
+    theme: { navTheme, fixedHeader}, 
+    App, 
+    User:{
+      user,
+      authority
+    }, 
+    dispatch, 
+    location, 
+    history
+  } = props;
 
   // let routes = ExArray.flatten(sliderMenus);
   // console.log('routes',routes)
+  
   
   // 导航折叠
   const [collapsed, setCollapsed] = useState(false);
@@ -52,7 +65,7 @@ function BaseLayout(props) {
     fixedHeader,
     userSetMenu,
     ...collapsedProps,
-    userinfo: App.user,
+    userinfo: user,
     userClick: (val) => {
       console.log(val)
       switch(val.key){
@@ -78,7 +91,7 @@ function BaseLayout(props) {
   
   // 定义额外的高亮条件
   let pathname = location.pathname;
-  const hightPath = ['/setting','/queue','/statistics/personnel','/search'];
+  const hightPath = ['/setting','/queue','/statistics/personnel/','/search'];
   let selectedKeys = [];
   for(let i in hightPath){
     if(pathname.includes(hightPath[i]) ){
@@ -92,7 +105,8 @@ function BaseLayout(props) {
     navTheme,
     ...collapsedProps,
     className: `${styles.slider}`,
-    menuRoutes: sliderMenus,
+    // menuRoutes: sliderMenus,
+    menuRoutes: getSliderMenusList(authority.permissions, sliderMenus),
     selectedKeys: (selectedKeys.length > 0 && selectedKeys) || location.pathname.split(','),
     themeProps: {
       ...theme,

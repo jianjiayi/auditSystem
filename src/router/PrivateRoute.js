@@ -3,38 +3,42 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 10:44:16
- * @LastEditTime: 2020-08-13 17:00:17
+ * @LastEditTime: 2020-08-17 17:46:17
  */ 
 import { notification, message} from 'antd';
 import {setStorage, getStorage} from '@utils/localStorage';
 import { ExArray } from '@utils/utils';
 const { Route, Redirect } = require('dva').router;
 
-// 获取设置受保护的所有路由
-const { sliderMenus } = require('./slidermenus');
-const contentDetailsRoutes  = require('../pages/$ContentDetails/router');
-console.log(sliderMenus)
-let routes = [{path:'/'}, ...ExArray.flatten([...sliderMenus, ...contentDetailsRoutes])];
-console.log('routes',routes)
 
-const AuthRouter = (props) => {
+const contentDetailsRoutes  = require('../pages/$ContentDetails/router');
+
+function AuthRouter(props) {
   
   const { route } = props;
   const { component:Component } = route;
 
-  // 获取存在本地的登录状态以及权限
+  // 获取存在本地的登录状态
   const isLogin = sessionStorage.getItem('$isLogin') || false;
 
-  // 获取用户路由权限
-  const user = JSON.parse(sessionStorage.getItem('$user')) || {};
+  // 获取用户权限
+  const authority = JSON.parse(sessionStorage.getItem('$authority')) || {};
 
+  // 获取路由权限
+  const getRouteRights = (data)=>{
+    return data.filter((item)=> item.type == 0);
+  }
+  // 拼合需要权限
+  let routes = [{permissionUrl:'/'}, ...getRouteRights(authority.permissions || [])];
+
+  // 判断当前路由是否受保护
   const isProteceRoute = (pathname) => {
     // 判断该路由是否存在
     let isProtext = routes.find((item)=>{
       if(pathname == '/queue/cdetails' || pathname == '/search/cdetails'){
-        return item.path == '/:type/cdetails';
+        return item.permissionUrl == '/:type/cdetails';
       }
-      return item.path == pathname;
+      return item.permissionUrl == pathname;
     });
 
     if(!isProtext) {

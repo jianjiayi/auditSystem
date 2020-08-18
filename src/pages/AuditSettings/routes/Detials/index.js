@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-14 17:47:13
+ * @LastEditTime: 2020-08-17 10:05:26
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -299,18 +299,21 @@ function QueueDetails(props) {
       type: 'QDetails/getDenyWords',
       payload: {
         type: getDenyWordsKey(label).key,
-        id: formRef.current.getFieldValue('bid')
+        bid: formRef.current.getFieldValue('bid')
       },
     });
     // 临时保存已存在数据
     let oldData= formRef.current.getFieldValue(name) || [];
+    console.log(oldData)
 
     setModalProps({
       name,
       title: label,
       handleSubmit: (name,data)=>{
+        console.log(name,data)
         // 合并新老数据
         let newData = ExArray.listRemoveRepeat([...oldData, ...data]);
+        console.log('newData',newData)
         // 设置form中的name数据
         let obj = {};
         obj[name]= newData;
@@ -337,18 +340,8 @@ function QueueDetails(props) {
         render: text => <a>{text}</a>,
       },
     ],
-    onPageChg: (page) => {
-      // console.log(page)
-      dispatch({
-        type:'Methods/getDenyWords',
-        payload:{
-          pageNo: page.current,
-          pageSize: page.pageSize
-        }
-      })
-    },
     dataSource,
-    pagination,
+    // pagination,
     ...modalProps
   }
 

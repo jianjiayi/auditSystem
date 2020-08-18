@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-14 17:10:49
+ * @LastEditTime: 2020-08-17 09:45:05
  */ 
 import * as api from '../service/index.js';
 
@@ -95,8 +95,8 @@ export default {
       // 合并参数
       const params = {
         ...query,
-        pageNo: 1,
-        pageSize: pagination.pageSize,
+        // pageNo: 1,
+        // pageSize: pagination.pageSize,
         ...payload,
       };
       
@@ -107,12 +107,12 @@ export default {
           type: 'save',
           payload: {
             query: params,
-            dataSource: data.data || [],
+            dataSource: data || [],
             pagination: {
               ...pagination,
-              total: data.totalCount,
-              current: data.pageNo,
-              pageSize: data.pageSize
+              // total: data.totalCount,
+              // current: data.pageNo,
+              pageSize: 10
             }
           }
         })

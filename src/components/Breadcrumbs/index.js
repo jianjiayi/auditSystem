@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 17:08:38
- * @LastEditTime: 2020-07-10 15:50:22
+ * @LastEditTime: 2020-08-17 20:13:30
  */ 
 import Link from 'umi/link';
 import { Button, Icon } from 'antd';
@@ -25,6 +25,7 @@ function getRoutes(data){
       breadcrumb: item.title
     });
   });
+  // console.log(routeArr)
   return routeArr;
 }
 
@@ -40,9 +41,7 @@ const Breadcrumbs = (props) => {
             { index !== breadcrumbs.length-1 || breadcrumbs.length === 1 ?
               <Link
                 to={{
-                  pathname: breadcrumb.match.url,
-                  state: breadcrumb.match.params ? breadcrumb.match.params : {},
-                  query: breadcrumb.location.query ? breadcrumb.location.query : {},
+                  pathname: breadcrumb.match.url
                 }}
               >
                 <Icon type={breadcrumb.icon} className={styles.icon}/>

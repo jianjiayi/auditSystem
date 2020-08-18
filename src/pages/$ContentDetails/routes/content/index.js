@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-10 09:44:08
+ * @LastEditTime: 2020-08-17 20:46:03
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -15,8 +15,10 @@ import _ from 'lodash';
 import {AudioPlayer, VideoPlayer } from '@components/Media';
 import Ueditor from '@components/Editor';
 
-
 import styles from './index.module.less';
+
+import wrapAuth from '@components/WrapAuth';
+const AuthButton = wrapAuth(Button);
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 const layout = {
@@ -116,7 +118,7 @@ function Content(props) {
           </Row>
         </div>
         <div className={styles['button-box']}>
-          {!isEdit && <Button type="primary" size="small" onClick={()=>{setIsEdit(!isEdit)}}>修改</Button>}
+          {!isEdit && <AuthButton perms={'news:edit'} type="primary" size="small" onClick={()=>{setIsEdit(!isEdit)}}>修改</AuthButton>}
           {isEdit && 
             <div className={styles['button-group']}>
               <Button type="primary" size="small" type="primary" htmlType="submit">确定</Button>

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-03 15:29:38
+ * @LastEditTime: 2020-08-17 20:41:04
  */ 
 import React, {useRef} from 'react';
 import { connect } from 'dva';
@@ -12,6 +12,9 @@ import { BaseForm, ModalForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable'
 
 import styles from './index.module.less';
+
+import wrapAuth from '@components/WrapAuth';
+const AuthButton = wrapAuth(Button);
 
 const { TextArea } = Input;
 
@@ -24,6 +27,7 @@ function UserRights(props) {
   const searchFormProps = {
     className: styles['form-contaner'],
     layout: 'inline',
+    okPerms: 'user:select',
     dataSource: [
       {
         label: '业务线',
@@ -109,8 +113,8 @@ function UserRights(props) {
         render(r) {
           return (
             <div className={styles.tableaction}>
-              <Button type="primary" size="small" onClick={()=>{console.log(r.id)}}>编辑</Button>
-              <Button size="small" onClick={()=>{console.log(r.id)}}>注销</Button>
+              <AuthButton perms={'user:edit'} type="primary" size="small" onClick={()=>{console.log(r.id)}}>编辑</AuthButton>
+              <AuthButton perms={'user:edit'} size="small" onClick={()=>{console.log(r.id)}}>注销</AuthButton>
             </div>);
         }
       },
@@ -185,7 +189,7 @@ function UserRights(props) {
   return (
     <div>
       <BaseForm {...searchFormProps}>
-        <Button  ghost type="primary" onClick={()=>addUser()}>创建用户</Button>
+        <AuthButton perms={'user:add'}  ghost type="primary" onClick={()=>addUser()}>创建用户</AuthButton>
       </BaseForm>
       <BaseTable {...tableProps}></BaseTable>
       <ModalForm {...modalFormProps} ref={modalFormRef}></ModalForm>

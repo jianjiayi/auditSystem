@@ -3,146 +3,38 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-13 10:11:39
+ * @LastEditTime: 2020-08-17 20:40:31
  */ 
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import { connect } from 'dva';
 import { Button, TreeSelect } from 'antd';
 import { BaseForm, ModalForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
-import { sliderMenus }  from '../../../router/slidermenus';
+import { getTreeData }  from '@utils/rights.js';
 
 import styles from './index.module.less';
-console.log(sliderMenus)
-const treeData = [
-  {
-    label: '审核设置',
-    value: '10001',
-    key: '10001',
-    children: [
-      {
-        title: '查询',
-        value: '10011',
-        key: '10011',
-      },
-    ],
-  },
-  {
-    title: '审核队列',
-    value: '10002',
-    key: '10002',
-    children: [
-      {
-        title: '查询',
-        value: '10012',
-        key: '10012',
-      },
-      {
-        title: '领取',
-        value: '10022',
-        key: '10022',
-      },
-    ],
-  },
-  {
-    title: '审核检索',
-    value: '10003',
-    key: '10003',
-    children: [
-      {
-        title: '查询',
-        value: '10013',
-        key: '10013',
-      },
-      {
-        title: '领审',
-        value: '10023',
-        key: '10023',
-      },
-      {
-        title: '加队列',
-        value: '10033',
-        key: '10033',
-      },
-    ],
-  },
-  {
-    title: '审核详情页',
-    value: '10003',
-    key: '10003',
-  },
-  {
-    title: '审核统计',
-    value: '10004',
-    key: '10004',
-    children: [
-      {
-        title: '分类统计',
-        value: '10014',
-        key: '10014',
-        children: [
-          {
-            title: '查询',
-            value: '100141',
-            key: '100141',
-          },
-        ]
-      },
-      {
-        title: '人员统计',
-        value: '10024',
-        key: '10024',
-        children: [
-          {
-            title: '查询',
-            value: '100241',
-            key: '100241',
-          },
-        ]
-      },
-    ],
-  },
-  {
-    title: '权限管理',
-    value: '/rights',
-    key: '10005',
-    children: [
-      {
-        title: '用户管理',
-        value: '10015',
-        key: '10015',
-        children: [
-          {
-            title: '查询',
-            value: '100151',
-            key: '100151',
-          },
-        ]
-      },
-      {
-        title: '角色管理',
-        value: '10025',
-        key: '10025',
-        children: [
-          {
-            title: '查询',
-            value: '100251',
-            key: '100251',
-          },
-        ]
-      },
-    ],
-  },
-];
+
+import wrapAuth from '@components/WrapAuth';
+const AuthButton = wrapAuth(Button);
+
+// 获取用户路由权限
+const user = JSON.parse(sessionStorage.getItem('$user')) || {};
+
 
 function RolePage(props) {
   const modalFormRef = useRef(null);
-  const {Rights: {table}} = props;
+  const {
+    User: {
+      authority,
+    },
+    Rights: {table}
+  } = props;
 
   // 多条件搜索配置
   const searchFormProps = {
     className: styles['form-contaner'],
     layout: 'inline',
+    okPerms: 'role:select',
     dataSource: [
       {
         label: '业务线',
@@ -212,8 +104,8 @@ function RolePage(props) {
         render(r) {
           return (
             <div className={styles.tableaction}>
-              <Button type="primary" size="small" onClick={()=>{console.log(r.id)}}>编辑</Button>
-              <Button size="small" onClick={()=>{console.log(r.id)}}>注销</Button>
+              <AuthButton perms={'role:edit'} type="primary" size="small" onClick={()=>{console.log(r.id)}}>编辑</AuthButton>
+              <AuthButton perms={'role:edit'} size="small" onClick={()=>{console.log(r.id)}}>注销</AuthButton>
             </div>);
         }
       },
@@ -260,7 +152,7 @@ function RolePage(props) {
                       showCheckedStrategy={TreeSelect.SHOW_ALL}
                       placeholder="选择权限"
                       dropdownStyle={{maxHeight: 300, overflow: 'auto'}}
-                      treeData={treeData}
+                      treeData={getTreeData(authority.permissions)}
                       multiple={true}
                       treeCheckable={true}
                   />
@@ -320,7 +212,7 @@ function RolePage(props) {
   return (
     <div>
       <BaseForm {...searchFormProps}>
-        <Button  ghost type="primary" onClick={()=>addUser()}>创建角色</Button>
+        <AuthButton perms={'role:add'}  ghost type="primary" onClick={()=>addUser()}>创建角色</AuthButton>
       </BaseForm>
       <BaseTable {...tableProps}></BaseTable>
       <ModalForm {...modalFormProps} ref={modalFormRef}></ModalForm>
@@ -328,8 +220,8 @@ function RolePage(props) {
   )
 }
 
-function mapStateToProps({Rights}){
-  return {Rights}
+function mapStateToProps({User, Rights}){
+  return {User, Rights}
 }
 
 export default connect(mapStateToProps)(RolePage)

@@ -3,16 +3,19 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-10 11:01:28
+ * @LastEditTime: 2020-08-17 20:50:16
  */ 
 import React, {useState, useEffect} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import { Select, Input, Button } from 'antd';
 import { BaseForm, MoreSelect } from '@components/BasicForm';
-import { BaseTable } from '@components/BasicTable'
+import { BaseTable } from '@components/BasicTable';
 
 import styles from './index.module.less';
+
+import wrapAuth from '@components/WrapAuth';
+const AuthButton = wrapAuth(Button);
 
 const { Option } = Select;
 
@@ -43,6 +46,7 @@ function AuditSearch(props) {
   const searchFormProps = {
     className: styles['form-contaner'],
     layout: 'inline',
+    okPerms: 'news:select',
     dataSource: [
       {
         label: '业务线',
@@ -216,9 +220,9 @@ function AuditSearch(props) {
         render(r) {
           return (
             <div className={styles.tableaction}>
-              <Button type="primary" size="small" onClick={()=>goDetails(r.id)}>领审</Button>
-              <Button size="small" type="dashed" onClick={()=>{console.log(r.id)}}>加队列</Button>
-              <Button size="small" onClick={()=>{console.log(r.id)}}>操作记录</Button>
+              <AuthButton perms={'news:get'} type="primary" size="small" onClick={()=>goDetails(r.id)}>领审</AuthButton>
+              <AuthButton perms={'queue:add'} size="small" type="dashed" onClick={()=>{console.log(r.id)}}>加队列</AuthButton>
+              <AuthButton perms={'history:select'} size="small" onClick={()=>{console.log(r.id)}}>操作记录</AuthButton>
             </div>);
         }
       },
@@ -231,8 +235,8 @@ function AuditSearch(props) {
       <BaseForm {...searchFormProps}></BaseForm>
       <BaseTable {...tableProps}>
         <div className={styles['right-button']}>
-          <Button type="primary" onClick={()=>{}}>通过</Button>
-          <Button type="danger" onClick={() =>{}}>未通过</Button>
+          <AuthButton perms={'news:audit'} type="primary" onClick={()=>{}}>通过</AuthButton>
+          <AuthButton perms={'news:audit'} type="danger" onClick={() =>{}}>未通过</AuthButton>
         </div>
       </BaseTable>
     </div>

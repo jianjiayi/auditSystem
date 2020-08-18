@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-03 10:29:23
+ * @LastEditTime: 2020-08-17 20:37:45
  */ 
 import React, {Fragment, useRef } from 'react';
 import { connect } from 'dva';
@@ -11,17 +11,24 @@ import router from 'umi/router';
 import { Button } from 'antd';
 import { BaseForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
+import wrapAuth from '@components/WrapAuth';
 
 import styles from './index.module.less';
 
+const AuthButton = wrapAuth(Button);
+
 function AuditSettings(props) {
   
-  const {Settings: {table}} = props;
+  const {
+    location,
+    Settings: {table}
+  } = props;
 
   // 搜索表单配置项
   const searchFormProps = {
     className: styles['form-contaner'],
     layout: 'inline',
+    okPerms: 'setting:select',
     dataSource: [
       {
         label: '业务线',
@@ -134,7 +141,7 @@ function AuditSettings(props) {
         render(r) {
           return (
             <div className={styles.tableaction}>
-              <Button type="primary" size="small"onClick={()=>goDetails({id: '2222',action: 'update'})}>修改</Button>
+              <AuthButton perms={'setting:edit'} type="primary" size="small"onClick={()=>goDetails({id: '2222',action: 'update'})}>修改</AuthButton>
               <Button size="small" onClick={()=>{console.log(r.id)}}>停用</Button>
               <Button size="small" onClick={()=>goDetails({id: '2222',action: 'copy'})}>复制</Button>
             </div>);
@@ -148,7 +155,7 @@ function AuditSettings(props) {
   return (
     <Fragment>
       <BaseForm {...searchFormProps}>
-        <Button  ghost type="primary" onClick={()=>goDetails({action: 'create'})}>创建队列</Button>
+        <AuthButton perms={'setting:add'}  ghost type="primary" onClick={()=>goDetails({action: 'create'})}>创建队列</AuthButton>
       </BaseForm>
       <BaseTable {...tableProps}></BaseTable>
     </Fragment>

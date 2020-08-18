@@ -85,7 +85,7 @@ export default function request(url, options) {
     })
     .then(res=>{
       if(res.code === 500){
-        message.error(res.msg)
+        message.error(res.data || res.desc)
         return;
       }
       return res

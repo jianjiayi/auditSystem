@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-14 16:31:29
+ * @LastEditTime: 2020-08-17 20:47:39
  */ 
 import React, { useRef } from 'react';
 import { connect } from 'dva';
@@ -14,6 +14,9 @@ import SectionInfo from './sectionInfo';
 import SectionAction from './sectionAction';
 
 import styles from './index.module.less';
+
+import wrapAuth from '@components/WrapAuth';
+const AuthButton = wrapAuth(Button);
 
 function Operate(props) {
   const {className, CDetails, Global,dispatch} = props;
@@ -63,8 +66,8 @@ function Operate(props) {
       <SectionAction {...sectionActionProps}></SectionAction>
       
       <div className={styles['button-group']}>
-        <Button type="primary" onClick={()=>handleSubmit()}>确定</Button>
-        <Button onClick={()=>handleSubmit()}>跳过</Button>
+        <AuthButton perms={'news:audit'} type="primary" onClick={()=>handleSubmit()}>确定</AuthButton>
+        <AuthButton perms={'news:skip'} onClick={()=>handleSubmit()}>跳过</AuthButton>
         <Button type="primary" ghost onClick={()=>handleSubmit()}>退出</Button>
       </div>
     </div>

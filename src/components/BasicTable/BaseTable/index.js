@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-30 09:35:29
- * @LastEditTime: 2020-08-10 10:56:07
+ * @LastEditTime: 2020-08-17 10:09:37
  */ 
 import React, { useState, useImperativeHandle, forwardRef } from 'react';
 import classNames from 'classnames';
@@ -75,7 +75,7 @@ function BaseTable(props, ref) {
     // dataSource,
     dataSource: createNewArr(dataSource),
     pagination,
-    rowKey: (record, index) => index,
+    rowKey: (record, index) => record.id,
     rowSelection: rowLelection ? rowSelection : null,
     onChange: onPageChg,
     ...rest

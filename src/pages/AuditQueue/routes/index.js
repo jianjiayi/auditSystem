@@ -3,15 +3,18 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-07-21 15:45:07
+ * @LastEditTime: 2020-08-17 19:53:16
  */ 
 import React from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import { Form, Select, Button } from 'antd';
 import { BaseTable } from '@components/BasicTable';
+import wrapAuth from '@components/WrapAuth';
 
 import styles from './index.module.less';
+
+const AuthButton = wrapAuth(Button);
 
 const { Option } = Select;
 
@@ -60,7 +63,7 @@ function AuditQueue(props) {
       {
         title: '操作',
         render(r) {
-          return (<Button onClick={()=>{goDetails(r.id)}}>领取</Button>);
+          return (<AuthButton perms={'queue:receive'} onClick={()=>{goDetails(r.id)}}>领取</AuthButton>);
         }
       },
     ],
@@ -95,7 +98,7 @@ function AuditQueue(props) {
           )}
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">刷新</Button>
+          <AuthButton perms={'queue:select'} type="primary" htmlType="submit">刷新</AuthButton>
         </Form.Item>
       </Form>
 

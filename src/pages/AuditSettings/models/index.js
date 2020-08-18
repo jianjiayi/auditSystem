@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-03 10:34:33
+ * @LastEditTime: 2020-08-17 19:50:18
  */ 
 import * as api from '../service/index.js';
 
@@ -14,7 +14,7 @@ export default {
     isLogin: false,
     // 表单信息
     table: {
-      loading: true,
+      loading: false,
       // 数据源
       dataSource: [
         {
