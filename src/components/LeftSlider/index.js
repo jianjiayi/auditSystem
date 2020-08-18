@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 16:54:36
- * @LastEditTime: 2020-08-14 17:55:41
+ * @LastEditTime: 2020-08-18 09:03:39
  */ 
  
 /* eslint-disable compat/compat */
@@ -65,7 +65,7 @@ function LeftSlider(props) {
       setOpenKeys([])
       setSelectedKeys([])
     }
-  }, [getRouteOpenKeys, menuRoutes, props.selectedKeys])
+  }, [menuRoutes, props.selectedKeys])
 
   //生成路由
   const renderMenuItem = (route) => {
