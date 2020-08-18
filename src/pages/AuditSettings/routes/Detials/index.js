@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-18 10:40:04
+ * @LastEditTime: 2020-08-18 21:51:20
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -13,6 +13,7 @@ import { renderSelect } from '@components/BasicForm/BaseForm';
 import { BaseForm, MoreSelect } from '@components/BasicForm';
 import { ModalTable } from '@components/BasicTable';
 import PageLoading from '@components/PageLoading';
+import _ from 'lodash';
 
 import {getRulesItem, getRules, getDenyWordsKey, isShowInclude} from './config';
 import {
@@ -98,7 +99,14 @@ function QueueDetails(props) {
   /**添加要创建的表单项*/ 
   const addItemOption = (item, isInclude) => {
     console.log(item)
-    let ItemName = item.id +'_'+ isInclude;
+    console.log('itemKey', itemKey)
+    
+    let ItemName = `${item.id}'_'${isInclude == 0 ? 'in': 'notIn'}`;
+    // if(itemKey == 5 || itemKey == 6){
+    //   ItemName = item.id;
+    // }else{
+    //   ItemName = `${item.id}'_'${isInclude == 0 ? 'in': 'notIn'}`;
+    // }
 
     // 判断是否存在该表单项
     let isExist = itemOptions.find((v)=>{
@@ -121,8 +129,8 @@ function QueueDetails(props) {
               (itemKey >= 1 && itemKey <= 4) && 
               getModelSelect(formRef,ItemName,item.name,onOpenModal)
             }
-            {itemKey == 5 && getContentNumber(formRef,ItemName)}
-            {itemKey == 6 && getMediaWeight(getFieldDecorator,ItemName)}
+            {itemKey == 5 && getContentNumber(formRef,ItemName,[45,88])}
+            {itemKey == 6 && getMediaWeight(formRef,ItemName,[4,9])}
             {itemKey == 7 && getMediaType(formRef,ItemName,mediaInfo, mediaInfoList)}
             {itemKey == 8 && getMediaClassify(formRef,ItemName)}
             {itemKey == 9 && getMediaAttr(getFieldDecorator,ItemName)}
@@ -208,7 +216,7 @@ function QueueDetails(props) {
         name:'type',
         required: true,
         placeholder:'选择类型',
-        map: { noraml: '图文', video: '视频', audio: '音频', images: '图集' }
+        map: { 1: '图文', 2: '视频', 3: '音频', 4: '图集' }
       },
       { label: '队列名称', name: 'name', required: true,},
       {
@@ -286,11 +294,29 @@ function QueueDetails(props) {
       ...art
     },
     onSearch: (formValues)=>{
+      // 整理配置规则
+      let ruleJson = {};
+      if(_.isEmpty(formOptions)){
+        return message.error('请添加配置规则')
+      }
+      !_.isEmpty(formOptions) && formOptions.map((option, index) => {
+        ruleJson[option.name] = formValues[option.name];
+        delete formValues[option.name];
+      })
+      formValues.ruleJson = ruleJson;
+      
       console.log('formValues', formValues)
+      
+      dispatch({
+        type: 'QDetails/saveQueue',
+        payload: formValues,
+        callback: (res) => {
+
+        }
+      })
     }
   }
-
-  const refForm = null;
+  
 
   // 打开模态框
   const onOpenModal = (name, label)=>{

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-18 10:02:08
+ * @LastEditTime: 2020-08-18 19:39:29
  */ 
 import React, {useRef} from 'react';
 import { connect } from 'dva';
@@ -134,6 +134,7 @@ function UserRights(props) {
   const addUser = () =>{
     modalFormRef.current.setVisible(true);
   }
+
 
   // 
   const modalFormProps = {

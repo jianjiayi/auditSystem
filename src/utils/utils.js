@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-24 10:51:22
- * @LastEditTime: 2020-08-18 10:38:47
+ * @LastEditTime: 2020-08-18 10:49:32
  */ 
 
 
@@ -133,8 +133,8 @@ export const ExParams = {
 * 获取对象第一个属性值
 */ 
 export const ExObject = {
+  //获取随机第一个
   getFirstValue (data){
-     for (var key in data)
-        return data[key];
+    return Object.keys(data)[0]
   }
 }

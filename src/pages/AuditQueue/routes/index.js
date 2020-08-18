@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-17 19:53:16
+ * @LastEditTime: 2020-08-18 19:43:59
  */ 
 import React from 'react';
 import { connect } from 'dva';
@@ -73,6 +73,18 @@ function AuditQueue(props) {
   return (
     <div>
       <Form layout="inline" onSubmit={handleSubmit}>
+        <Form.Item>
+          {getFieldDecorator('role', {
+            initialValue: '0',
+          })(
+           <Select style={{ width: '160px' }}>
+              <Option value="0">聚合分发</Option>
+              <Option value="1">视频</Option>
+              <Option value="2">音频</Option>
+              <Option value="3">图集</Option>
+            </Select>
+          )}
+        </Form.Item>
         <Form.Item>
           {getFieldDecorator('username', {
             initialValue: '0',

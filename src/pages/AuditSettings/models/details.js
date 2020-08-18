@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-17 09:45:05
+ * @LastEditTime: 2020-08-18 21:52:50
  */ 
 import * as api from '../service/index.js';
 
@@ -76,6 +76,22 @@ export default {
           art
         }
       })
+    },
+    // 保存接口
+    *saveQueue({payload, callback}, {call, put}){
+      // yield put({type: 'save',payload: { loading: true}})
+      const {code, data} = yield call(api.saveQueue, payload);
+      if(code == 200){
+        yield put({
+          type: 'save',
+          payload: {
+            // loading: false,
+          },
+          callback: (code) => {
+
+          }
+        })
+      }
     },
     // 获取规则列表接口
     *getRuleInfo({payload}, {call, put}){

@@ -3,14 +3,14 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-08-14 16:16:40
+ * @LastEditTime: 2020-08-18 21:42:21
  */ 
 import request from '@http';
 import { ExParams } from '@utils/utils';
 
-export async function login(params){
-  alert(1)
-  return request(`/user/login`, {
+// 保存接口
+export async function saveQueue(params){
+  return request(`/save/queue`, {
     method: 'POST',
     body: params
   })

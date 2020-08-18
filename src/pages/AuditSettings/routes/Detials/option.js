@@ -3,12 +3,13 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-14 09:06:08
- * @LastEditTime: 2020-08-17 09:59:03
+ * @LastEditTime: 2020-08-18 21:32:34
  */
 import React, {useState} from 'react';
 import _ from 'lodash';
 import {message, Modal, Tag, Select, Input, InputNumber, Button, Row, Col, Icon } from 'antd';
 import { renderSelect, renderCheckBoxGroup } from '@components/BasicForm/BaseForm'; 
+import { MaxAndMin } from '@components/BasicForm';
 const { Option } = Select;
 const InputGroup = Input.Group;
 
@@ -49,49 +50,49 @@ export const getModelSelect = (formRef, ItemName, label, onOpenModal) =>{
 }
 
 // 内容分值
-export const getContentNumber = (formRef,ItemName) =>{
+export const getContentNumber = (formRef,ItemName, values = []) =>{
   const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
 
-  let minName = ItemName+'min';
-  let maxName = ItemName+'max';
-  const onChange = (type, value) =>{
-    console.log(type, value)
-    if(type == 'min'){
-      let max = getFieldValue(maxName) || 100;
-      if(value>=max) setFieldsValue({minName: max})
-    }else{
-      let min = getFieldValue(minName) || 0;
-      if(value<=min) setFieldsValue({maxName: min})
+  const MaxAndMinProps = {
+    number: values,
+    min: 0,
+    max: 100,
+    onChangeNumber: (values) => {
+      console.log(values)
+      
+      let obj = {};
+      obj[ItemName]= values;
+      setFieldsValue(obj)
     }
   }
 
   return getFieldDecorator(ItemName, {
     rules: [{ required: true, message: `请输入内容分值` }],
     // initialValue: formValues.name5,
-  })(
-    <InputGroup compact>
-      {
-        getFieldDecorator(minName, {
-          // rules: [{ required: true, message: `请输入内容分值` }],
-          // initialValue: formValues.name5,
-        })(<InputNumber min={0} onBlur={e=>onChange('min', e.currentTarget.value)}></InputNumber>)
-      }
-      {
-        getFieldDecorator(maxName, {
-          // rules: [{ required: true, message: `请输入内容分值` }],
-          // initialValue: formValues.name5,
-        })(<InputNumber max={100} onBlur={e=>onChange('max', e.currentTarget.value)}></InputNumber>)
-      }
-    </InputGroup>
-  )
+  })(<MaxAndMin {...MaxAndMinProps}></MaxAndMin>)
 }
 
 // 媒体权重
-export const getMediaWeight = (getFieldDecorator, ItemName) => {
+export const getMediaWeight = (formRef, ItemName, values = []) => {
+  const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
+
+  const MaxAndMinProps = {
+    number: values,
+    min: 0,
+    max: 10,
+    onChangeNumber: (values) => {
+      console.log(values)
+      
+      let obj = {};
+      obj[ItemName]= values;
+      setFieldsValue(obj)
+    }
+  }
+
   return getFieldDecorator(ItemName, {
     rules: [{ required: true, message: `请输入媒体权重` }],
     // initialValue: formValues.name5,
-  })(<InputNumber min={1} max={10}></InputNumber>)
+  })(<MaxAndMin {...MaxAndMinProps}></MaxAndMin>)
 }
 
 // 媒体类型
@@ -157,7 +158,7 @@ export const getMediaData = (getFieldDecorator, ItemName) =>{
 export const getBreakRules = (getFieldDecorator, ItemName, label) =>{
   return  getFieldDecorator(ItemName, {
     // rules: [{ required: true, message: `请选择` }],
-    initialValue: label,
+    initialValue: 1,
   })(
     <span>{label}</span>
   );
