@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-08-17 13:33:42
- * @LastEditTime: 2020-08-18 09:00:40
+ * @LastEditTime: 2020-08-18 09:39:23
  */
 import _ from 'lodash';
 
@@ -60,7 +60,7 @@ export const getLocalRoutesFlatten = (sliderMenus) => {
 // 获取系统路由菜单
 export const getSliderMenusList = (dataPermissions, sliderMenus) =>{
   // 深拷贝权限
-  let permissions = _.cloneDeep(dataPermissions);
+  let permissions = _.cloneDeep(dataPermissions) || [];
   // 获取所有路由
   const getRouteRights = (data)=>{
     return data.filter((item)=> item.type == 0);
@@ -114,9 +114,8 @@ export const getNowRoutePermission = (pathname, dataPermissions) => {
 
   // console.log(dataPermissions)
   let nowRoute = dataPermissions.find((item) => item.permissionUrl == pathname);
-  if(!nowRoute) return [];
   // 获取所有按钮
   const btnPermission = dataPermissions.filter((item)=> item.parentId == nowRoute.permissionId && item.type == 1);
-  console.log(btnPermission);
+  // console.log(btnPermission);
   return btnPermission;
 }

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 16:54:36
- * @LastEditTime: 2020-08-18 09:03:39
+ * @LastEditTime: 2020-08-18 09:40:43
  */ 
  
 /* eslint-disable compat/compat */
@@ -18,6 +18,7 @@ const { Sider } = Layout;
 const { SubMenu } = Menu;
 
 function LeftSlider(props) {
+  // console.log('props.menuRoutes', props.menuRoutes)
   const [menuRoutes, setMenuRoutes] = useState(props.menuRoutes);
   const [openKeys, setOpenKeys] = useState([]);
   const [selectedKeys, setSelectedKeys] = useState([]);
@@ -59,13 +60,14 @@ function LeftSlider(props) {
   });
 
   useEffect(()=>{
+    setMenuRoutes(props.menuRoutes)
     getRouteOpenKeys(menuRoutes, [], props.selectedKeys);
     
     return () =>{
       setOpenKeys([])
       setSelectedKeys([])
     }
-  }, [menuRoutes, props.selectedKeys])
+  }, [props.menuRoutes, props.selectedKeys])
 
   //生成路由
   const renderMenuItem = (route) => {
