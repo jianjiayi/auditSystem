@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-17 20:41:04
+ * @LastEditTime: 2020-08-18 10:02:08
  */ 
 import React, {useRef} from 'react';
 import { connect } from 'dva';
@@ -21,7 +21,14 @@ const { TextArea } = Input;
 
 function UserRights(props) {
   const modalFormRef = useRef(null);
-  const {Rights: {table}} = props;
+  const {
+    User: {
+      business,
+    },
+    Rights: {
+      table
+    }
+  } = props;
 
 
   const searchFormProps = {
@@ -34,7 +41,7 @@ function UserRights(props) {
         type: 'SELECT',
         name:'params1',
         initialValue: '0',
-        map: { 0: '全部', 1: '选项1', 2: '选项2' }
+        map: business
       },
       {
         label: '角色',
@@ -197,8 +204,8 @@ function UserRights(props) {
   )
 }
 
-function mapStateToProps({Rights}){
-  return {Rights}
+function mapStateToProps({User, Rights}){
+  return {User, Rights}
 }
 
 export default connect(mapStateToProps)(UserRights)

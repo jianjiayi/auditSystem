@@ -3,9 +3,10 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-17 16:32:08
+ * @LastEditTime: 2020-08-18 10:04:21
  */ 
 import * as api from '../service/index.js';
+import _ from 'lodash';
 import {setStorage, getStorage} from '@utils/localStorage';
 
 export default {
@@ -13,7 +14,7 @@ export default {
   
   state: {
     isLogin: sessionStorage.getItem('$isLogin') || '',//验证用户登录
-    business: sessionStorage.getItem('$business') != '' ? JSON.parse(sessionStorage.getItem('$business')) || [] : [],//保存用户业务线
+    business: sessionStorage.getItem('$business') != '' ? JSON.parse(sessionStorage.getItem('$business')) || {} : {},//保存用户业务线
     user: {
       name: 'admin'
     },
@@ -44,26 +45,31 @@ export default {
     *getBusiness({ payload, callback }, { call, put }){
       const {code ,data} = yield call(api.getBusiness, {});
       if(code == 200){
-        sessionStorage.setItem('$business', JSON.stringify(data));
-        yield put({type: 'save', payload:{business: data}});
+        let map = {}
+        !_.isEmpty(data) && data.map(item=>{
+          map[item.id] = item.coorpName
+        })
+        
+        yield put({type: 'save', payload:{business: map}});
+        sessionStorage.setItem('$business', JSON.stringify(map));
       }
     },
     // 获取用户角色和权限
     *getRoleAndPermission({ payload, callback }, { call, put }){
       const {code ,data} = yield call(api.getRoleAndPermission, {});
       if(code == 200){
-        sessionStorage.setItem('$authority', JSON.stringify(data));
+
         yield put({type: 'save', payload:{authority: data}});
+        sessionStorage.setItem('$authority', JSON.stringify(data));
       }
     },
     // 退出登录
     *logout({ payload, callback }, { call, put }){
+
+      yield put({type: 'save', payload:{ isLogin: false, user: {}, business: []}});
       sessionStorage.setItem('$business', JSON.stringify({}));
       sessionStorage.setItem('$authority', JSON.stringify({}));
       sessionStorage.setItem('$isLogin', '');
-
-      yield put({type: 'save', payload:{ isLogin: false, user: {}, business: []}});
-      
       callback()
     }
   },

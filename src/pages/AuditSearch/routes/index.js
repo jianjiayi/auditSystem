@@ -3,12 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-17 20:50:16
+ * @LastEditTime: 2020-08-18 10:26:06
  */ 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import { Select, Input, Button } from 'antd';
+import {Form, Select, Input, Button } from 'antd';
 import { BaseForm, MoreSelect } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
 
@@ -20,26 +20,66 @@ const AuthButton = wrapAuth(Button);
 const { Option } = Select;
 
 function AuditSearch(props) {
-  const {Search:{table}} = props;
+  
+  const formRef = useRef(null);
   // 搜索标题、ID参数名称
-  const [params, setParams] = useState('title')
+  const [params, setParams] = useState('title');
 
-  // 三级分类参数
-  const moreSelectPrtops = {
+  const {
+    dispatch,
+    category, //分类
+    Global: {
+      firstCategory,
+      secondCategory,
+      thirdCategory,
+    },
+    User: {
+      business
+    },
+    Search:{
+      table
+    },
+    form: {getFieldDecorator, getFieldValue, setFieldsValue},
+  } = props;
+
+
+  useEffect(()=>{
+    dispatch({
+      type: 'Search/init',
+      payload: {}
+    })
+  }, [])
+
+
+  /**三级分类参数*/ 
+  const moreSelectProps = {
     size: 'default',
     style: { width: '420px' },
-    firstCategoryId: '',
-    secondCategoryId: '',
-    thirdCategoryId: '',
-    firstCategory: [],
-    secondCategory: [],
-    thirdCategory: [],
-    selectFirstCategory: () =>{
-
+    category, //分类
+    firstCategory,
+    secondCategory,
+    thirdCategory,
+    onSelect: (values) => {
+      let arr = Object.values(values);
+      arr = arr.filter((item,index)=>item != undefined)
+      formRef.current.setFieldsValue({'category':arr.join('/')})
     },
-    selectSecondCategory: ()=>{
-
-    }
+    selectFirstCategory: (id) =>{
+      dispatch({
+        type: 'Global/getSecondCategory',
+        payload: {
+          id: id
+        }
+      })
+    },
+    selectSecondCategory: (id)=>{
+      dispatch({
+        type: 'Global/getThirdCategory',
+        payload: {
+          id: id
+        }
+      })
+    },
   }
 
   // 多条搜索表单配置
@@ -53,7 +93,7 @@ function AuditSearch(props) {
         type: 'SELECT',
         name:'params1',
         initialValue: '0',
-        map: { 0: '聚合分发', 1: '选项1',2: '选项2' }
+        map: business
       },
       {
         label: '内容类型',
@@ -68,10 +108,10 @@ function AuditSearch(props) {
         itemRender: getFieldDecorator => (
           <div className="">
             {
-              getFieldDecorator('params3', {
+              getFieldDecorator('category', {
                 // rules: [{ required: true, message: `请选择` }],
                 // initialValue: formValues.name5,
-              })(<MoreSelect {...moreSelectPrtops}></MoreSelect>)
+              })(<MoreSelect {...moreSelectProps}></MoreSelect>)
             }
           </div>
         )
@@ -232,7 +272,7 @@ function AuditSearch(props) {
 
   return (
     <div>
-      <BaseForm {...searchFormProps}></BaseForm>
+      <BaseForm {...searchFormProps}  wrappedComponentRef={formRef}></BaseForm>
       <BaseTable {...tableProps}>
         <div className={styles['right-button']}>
           <AuthButton perms={'news:audit'} type="primary" onClick={()=>{}}>通过</AuthButton>
@@ -243,8 +283,8 @@ function AuditSearch(props) {
   )
 }
 
-function mapStateToProps({Search}){
-  return {Search}
+function mapStateToProps({Global, User, Search}){
+  return {Global, User, Search}
 }
 
-export default connect(mapStateToProps)(AuditSearch)
+export default Form.create({})(connect(mapStateToProps)(AuditSearch))

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-24 10:51:22
- * @LastEditTime: 2020-08-17 14:51:49
+ * @LastEditTime: 2020-08-18 10:38:47
  */ 
 
 
@@ -126,5 +126,15 @@ export const ExParams = {
       result = '?' + result.slice(1);
     }
     return result;
+  }
+}
+
+/**
+* 获取对象第一个属性值
+*/ 
+export const ExObject = {
+  getFirstValue (data){
+     for (var key in data)
+        return data[key];
   }
 }

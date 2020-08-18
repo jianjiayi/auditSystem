@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-17 10:05:26
+ * @LastEditTime: 2020-08-18 10:40:04
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -29,7 +29,7 @@ import {
   getAuditType
 } from './option';
 
-import { ExArray } from '@utils/utils.js';
+import { ExArray, ExObject } from '@utils/utils.js';
 
 import styles from './index.module.less';
 
@@ -198,9 +198,9 @@ function QueueDetails(props) {
         label: '业务线',
         type: 'SELECT',
         name:'bid',
-        initialValue: '3001004',
+        initialValue: ExObject.getFirstValue(business),
         placeholder:'选择业务线',
-        map: { '3001004': '聚合分发', key1: '选项1', key2: '选项2' }
+        map: business,
       },
       {
         label: '内容类型',

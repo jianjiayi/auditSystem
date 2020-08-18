@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-17 20:40:31
+ * @LastEditTime: 2020-08-18 10:01:16
  */ 
 import React, {useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -25,6 +25,7 @@ function RolePage(props) {
   const modalFormRef = useRef(null);
   const {
     User: {
+      business,
       authority,
     },
     Rights: {table}
@@ -41,7 +42,7 @@ function RolePage(props) {
         type: 'SELECT',
         name:'params1',
         initialValue: '0',
-        map: { 0: '全部', 1: '选项1', 2: '选项2' }
+        map: business
       },
       {
         label: '角色',

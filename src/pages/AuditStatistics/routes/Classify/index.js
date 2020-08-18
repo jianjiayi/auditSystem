@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-17 20:39:17
+ * @LastEditTime: 2020-08-18 09:59:55
  */ 
 import React, {useState, useRef} from 'react';
 import { connect } from 'dva';
@@ -24,7 +24,14 @@ function AuditStatistics(props) {
   // 搜索标题、ID参数名称
   const [params, setParams] = useState('default');
   
-  const {Statistics: {table}} = props;
+  const {
+    User: {
+      business
+    },
+    Statistics: {
+      table
+    }
+  } = props;
 
   // 多条件搜索配置
   const searchFormProps = {
@@ -37,7 +44,7 @@ function AuditStatistics(props) {
         type: 'SELECT',
         name:'params0',
         initialValue: '0',
-        map: { 0: '图文', 1: '选项1', 2: '选项2' }
+        map: business
       },
       {
         label: '类型',
@@ -139,8 +146,8 @@ function AuditStatistics(props) {
   )
 }
 
-function mapStateToProps({Statistics}){
-  return {Statistics}
+function mapStateToProps({User, Statistics}){
+  return {User, Statistics}
 }
 
 export default connect(mapStateToProps)(AuditStatistics)

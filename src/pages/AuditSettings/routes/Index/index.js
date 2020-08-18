@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-17 20:37:45
+ * @LastEditTime: 2020-08-18 09:57:47
  */ 
 import React, {Fragment, useRef } from 'react';
 import { connect } from 'dva';
@@ -21,6 +21,9 @@ function AuditSettings(props) {
   
   const {
     location,
+    User: {
+      business
+    },
     Settings: {table}
   } = props;
 
@@ -35,7 +38,7 @@ function AuditSettings(props) {
         type: 'SELECT',
         name:'params1',
         initialValue: '0',
-        map: { 0: '全部', 1: '选项1', 2: '选项2',0: '全部', 1: '选项1', 2: '选项2'  }
+        map: business
       },
       {
         label: '内容类型',
@@ -162,8 +165,8 @@ function AuditSettings(props) {
   )
 }
 
-function mapStateToProps({Settings}){
-  return {Settings}
+function mapStateToProps({User, Settings}){
+  return {User, Settings}
 }
 
 export default connect(mapStateToProps)(AuditSettings)

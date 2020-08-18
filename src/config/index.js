@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 14:15:45
- * @LastEditTime: 2020-08-17 16:32:21
+ * @LastEditTime: 2020-08-18 09:47:30
  */ 
 
 const type = process.env.BUILD_TYPE;

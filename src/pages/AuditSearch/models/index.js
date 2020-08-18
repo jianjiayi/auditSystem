@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-07-17 14:42:48
+ * @LastEditTime: 2020-08-18 10:24:49
  */ 
 import * as api from '../service/index.js';
 
@@ -54,6 +54,12 @@ export default {
   },
 
   effects: {
+    // 初始化
+    *init({payload}, {call, put}){
+      yield put({type: 'save',payload: { loading: true}})
+      yield put({type: 'Global/getFirstCategory'});
+      yield put({type: 'save',payload: { loading: false}})
+    },
     *login({ payload }, { call, put }){
       const { code, data } = yield call(api.login, {});
       if(code == 0){

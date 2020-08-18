@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-20 16:56:06
- * @LastEditTime: 2020-08-18 09:39:05
+ * @LastEditTime: 2020-08-18 09:46:44
  */ 
 import React, {Component} from 'react';
 import { Modal } from 'antd';
@@ -36,7 +36,7 @@ const wrapAuth = ((ComposedComponent, path) => withRouter(class WrapComponent ex
         let {location, perms, staticContext, ...rest} = this.props;
 
         const comProps = {
-            disabled: perms ? this.isProteceBtn(location, perms) : false,
+            disabled: perms ? !this.isProteceBtn(location, perms) : false,
             ...rest
         }
         return <ComposedComponent {...comProps}></ComposedComponent>
