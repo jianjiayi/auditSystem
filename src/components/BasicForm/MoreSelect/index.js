@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-07 10:21:51
- * @LastEditTime: 2020-08-14 17:25:31
+ * @LastEditTime: 2020-08-19 17:34:15
  */ 
 import React, {useState, useEffect} from 'react';
 import {Form, Select, Row, Col} from 'antd';
@@ -16,7 +16,7 @@ const { Option } = Select;
 function MoreSelect(props) {
   const {
     style = {},
-    category = '',
+    category,
     onSelect,
     firstCategory = [],
     secondCategory = [],
@@ -28,9 +28,10 @@ function MoreSelect(props) {
 
   useEffect(()=>{
     initSelect()
-  },[initSelect])
+  },[initSelect, category])
 
   const initSelect = () => {
+    // console.log('category',category)
     let categoryArr = category && category.split('/') || [];
     for(var i in categoryArr){
       (function(i){

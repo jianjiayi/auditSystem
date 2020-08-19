@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-19 18:57:01
+ * @LastEditTime: 2020-08-19 21:57:53
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -43,13 +43,14 @@ const InputGroup = Input.Group;
 * formOptions改变量用于辅助动态创建表单用
 */ 
 let formOptions =  [];
+let itemKey = null;
 
 
 function QueueDetails(props) {
   const formRef = useRef(null);
   const rulesModal = useRef(null);
   // 创建key
-  const [itemKey, setItemKey] = useState(null);
+  // const [itemKey, setItemKey] = useState(null);
   // 包含状态
   const [include, setInclude] = useState(0);
   // 动态表单项数组
@@ -100,7 +101,8 @@ function QueueDetails(props) {
     })
 
     return ()=>{
-      formOptions =  [];//组件销毁时候，清空配置数组
+      formOptions = []
+      setItemOptions([]);//组件销毁时候，清空配置数组
     }
   }, [art, dispatch, location.query.action, location.query.id]);
 
@@ -109,24 +111,40 @@ function QueueDetails(props) {
     insertForm(art.ruleJson);
 
     return ()=>{
-
+      formOptions = []
     }
   },[art, insertForm])
 
   // 将创建配置规则嵌入Form里面
   const insertForm = (ruleJson) => {
+    formOptions = []
     if(_.isEmpty(ruleJson)) return;
 
     let data = JSON.parse(ruleJson);
+    console.log(data)
     for (let key in data){
       console.log(key)
-      addItemOption(key)
+      let keyArr = key.split("_");
+      // console.log('include',keyArr)
+      
+      let iKey = keyArr[0];
+      
+      
+      if(keyArr.length>1){
+        let include = keyArr[1] == 'in' ? 0 : 1;
+        // console.log('configRule', configRule)
+        console.log('keyArr[0]',iKey)
+        addItemOption(iKey, getRulesItem(iKey, configRule), include, data[key])
+      }else{
+        addItemOption(iKey, getRulesItem(iKey, configRule), 0, data[key])
+      }
+      
     }
   }
   
   
   /**添加要创建的表单项*/ 
-  const addItemOption = (item, isInclude) => {
+  const addItemOption = (itemKey, item, isInclude, values='') => {
     console.log(item)
     console.log('itemKey', isShowInclude(itemKey))
     
@@ -147,46 +165,47 @@ function QueueDetails(props) {
       name: ItemName,
       isInclude,
       itemRender:  getFieldDecorator => (
-        <Row type="flex">
+        <Row key={itemKey} type="flex">
           <Col span={18}>
             {
               (itemKey >= 1 && itemKey <= 4) && 
-              getModelSelect(formRef,ItemName,item.name,onOpenModal)
+              getModelSelect(formRef,ItemName,item.name,onOpenModal, values)
             }
-            {itemKey == 5 && getContentNumber(formRef,ItemName,[45,88])}
-            {itemKey == 6 && getMediaWeight(formRef,ItemName,[4,9])}
-            {itemKey == 7 && getMediaType(formRef,ItemName,mediaInfo, mediaInfoList)}
-            {itemKey == 8 && getMediaClassify(formRef,ItemName)}
-            {itemKey == 9 && getMediaAttr(getFieldDecorator,ItemName)}
-            {itemKey == 10 && getMediaData(getFieldDecorator,ItemName)}
+            {itemKey == 5 && getContentNumber(formRef,ItemName,values)}
+            {itemKey == 6 && getMediaWeight(formRef,ItemName,values)}
+            {itemKey == 7 && getMediaType(formRef,ItemName,mediaInfo, mediaInfoList, values)}
+            {itemKey == 8 && getMediaClassify(formRef,ItemName, values)}
+            {itemKey == 9 && getMediaAttr(getFieldDecorator,ItemName, values)}
+            {itemKey == 10 && getMediaData(getFieldDecorator,ItemName, values)}
             {
               itemKey >= 11 && itemKey <= 14 && 
-              getBreakRules(getFieldDecorator,ItemName,item.name)
+              getBreakRules(getFieldDecorator,ItemName,item.name, values)
             }
-            {itemKey == 15 && getSpecificText(getFieldDecorator,ItemName)}
-            {itemKey == 16 && getTimeLiness(getFieldDecorator,ItemName)}
-            {itemKey == 17 && getAuditType(getFieldDecorator,ItemName)}
+            {itemKey == 15 && getSpecificText(getFieldDecorator,ItemName, values)}
+            {itemKey == 16 && getTimeLiness(getFieldDecorator,ItemName, values)}
+            {itemKey == 17 && getAuditType(getFieldDecorator,ItemName, values)}
             { 
               (itemKey >= 18 && itemKey <= 19 )  && 
-              getSourceSelect(formRef,ItemName,item.name,sourceList)
+              getSourceSelect(formRef,ItemName,item.name,sourceList, values=null)
             }
           </Col>
           <Col span={1}>
-            <Button type='link' icon="delete" onClick={()=>delItemOption(ItemName)}>删除</Button>
+            <Button key={ItemName} type='link' icon="delete" onClick={()=>delItemOption(ItemName)}>删除</Button>
           </Col>
         </Row>
       )
     }
-    console.log('222222222222')
+    
     formOptions.push(options)
-    console.log(formOptions)
     setItemOptions([...formOptions])
   }
 
   /**删除创建的表单项*/ 
   const delItemOption = (name) =>{
-    let arr = formOptions;
-    arr.splice(arr.findIndex(item =>  item.name === name), 1);
+    
+    let remoteItem = formOptions.find(item =>  item.name == name);
+    console.log('remoteItem',remoteItem)
+    _.pull(formOptions, remoteItem);
     setItemOptions([...formOptions])
   }
 
@@ -264,6 +283,7 @@ function QueueDetails(props) {
         type: 'SELECT',
         name:'params5',
         placeholder:'选择状态',
+        initialValue: '无',
         itemRender: getFieldDecorator => (
           <div  type="flex">
             {
@@ -274,7 +294,7 @@ function QueueDetails(props) {
                   style: {width: '160px'},
                   onChange: (e)=>{
                     // console.log('change',e);
-                    setItemKey(e)
+                    itemKey = e
                   }
                 })
               )
@@ -296,12 +316,12 @@ function QueueDetails(props) {
             <Button 
               type='link' 
               disabled={itemKey ==null || itemKey ==0} 
-              onClick={()=>addItemOption(getRulesItem(itemKey,configRule), include)}
+              onClick={()=>addItemOption(itemKey, getRulesItem(itemKey,configRule), include)}
             >添加</Button>
           </div>
         )
       },
-      ...itemOptions,
+      ...formOptions,
       {
         label: '队列机制',
         type: 'RADIO',
@@ -320,8 +340,9 @@ function QueueDetails(props) {
     ],
     formValues: {
       ...art,
-      queueType: art['queueType'] && art['queueType'].toString(),
-      keepDays: art['queueType'] && art['keepDays'].toString(),
+      category: _.cloneDeep(art['category']),
+      queueType: _.toString(art['queueType']),
+      keepDays: _.toString(art['keepDays']),
     },
     onSearch: (formValues)=>{
       // 整理配置规则

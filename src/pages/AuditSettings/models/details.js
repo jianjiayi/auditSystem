@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-18 21:52:50
+ * @LastEditTime: 2020-08-19 17:29:07
  */ 
 import * as api from '../service/index.js';
 
@@ -15,7 +15,8 @@ export default {
     configRule: [], // 配置规则
     mediaInfo: [], //媒体类型
     mediaInfoList: {},
-    category: '152/219', //三级分类
+    sourceList: [], //内容来源、抓取来源
+    category: '', //三级分类
     // 查询条件
     query: {},
     // 文章列表
@@ -43,55 +44,38 @@ export default {
 
   effects: {
     // 初始化
-    *init({payload}, {call, put}){
-      yield put({type: 'save',payload: { loading: true}})
+    *init({payload, callback}, {call, put, select}){
+      yield put({type: 'save',payload: {art: {}, loading: true}})
       yield put({type: 'getMediaInfo', payload: {type: 'rmw_media_type'}});
       yield put({type: 'Global/getFirstCategory'});
       yield put({type: 'getRuleInfo'});
+      yield put({type: 'getContentSource'});
       yield put({type: 'save',payload: { loading: false}})
-
       
       if(payload.action == 'create') return;
-      let art = {
-        isInclude: 1,
-        params1: "all",
-        params2: "video",
-        params3: "111",
-        params4: undefined,
-        params5: "1",
-        params6: "1",
-        params7: "1",
-        rparams1_0: undefined,
-        rparams1_1: undefined,
-        rparams2_0: undefined,
-        rparams3_0: undefined,
-        rparams4_0: undefined,
-        rparams5_0: undefined,
-        rparams6_0: undefined,
-        rparams7_0: undefined,
+
+      // 编辑、复用
+      yield put({type: 'getQueue',payload});
+    },
+    *getQueue({payload}, {call, put, select}){
+      const {code, data} = yield call(api.getQueue, payload);
+      
+      if(code == 200 && data){
+         yield put({
+          type: 'save',
+          payload: {
+            loading: false,
+            art: data.data[0] || {},
+            category: data.data[0].category
+          },
+        })
       }
-      yield put({
-        type: 'save',
-        payload: {
-          art
-        }
-      })
     },
     // 保存接口
     *saveQueue({payload, callback}, {call, put}){
       // yield put({type: 'save',payload: { loading: true}})
       const {code, data} = yield call(api.saveQueue, payload);
-      if(code == 200){
-        yield put({
-          type: 'save',
-          payload: {
-            // loading: false,
-          },
-          callback: (code) => {
-
-          }
-        })
-      }
+      callback(code);
     },
     // 获取规则列表接口
     *getRuleInfo({payload}, {call, put}){
@@ -101,6 +85,18 @@ export default {
           type: 'save',
           payload: {
             configRule: data
+          }
+        })
+      }
+    },
+    // 内容来源、抓取来源接口
+    *getContentSource({payload}, {call, put}){
+      const {code, data} = yield call(api.getContentSource, payload);
+      if(code == 200){
+        yield put({
+          type: 'save',
+          payload: {
+            sourceList: data
           }
         })
       }

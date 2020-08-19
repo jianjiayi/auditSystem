@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-17 19:50:18
+ * @LastEditTime: 2020-08-19 15:30:08
  */ 
 import * as api from '../service/index.js';
 
@@ -12,56 +12,57 @@ export default {
   
   state: {
     isLogin: false,
-    // 表单信息
-    table: {
-      loading: false,
-      // 数据源
-      dataSource: [
-        {
-          name: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-        },
-        {
-          name: 'Jim Green',
-          age: 42,
-          address: 'London No. 1 Lake Park',
-        },
-        {
-          name: 'Joe Black',
-          age: 32,
-          address: 'Sidney No. 1 Lake Park',
-        },
-        {
-          name: 'Disabled User',
-          age: 99,
-          address: 'Sidney No. 1 Lake Park',
-        },
-      ],
-      // 分页信息
-      pagination: {
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: total => `共 ${total} 条`,
-          pageSize: 10,
-          current: 1,
-          total: null
-      },
+    loading: false,
+    // 查询条件
+    query: {},
+    // 文章列表
+    dataSource: [],
+    // 分页信息
+    pagination: {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      showTotal: total => `共 ${total} 条`,
+      pageSize: 10,
+      current: 1,
+      total: null
     },
   },
 
   effects: {
-    *login({ payload }, { call, put }){
-      const { code, data } = yield call(api.login, {});
-      if(code == 0){
-        yield put({
+    // 初始化
+    *init({payload}, {call, put}){
+      yield put({type: 'save',payload: { query: {}, loading: true}})
+      yield put({type: 'getQueue'})
+    },
+    *getQueue({payload}, {call, put, select}){
+      const {query, pagination} = yield select(({ Settings }) => Settings);
+      // 合并参数
+      const params = {
+        ...query,
+        pageNum: 1,
+        pageSize: pagination.pageSize,
+        ...payload,
+      };
+      
+      const {code, data} = yield call(api.getQueue, params);
+      
+      if(code == 200 && data){
+         yield put({
           type: 'save',
           payload: {
-            isLogin: true
+            loading: false,
+            query: params,
+            dataSource: data.data || [],
+            pagination: {
+              ...pagination,
+              total: data.totalSize,
+              current: data.pageNum,
+              pageSize: 10
+            }
           }
         })
       }
-    }
+    },
   },
 
   reducers: {

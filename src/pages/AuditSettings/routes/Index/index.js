@@ -3,29 +3,47 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-18 09:57:47
+ * @LastEditTime: 2020-08-19 16:45:54
  */ 
-import React, {Fragment, useRef } from 'react';
+import React, {Fragment, useEffect, useRef } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import { Button } from 'antd';
 import { BaseForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
 import wrapAuth from '@components/WrapAuth';
+import _ from 'lodash';
+
+import { ExArray, ExObject } from '@utils/utils.js';
+import {contentType, queueType, keepDays, queueStatus} from '@config/constants';
 
 import styles from './index.module.less';
 
 const AuthButton = wrapAuth(Button);
 
+const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+
 function AuditSettings(props) {
   
   const {
+    dispatch,
     location,
     User: {
       business
     },
-    Settings: {table}
+    Settings: {
+      loading,
+      dataSource, 
+      pagination,
+    }
   } = props;
+
+  useEffect(()=>{
+    dispatch({
+      type: 'Settings/init',
+      payload: {}
+    })
+  }, [dispatch])
 
   // 搜索表单配置项
   const searchFormProps = {
@@ -36,44 +54,55 @@ function AuditSettings(props) {
       {
         label: '业务线',
         type: 'SELECT',
-        name:'params1',
-        initialValue: '0',
-        map: business
+        name:'bid',
+        initialValue: '', 
+        map: {'': '全部', ...business}
       },
       {
         label: '内容类型',
         type: 'SELECT',
-        name:'params2',
-        initialValue: '0',
-        map: { 0: '全部', 1: '图文', 2: '视频', 3: '音频', 4: '图集' }
+        name:'type',
+        initialValue: '',
+        map: contentType
       },
       {
         label: '队列机制',
         type: 'SELECT',
-        name:'params3',
-        initialValue: '0',
-        map: { 0: '先审后发', 1: '先发后审', 2: '免审' }
+        name:'queueType',
+        initialValue: '',
+        map: queueType
       },
       {
         label: '保存时长',
         type: 'SELECT',
-        name:'params4',
-        initialValue: '0',
-        map: { 0: '全部', 1: '1天', 3: '3天', 7: '7天', 15: '15天', 30: '30天', 60: '60天', 90: '90天' }
+        name:'keepDays',
+        initialValue: '',
+        map: keepDays
       },
       {
         label: '状态',
         type: 'SELECT',
-        name:'params5',
-        initialValue: '0',
-        map: { 0: '全部', 1: '有效', 2: '隐藏' }
+        name:'status',
+        initialValue: '',
+        map: queueStatus
       },
-      { label: '更新时间', name: 'params6', type: 'DATATIME_START_END'},
-      { label: '更新人', name: 'params7'},
-      { label: '队列名称', name: 'params8'},
+      { label: '更新时间', name: 'updateTime', type: 'DATATIME_START_END'},
+      { label: '更新人', name: 'updateBy'},
+      { label: '队列名称', name: 'name'},
     ],
     onSearch: (formValues)=>{
+      if(!_.isEmpty(formValues.updateTime)){
+        formValues.updateTime_start = formValues.updateTime[0].format(dateFormat);
+        formValues.endTime_end = formValues.updateTime[1].format(dateFormat);
+      }
+      delete formValues.updateTime;
+      
       console.log('formValues', formValues)
+      dispatch({
+        type: 'Settings/getQueue',
+        payload: formValues
+      })
+      
     }
   }
 
@@ -98,7 +127,7 @@ function AuditSettings(props) {
       {
         title: '队列名称',
         dataIndex: 'name',
-        render: text => <a>{text}</a>,
+        render: text => <span>{text}</span>,
       },
       {
         title: '队列规则',
@@ -109,33 +138,37 @@ function AuditSettings(props) {
       {
         title: '内容类型',
         align: 'center',
-        dataIndex: 'address1',
+        dataIndex: 'type',
+        render: text => <span>{contentType[text || '']}</span>,
       },
       {
         title: '队列机制',
         align: 'center',
-        dataIndex: 'age',
+        dataIndex: 'queueType',
+        render: text => <span>{queueType[text || '']}</span>,
       },
       {
         title: '保存时长',
         align: 'center',
-        dataIndex: 'address2',
+        dataIndex: 'keepDays',
+        render: text => <span>{keepDays[text || ''] || text+'天'}</span>,
       },
       {
         title: '更新时间',
         align: 'center',
-        dataIndex: 'age3',
+        dataIndex: 'createTime',
       },
       {
         title: '更新人',
         align: 'center',
-        dataIndex: 'age4',
+        dataIndex: 'updateBy',
       },
       {
         title: '状态',
         align: 'center',
         width: '160px',
-        dataIndex: 'age5',
+        dataIndex: 'status',
+        render: text => <span>{queueStatus[text || '']}</span>,
       },
       {
         title: '操作',
@@ -144,14 +177,17 @@ function AuditSettings(props) {
         render(r) {
           return (
             <div className={styles.tableaction}>
-              <AuthButton perms={'setting:edit'} type="primary" size="small"onClick={()=>goDetails({id: '2222',action: 'update'})}>修改</AuthButton>
-              <Button size="small" onClick={()=>{console.log(r.id)}}>停用</Button>
-              <Button size="small" onClick={()=>goDetails({id: '2222',action: 'copy'})}>复制</Button>
-            </div>);
+              <AuthButton perms={'setting:edit'} type="primary" size="small"onClick={()=>goDetails({id: r.id,action: 'update'})}>修改</AuthButton>
+              <AuthButton perms={'setting:edit'} size="small" onClick={()=>{console.log(r.id)}}>停用</AuthButton>
+              <AuthButton perms={'setting:add'} size="small" onClick={()=>goDetails({id: r.id,action: 'copy'})}>复制</AuthButton>
+            </div>
+          );
         }
       },
     ],
-    ...table,
+    loading,
+    dataSource,
+    pagination,
   }
 
   

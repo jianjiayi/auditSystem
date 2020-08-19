@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-14 09:06:08
- * @LastEditTime: 2020-08-14 16:47:12
+ * @LastEditTime: 2020-08-19 21:01:04
  */
 // 规则配置
 // const configRule = [
@@ -136,6 +136,7 @@ export const getDenyWordsKey = (name) =>{
 
 /**是否展示包含选项*/
 export const isShowInclude = (key) => {
+  console.log('222222222',key)
   const arr = ['1','2','3','4','7','8','9','10','15','16','17','18','19'];
   if(arr.includes(key)){
     return true;

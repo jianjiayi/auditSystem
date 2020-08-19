@@ -3,7 +3,7 @@
  * @version:
  * @Author: big bug
  * @Date: 2019-11-19 10:40:05
- * @LastEditTime: 2020-07-20 13:50:23
+ * @LastEditTime: 2020-08-19 20:00:29
  */
 
 import React from 'react';
@@ -130,7 +130,7 @@ export function renderFormItem(item, getFieldDecorator, formLayout) {
     );
   }
   return (
-    <Form.Item key={name} label={label} {...layout}>
+    <Form.Item key={name+Date.parse(new Date())} label={label} {...layout}>
       {child}
     </Form.Item>
   );

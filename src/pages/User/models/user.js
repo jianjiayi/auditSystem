@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-18 10:04:21
+ * @LastEditTime: 2020-08-19 20:48:28
  */ 
 import * as api from '../service/index.js';
 import _ from 'lodash';
@@ -13,6 +13,7 @@ export default {
   namespace: 'User',
   
   state: {
+    loading: false,
     isLogin: sessionStorage.getItem('$isLogin') || '',//验证用户登录
     business: sessionStorage.getItem('$business') != '' ? JSON.parse(sessionStorage.getItem('$business')) || {} : {},//保存用户业务线
     user: {
@@ -24,6 +25,7 @@ export default {
   effects: {
     // 用户登录
     *login({ payload, callback }, { call, put }){
+      yield put({type: 'save',payload: { loading: true}})
       const {code ,data} = yield call(api.login, payload);
 
       if(code == 200){
@@ -33,6 +35,7 @@ export default {
 
         yield put({type: 'getBusiness'});
         yield put({type: 'getRoleAndPermission'});
+         yield put({type: 'save',payload: { loading: false}})
       }  
 
       // sessionStorage.setItem('$isLogin', true);

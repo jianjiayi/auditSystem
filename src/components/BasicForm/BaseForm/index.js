@@ -3,7 +3,7 @@
  * @version:
  * @Author: big bug
  * @Date: 2019-11-19 10:39:54
- * @LastEditTime: 2020-08-17 20:36:06
+ * @LastEditTime: 2020-08-19 19:08:32
  */
 import React, {useImperativeHandle, useRef, forwardRef} from 'react';
 import { Form,Button } from 'antd';
@@ -28,6 +28,7 @@ function BaseForm(props, ref) {
 
   const {
     className,
+    loading = false,
     children,
     okPerms,
     okText,
@@ -43,7 +44,7 @@ function BaseForm(props, ref) {
     renderItem= renderFormItem,
   } = props;
 
-  // console.log(dataSource)
+  console.log(dataSource)
 
   // 向父组件暴露的方法
   useImperativeHandle(ref, () => ({
@@ -94,6 +95,13 @@ function BaseForm(props, ref) {
     className: classNames(className, styles.container), 
   }
 
+  const AuthButtonProps = {
+    loading,
+    perms: okPerms,
+    type: okTextType ? okTextType : 'primary',
+    htmlType: "submit"
+  }
+
   return (
     <Form {...formProps}>
       {
@@ -103,7 +111,7 @@ function BaseForm(props, ref) {
       }
       <Form.Item>
         <div className={styles['button-group']}>
-          <AuthButton perms={okPerms} type={okTextType ? okTextType : 'primary'} htmlType="submit">{okText? okText : '查询'}</AuthButton>
+          <AuthButton {...AuthButtonProps}>{okText? okText : '查询'}</AuthButton>
           {isReset && <Button onClick={()=>reset()}>重置</Button>}
           { children }
         </div>

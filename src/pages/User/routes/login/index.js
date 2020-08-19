@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-01 15:51:25
- * @LastEditTime: 2020-08-18 09:44:42
+ * @LastEditTime: 2020-08-19 20:51:13
  */ 
 import React from 'react';
 import { connect } from 'dva';
@@ -32,7 +32,7 @@ const config = {
 }
 
 function Login(props) {
-  const { App, dispatch, form:{getFieldDecorator} } = props;
+  const { User:{loading}, dispatch, form:{getFieldDecorator} } = props;
   const {logo, homePath, title, copyRight} = appConfig;
 
   const handleSubmit = e => {
@@ -57,6 +57,13 @@ function Login(props) {
 
   const register = () => {
     
+  }
+
+  const submitProps = {
+    className: `${styles.login_button} ${styles.item_button}`,
+    loading,
+    type: "primary",
+    htmlType: "submit"
   }
 
   return (
@@ -94,7 +101,7 @@ function Login(props) {
                 })(<Checkbox>记住密码</Checkbox>)}
                 <Link to="/">忘记密码？</Link>
               </div>
-              <Button className={`${styles.login_button} ${styles.item_button}`} type="primary" htmlType="submit"> 登录</Button>
+              <Button {...submitProps}> 登录</Button>
               <Button className={styles.item_button} onClick={()=>register()}> 注册</Button>
             </Form>
           </div>

@@ -84,6 +84,12 @@ export default function request(url, options) {
       return response.json();
     })
     .then(res=>{
+      if (res.code === 401) {
+        window.g_app._store.dispatch({
+          type: 'User/logout',
+        });
+        return;
+      }
       if(res.code === 500){
         message.error(res.data || res.desc)
         return;
@@ -91,13 +97,13 @@ export default function request(url, options) {
       return res
     })
     .catch((e) => {
-      const status = e.code;
-      if (status === 401) {
-        window.g_app._store.dispatch({
-          type: 'App/logout',
-        });
-        return;
-      }
+      // const status = e.code;
+      // if (status === 401) {
+      //   window.g_app._store.dispatch({
+      //     type: 'User/logout',
+      //   });
+      //   return;
+      // }
       // if (status === 403) {
       //   router.push('/403');
       //   return;
