@@ -102,7 +102,7 @@ function QueueDetails(props) {
     return ()=>{
       formOptions =  [];//组件销毁时候，清空配置数组
     }
-  }, [art]);
+  }, [art, dispatch, location.query.action, location.query.id]);
 
   // 处理规则配置回显
   useEffect(()=>{
@@ -111,7 +111,7 @@ function QueueDetails(props) {
     return ()=>{
 
     }
-  },[art])
+  },[art, insertForm])
 
   // 将创建配置规则嵌入Form里面
   const insertForm = (ruleJson) => {

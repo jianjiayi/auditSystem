@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-21 15:34:35
+ * @LastEditTime: 2020-08-21 15:39:00
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -113,7 +113,7 @@ function QueueDetails(props) {
     return ()=>{
       formOptions = []
     }
-  },[art])
+  },[art, insertForm])
 
   // 将创建配置规则嵌入Form里面
   const insertForm = (ruleJson) => {
