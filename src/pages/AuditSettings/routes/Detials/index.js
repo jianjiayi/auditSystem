@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-20 09:35:04
+ * @LastEditTime: 2020-08-21 15:34:18
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -102,7 +102,7 @@ function QueueDetails(props) {
     return ()=>{
       formOptions =  [];//组件销毁时候，清空配置数组
     }
-  }, [art, dispatch, location.query.action, location.query.id]);
+  }, [art]);
 
   // 处理规则配置回显
   useEffect(()=>{
@@ -111,7 +111,7 @@ function QueueDetails(props) {
     return ()=>{
 
     }
-  },[art, insertForm])
+  },[art])
 
   // 将创建配置规则嵌入Form里面
   const insertForm = (ruleJson) => {
