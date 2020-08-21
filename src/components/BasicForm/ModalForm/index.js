@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-08 10:57:04
- * @LastEditTime: 2020-08-13 10:10:00
+ * @LastEditTime: 2020-08-21 12:01:01
  */ 
 import React, {useState, useImperativeHandle, forwardRef} from 'react';
 import {Modal, Button} from 'antd';
@@ -15,14 +15,21 @@ import styles from './index.module.less';
 
 function ModalForm(props, ref) {
   const [visible, setVisible] = useState(false);
-  const {title, formProps, disabled, ...rest} = props;
+  const {title, formProps, disabled, onCancel,...rest} = props;
 
   // 向父组件暴露的方法
   useImperativeHandle(ref, () => {
     return {
+      visible,
       setVisible, //设置modal状态
+      setModalStatus,
     }
   })
+
+  const setModalStatus = (status, callback) =>{
+    setVisible(status);
+    callback();
+  }
   
   const modalProps = {
     title,
@@ -32,14 +39,14 @@ function ModalForm(props, ref) {
     cancelText: "取消",
     destroyOnClose: true,
     // onOk: () =>{this.handleOk},
-    onCancel: () =>{setVisible(!visible)},
+    onCancel,
     ...rest,
   }
   return (
     <div className={classNames(styles.container)}>
       <Modal {...modalProps}>
         <BaseForm {...formProps}>
-          <Button onClick={()=>{setVisible(!visible)}}>取消</Button>
+          <Button onClick={()=> onCancel()}>取消</Button>
         </BaseForm>
       </Modal>
     </div>

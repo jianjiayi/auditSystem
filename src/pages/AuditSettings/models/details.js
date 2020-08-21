@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-19 17:29:07
+ * @LastEditTime: 2020-08-20 17:26:42
  */ 
 import * as api from '../service/index.js';
 
@@ -14,7 +14,7 @@ export default {
     loading: false,
     configRule: [], // 配置规则
     mediaInfo: [], //媒体类型
-    mediaInfoList: {},
+    mediaInfoList: [],
     sourceList: [], //内容来源、抓取来源
     category: '', //三级分类
     // 查询条件
@@ -45,7 +45,7 @@ export default {
   effects: {
     // 初始化
     *init({payload, callback}, {call, put, select}){
-      yield put({type: 'save',payload: {art: {}, loading: true}})
+      yield put({type: 'save',payload: {category: '', art: {}, loading: true}})
       yield put({type: 'getMediaInfo', payload: {type: 'rmw_media_type'}});
       yield put({type: 'Global/getFirstCategory'});
       yield put({type: 'getRuleInfo'});
@@ -134,15 +134,18 @@ export default {
     *getMediaInfo({payload}, {call, put}){
       const {code, data} = yield call(api.getMediaInfo, payload);
       if(code == 200){
-        let mediaInfoList = {}
+        let mediaInfoList = []
         for(let i in data){
           let {code:c, data:d} = yield call(api.getMediaInfo, {type: data[i].code});
           if(c==200){
-            let map = {};
+            let map = [];
             d.map(item => {
-              map[item.code] = item.name;
+              map.push({
+                label:item.name,
+                value:item.code,
+              });
             })
-            mediaInfoList[data[i].code] = map
+            mediaInfoList[data[i].code]= map;
           }
         }
         yield put({

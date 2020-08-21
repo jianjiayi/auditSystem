@@ -3,68 +3,134 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-07-13 13:54:32
+ * @LastEditTime: 2020-08-21 15:00:59
  */ 
 import * as api from '../service/index.js';
+import _ from 'lodash';
 
 export default {
   namespace: 'Rights',
   
   state: {
-    isLogin: false,
-    // 表单信息
-    table: {
-      // 数据源
-      dataSource: [
-        {
-          key: '1',
-          name: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-        },
-        {
-          key: '2',
-          name: 'Jim Green',
-          age: 42,
-          address: 'London No. 1 Lake Park',
-        },
-        {
-          key: '3',
-          name: 'Joe Black',
-          age: 32,
-          address: 'Sidney No. 1 Lake Park',
-        },
-        {
-          key: '4',
-          name: 'Disabled User',
-          age: 99,
-          address: 'Sidney No. 1 Lake Park',
-        },
-      ],
-      // 分页信息
-      pagination: {
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: total => `共 ${total} 条`,
-          pageSize: 10,
-          current: 1,
-          total: null
-      },
+    loading: false,
+    permissionIds: [], // 当前角色拥有的权限
+    roleList: {}, //所有角色
+    // 查询条件
+    query: {},
+    // 文章列表
+    dataSource: [],
+    // 分页信息
+    pagination: {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      showTotal: total => `共 ${total} 条`,
+      pageSize: 10,
+      current: 1,
+      total: null
     },
   },
 
   effects: {
-    *login({ payload }, { call, put }){
-      const { code, data } = yield call(api.login, {});
-      if(code == 0){
+    // 初始化
+    *init({payload}, {call, put}){
+      yield put({type: 'getUserOrRoleQuery', payload});
+    },
+
+    // 创建用户获或角色
+    *addUserOrRole({payload, callback}, {call, put}){
+      const {code, data} = yield call(api.addUserOrRole, payload);
+      callback(code);
+    },
+
+    // 更新用户或角色状态
+    *updateUserOrRoleStatus({payload, callback}, {call, put}){
+      const {code, data} = yield call(api.updateUserOrRoleStatus, payload);
+      
+      callback(code);
+    },
+
+    // 更新用户或角色信息
+    *updateUserOrRoleInfo({payload, callback}, {call, put}){
+      let params = {
+        type : payload.type == 2 ? 'enable' : 'disable',
+        username: payload.username
+      }
+      const {code, data} = yield call(api.updateUserOrRoleInfo, params);
+      
+      callback(code);
+    },
+
+    // 根据id获取角色详情
+    *getRuleDetailsById({payload, callback}, {call, put}){
+      const {code, data} = yield call(api.getRuleDetailsById, payload);
+      if(code == 200){
+        // console.log(data)
+        let arr = [];
+        !_.isEmpty(data.permissions) && data.permissions.map((item)=>{
+          arr.push(item.permissionId.toString())
+        })
         yield put({
           type: 'save',
           payload: {
-            isLogin: true
+            permissionIds: arr
+          }
+        })
+        callback(arr)
+      }
+    },
+
+    // 根据业务线查询角色列表
+    *getRuleListByBusiness({payload, callback}, {call, put}){
+      const {code, data} = yield call(api.getRuleListByBusiness, payload);
+      if(code == 200){
+        // console.log(data)
+        let obj = {};
+        !_.isEmpty(data) && data.map((item)=>{
+          obj[item.id] = item.roleName
+        })
+        yield put({
+          type: 'save',
+          payload: {
+            roleList: obj
+          }
+        })
+        callback(obj)
+      }
+    },
+
+    // 获取用户或角色列表
+    *getUserOrRoleQuery({payload}, {call, put, select}){
+      yield put({type: 'save',payload: { query: {}, loading: true}})
+
+      const {query, pagination} = yield select(({ Settings }) => Settings);
+      // 合并参数
+      const params = {
+        ...query,
+        pageNum: 1,
+        pageSize: pagination.pageSize,
+        ...payload,
+      };
+      
+      const {code, data} = yield call(api.getUserOrRoleQuery, params);
+      
+      if(code == 200 && data){
+         yield put({
+          type: 'save',
+          payload: {
+            loading: false,
+            query: params,
+            dataSource: data.data || [],
+            pagination: {
+              ...pagination,
+              total: data.totalSize,
+              current: data.pageNum,
+              pageSize: data.pageSize
+            }
           }
         })
       }
-    }
+    },
+    
   },
 
   reducers: {

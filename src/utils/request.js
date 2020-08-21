@@ -54,6 +54,19 @@ export default function request(url, options) {
       Authorization: sessionStorage.getItem('$AUTHORIZATION') || ''
     }
   };
+  // 过去掉value为空的元素参数
+  const getValidParams = (params) =>{
+    for(let key in params){
+      if(!params[key]){
+        console.log(key)
+        delete params[key]
+      } 
+    }
+
+    return params;
+  }
+
+
   const newOptions = { ...defaultOptions, ...options };
   if (newOptions.method === 'POST' || newOptions.method === 'PUT') {
     if (!(newOptions.body instanceof FormData)) {
@@ -62,7 +75,7 @@ export default function request(url, options) {
         'Content-Type': 'application/json; charset=utf-8',
         ...newOptions.headers,
       };
-      newOptions.body = JSON.stringify(newOptions.body);
+      newOptions.body = JSON.stringify(getValidParams(newOptions.body));
     } else {
       // newOptions.body is FormData
       newOptions.headers = {
@@ -87,6 +100,9 @@ export default function request(url, options) {
       if (res.code === 401) {
         window.g_app._store.dispatch({
           type: 'User/logout',
+          payload: {
+            type: 'timeout'
+          }
         });
         return;
       }

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-19 15:30:08
+ * @LastEditTime: 2020-08-20 17:45:30
  */ 
 import * as api from '../service/index.js';
 
@@ -11,7 +11,6 @@ export default {
   namespace: 'Settings',
   
   state: {
-    isLogin: false,
     loading: false,
     // 查询条件
     query: {},
@@ -31,10 +30,13 @@ export default {
   effects: {
     // 初始化
     *init({payload}, {call, put}){
-      yield put({type: 'save',payload: { query: {}, loading: true}})
-      yield put({type: 'getQueue'})
+      yield put({type: 'getQueue'});
+      yield put({type: 'QDetails/getRuleInfo'});
+      yield put({type: 'QDetails/getContentSource'});
     },
     *getQueue({payload}, {call, put, select}){
+      yield put({type: 'save',payload: { query: {}, loading: true}})
+
       const {query, pagination} = yield select(({ Settings }) => Settings);
       // 合并参数
       const params = {
@@ -57,7 +59,7 @@ export default {
               ...pagination,
               total: data.totalSize,
               current: data.pageNum,
-              pageSize: 10
+              pageSize: data.pageSize
             }
           }
         })

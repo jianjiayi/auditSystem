@@ -3,15 +3,16 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-14 09:06:08
- * @LastEditTime: 2020-08-19 21:55:42
+ * @LastEditTime: 2020-08-20 17:44:12
  */
 import React, {useState} from 'react';
 import _ from 'lodash';
-import {message, Modal, Tag, Select, Input, InputNumber, Button, Row, Col, Icon } from 'antd';
+import {message, Modal, Tag, Checkbox, Select, Input, InputNumber, Button, Row, Col, Icon } from 'antd';
 import { renderSelect, renderCheckBoxGroup } from '@components/BasicForm/BaseForm'; 
 import { MaxAndMin } from '@components/BasicForm';
 const { Option } = Select;
 const InputGroup = Input.Group;
+const CheckboxGroup = Checkbox.Group
 
 let formValues = {};
 
@@ -51,8 +52,11 @@ export const getModelSelect = (formRef, ItemName, label, onOpenModal, data= []) 
 
 
 // 抓取来源、内容来源
-export const getSourceSelect = (formRef, ItemName, label, sourceList, values= null) =>{
+export const getSourceSelect = (formRef, ItemName, label, sourceList, values = []) =>{
   const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
+
+  let data = values? values : []
+  //  console.log('values:',data)
 
   const handleChange = (value) =>{
     console.log(`Selected: ${value}`);
@@ -61,7 +65,7 @@ export const getSourceSelect = (formRef, ItemName, label, sourceList, values= nu
   // render
   return getFieldDecorator(ItemName, {
     rules: [{ required: true, message: `请选择来源` }],
-    initialValue: values,
+    initialValue: data,
   })(
     <Select
       mode="tags"
@@ -89,7 +93,7 @@ export const getContentNumber = (formRef,ItemName, values = []) =>{
     min: 0,
     max: 100,
     onChangeNumber: (values) => {
-      console.log(values)
+      // console.log(values)
       
       let obj = {};
       obj[ItemName]= values;
@@ -112,7 +116,7 @@ export const getMediaWeight = (formRef, ItemName, values = []) => {
     min: 0,
     max: 10,
     onChangeNumber: (values) => {
-      console.log(values)
+      // console.log(values)
       
       let obj = {};
       obj[ItemName]= values;
@@ -126,31 +130,47 @@ export const getMediaWeight = (formRef, ItemName, values = []) => {
   })(<MaxAndMin {...MaxAndMinProps}></MaxAndMin>)
 }
 
+let newObj = {}
 // 媒体类型
-export const getMediaType = (formRef, ItemName, mediaInfo = [], mediaInfoList={}, data= []) =>{
+export const getMediaType = (formRef, ItemName, mediaInfo = [], mediaInfoList={}, data= {}) =>{
   const {getFieldDecorator, getFieldValue, setFieldsValue} = formRef.current;
   // 获取选择的媒体类型
   let values = getFieldValue(ItemName) || data;
+
   console.log(values)
   
   let map = {};
   !_.isEmpty(mediaInfo) && mediaInfo.map(item => {
     map[item.code] = item.name;
   })
+  
+  const onChange = (item,values) =>{
+    console.log('eeeeeeeeeeee',item,values);
+    let ItemNameValue = getFieldValue(ItemName) || []
+    newObj[item] = values;
+    console.log('Object.keys',newObj)
+    let obj = {};
+    obj[ItemName]= newObj;
+
+    // setFieldsValue(obj)
+  }
   return <div className="">
     {
       getFieldDecorator(ItemName, {
         rules: [{ required: true, message: `请选择媒体类型` }],
-        // initialValue: formValues.name5,
+        initialValue: values || [],
       })(renderCheckBoxGroup(map))
     }
     {
-      values.map((item,index) => {
-        console.log(mediaInfoList[item])
-        return !_.isEmpty(mediaInfoList[item]) && <div key={index}>
-          {getFieldDecorator(item, {
-            // initialValue: formValues.name5,
-          })(renderCheckBoxGroup(mediaInfoList[item]))}
+      !_.isEmpty(values) && values.map((item,index) => {
+        // console.log(mediaInfoList[item])
+        return !_.isEmpty(mediaInfoList[item]) && 
+        <div key={index}>
+          {
+            getFieldDecorator(`${ItemName}_${item}`, {
+              // initialValue: values[item],
+            })(<Checkbox.Group options={mediaInfoList[item]} onChange={e => onChange(item, e)} />)
+          }
         </div> 
       })
     }

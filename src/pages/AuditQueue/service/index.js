@@ -3,14 +3,14 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-07-30 17:06:57
+ * @LastEditTime: 2020-08-20 17:47:28
  */ 
 import request from '@http';
 
-export async function login(params){
-  alert(1)
-  return request(`/user/login`, {
-    method: 'post',
+// 队列查询接口
+export async function getQueueListCount(params){
+  return request(`/audit/queue/listCount`, {
+    method: 'POST',
     body: params
   })
 }

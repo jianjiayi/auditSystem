@@ -3,7 +3,7 @@
  * @version:
  * @Author: big bug
  * @Date: 2019-11-19 10:40:05
- * @LastEditTime: 2020-08-19 20:00:29
+ * @LastEditTime: 2020-08-21 09:42:50
  */
 
 import React from 'react';
@@ -93,7 +93,7 @@ export function renderFormItem(item, getFieldDecorator, formLayout) {
         return <Form.Item key={name} label={label} {...layout}>
           {
             getFieldDecorator(name, options)(
-              renderCheckBoxGroup(map)
+              renderCheckBoxGroup(map, Checkbox, {onChange})
             )
           }
         </Form.Item>
@@ -130,7 +130,7 @@ export function renderFormItem(item, getFieldDecorator, formLayout) {
     );
   }
   return (
-    <Form.Item key={name+Date.parse(new Date())} label={label} {...layout}>
+    <Form.Item key={name} label={label} {...layout}>
       {child}
     </Form.Item>
   );

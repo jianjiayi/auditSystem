@@ -3,14 +3,15 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-19 16:45:54
+ * @LastEditTime: 2020-08-20 20:52:20
  */ 
-import React, {Fragment, useEffect, useRef } from 'react';
+import React, {Fragment, useState, useEffect, useRef } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import { Button } from 'antd';
 import { BaseForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
+import ViewRules from './components/viewRules.js';
 import wrapAuth from '@components/WrapAuth';
 import _ from 'lodash';
 
@@ -24,12 +25,20 @@ const AuthButton = wrapAuth(Button);
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 function AuditSettings(props) {
+
+  const viewRulesRef = useRef(null);
+  const [rulesJsonStr, setRulesJsonStr] = useState('');
   
   const {
     dispatch,
     location,
     User: {
       business
+    },
+    QDetails: {
+      configRule,
+      mediaInfo, 
+      mediaInfoList,
     },
     Settings: {
       loading,
@@ -93,7 +102,7 @@ function AuditSettings(props) {
     onSearch: (formValues)=>{
       if(!_.isEmpty(formValues.updateTime)){
         formValues.updateTime_start = formValues.updateTime[0].format(dateFormat);
-        formValues.endTime_end = formValues.updateTime[1].format(dateFormat);
+        formValues.updateTime_end = formValues.updateTime[1].format(dateFormat);
       }
       delete formValues.updateTime;
       
@@ -127,13 +136,14 @@ function AuditSettings(props) {
       {
         title: '队列名称',
         dataIndex: 'name',
+        width: '300px',
         render: text => <span>{text}</span>,
       },
       {
         title: '队列规则',
         align: 'center',
-        dataIndex: 'id',
-        render: text => <a>{text}</a>,
+        dataIndex: 'ruleJson',
+        render: text => <a onClick={() => getViewRules(text)}>查看</a>,
       },
       {
         title: '内容类型',
@@ -188,6 +198,30 @@ function AuditSettings(props) {
     loading,
     dataSource,
     pagination,
+    onPageChg: (page) => {
+      // console.log(page)
+      dispatch({
+        type:'Settings/getQueue',
+        payload:{
+          pageNum: page.current,
+          pageSize: page.pageSize
+        }
+      })
+    },
+  }
+
+
+  // 查看队列规则
+  const getViewRules = (data) => {
+    setRulesJsonStr(data);
+    viewRulesRef.current.setVisible(true)
+  }
+  const viewRuleProps = {
+    footer: null,
+    configRule,
+    mediaInfo, 
+    mediaInfoList,
+    rulesJson: rulesJsonStr
   }
 
   
@@ -197,12 +231,13 @@ function AuditSettings(props) {
         <AuthButton perms={'setting:add'}  ghost type="primary" onClick={()=>goDetails({action: 'create'})}>创建队列</AuthButton>
       </BaseForm>
       <BaseTable {...tableProps}></BaseTable>
+      <ViewRules {...viewRuleProps} ref={viewRulesRef}></ViewRules>
     </Fragment>
   )
 }
 
-function mapStateToProps({User, Settings}){
-  return {User, Settings}
+function mapStateToProps({User,QDetails, Settings}){
+  return {User, QDetails, Settings}
 }
 
 export default connect(mapStateToProps)(AuditSettings)

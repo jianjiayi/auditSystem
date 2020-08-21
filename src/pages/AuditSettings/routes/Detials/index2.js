@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-19 21:57:53
+ * @LastEditTime: 2020-08-20 10:23:18
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -151,7 +151,7 @@ function QueueDetails(props) {
     let ItemName = isShowInclude(itemKey) ? `${item.id}_${isInclude == 0 ? 'in': 'notIn'}` : _.toString(item.id);
     
     // 判断是否存在该表单项
-    let isExist = itemOptions.find((v)=>{
+    let isExist = formOptions.find((v)=>{
       return v.name == ItemName;
     })
     if(isExist){
@@ -186,7 +186,7 @@ function QueueDetails(props) {
             {itemKey == 17 && getAuditType(getFieldDecorator,ItemName, values)}
             { 
               (itemKey >= 18 && itemKey <= 19 )  && 
-              getSourceSelect(formRef,ItemName,item.name,sourceList, values=null)
+              getSourceSelect(formRef,ItemName,item.name,sourceList, values)
             }
           </Col>
           <Col span={1}>
@@ -283,12 +283,13 @@ function QueueDetails(props) {
         type: 'SELECT',
         name:'params5',
         placeholder:'选择状态',
-        initialValue: '无',
+        initialValue: '',
         itemRender: getFieldDecorator => (
           <div  type="flex">
             {
-              getFieldDecorator('params5', {
+              getFieldDecorator('rulesSetting', {
                 rules: [{ required: true, message: `请选择` }],
+                initialValue: '无',
               })(
                 renderSelect(getRules(configRule), { 
                   style: {width: '160px'},

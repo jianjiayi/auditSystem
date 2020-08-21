@@ -3,14 +3,20 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-18 10:01:16
+ * @LastEditTime: 2020-08-21 15:21:24
  */ 
-import React, {useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
-import { Button, TreeSelect } from 'antd';
+import { message, Button, TreeSelect, Tag } from 'antd';
+import _ from 'lodash';
+
+
 import { BaseForm, ModalForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
 import { getTreeData }  from '@utils/rights.js';
+
+import { ExArray, ExObject } from '@utils/utils.js';
+import {contentType, queueType, roleStatus, dateFormat} from '@config/constants';
 
 import styles from './index.module.less';
 
@@ -23,13 +29,38 @@ const user = JSON.parse(sessionStorage.getItem('$user')) || {};
 
 function RolePage(props) {
   const modalFormRef = useRef(null);
+  // modal标题
+  const [title, setTitle] = useState('');
+  // 临时存储用户信息
+  const [formValues, setFormValues] = useState({});
+  // 保存由业务线创建出来的角色列表
+  const [ItemOptions, setItemOptions] = useState([]);
+  // 表单按钮状态
+  const [btnLoading, setBtnLoading] = useState(false);
+
   const {
+    dispatch,
     User: {
       business,
       authority,
     },
-    Rights: {table}
+    Rights: {
+      loading,
+      permissionIds,
+      roleList,
+      dataSource, 
+      pagination,
+    }
   } = props;
+
+  useEffect(()=>{
+    dispatch({
+      type: 'Rights/init',
+      payload: {
+        type: 'role'
+      }
+    })
+  }, [dispatch])
 
   // 多条件搜索配置
   const searchFormProps = {
@@ -40,29 +71,39 @@ function RolePage(props) {
       {
         label: '业务线',
         type: 'SELECT',
-        name:'params1',
-        initialValue: '0',
-        map: business
+        name:'businessId',
+        initialValue: '',
+        map: {'': '全部', ...business},
       },
       {
         label: '角色',
-        type: 'SELECT',
-        name:'params2',
-        initialValue: '0',
-        map: { 0: '全部', 1: '选项1', 1: '选项2' }
+        name:'roleName',
       },
       {
         label: '状态',
         type: 'SELECT',
-        name:'params3',
-        initialValue: '0',
-        map: { 0: '全部', 1: '选项1', 2: '选项2' }
+        name:'state',
+        initialValue: '',
+        map: roleStatus
       },
-      { label: '更新人', name: 'params4'},
-      { label: '更新时间', name: 'params5', type: 'DATATIME'},
+      { label: '更新人', name: 'updateUser'},
+      { label: '更新时间', name: 'datatime', type: 'DATATIME_START_END'},
     ],
     onSearch: (formValues)=>{
+      if(!_.isEmpty(formValues.datatime)){
+        formValues.startTime = formValues.datatime[0].format(dateFormat);
+        formValues.endTime = formValues.datatime[1].format(dateFormat);
+      }
+      delete formValues.datatime;
+      
       console.log('formValues', formValues)
+      dispatch({
+        type: 'Rights/getUserOrRoleQuery',
+        payload: {
+          ...formValues,
+          type: 'role'
+        }
+      })
     }
   }
 
@@ -74,29 +115,32 @@ function RolePage(props) {
     columns: [
       {
         title: '角色名',
-        dataIndex: 'name',
-        render: text => <a>{text}</a>,
+        dataIndex: 'roleName',
+        render: text => <span>{text}</span>,
       },
       {
         title: '业务线',
         align: 'center',
-        dataIndex: 'age',
+        render(data){
+          return (!_.isEmpty(data) && <Tag color="#108ee9" key={data.id}>{data.businessName}</Tag>)
+        },
       },
       {
         title: '更新时间',
         align: 'center',
-        dataIndex: 'address',
+        dataIndex: 'updateTime',
       },
       {
         title: '更新人',
         align: 'center',
-        dataIndex: 'age11',
+        dataIndex: 'updateUser',
       },
       {
         title: '状态',
         align: 'center',
         width: '160px',
-        dataIndex: 'address11',
+        dataIndex: 'state',
+        render: text => <span>{text === '' ? '全部' :  roleStatus[text]}</span>,
       },
       {
         title: '操作',
@@ -105,37 +149,100 @@ function RolePage(props) {
         render(r) {
           return (
             <div className={styles.tableaction}>
-              <AuthButton perms={'role:edit'} type="primary" size="small" onClick={()=>{console.log(r.id)}}>编辑</AuthButton>
-              <AuthButton perms={'role:edit'} size="small" onClick={()=>{console.log(r.id)}}>注销</AuthButton>
+              <AuthButton perms={'role:edit'} type="primary" size="small" onClick={()=>openUserModal('edit', r)}>编辑</AuthButton>
+              <AuthButton perms={'role:edit'} size="small" onClick={()=>updateUserOrRoleStatus('role', r.state, r.id)}>
+                {r.state !=2 ? '注销' : '开启'}
+              </AuthButton>
             </div>);
         }
       },
     ],
-    ...table,
+    loading,
+    dataSource, 
+    pagination,
+    onPageChg: (page) => {
+      // console.log(page)
+      dispatch({
+        type: 'Rights/getUserOrRoleQuery',
+        payload:{
+          pageNum: page.current,
+          pageSize: page.pageSize
+        }
+      })
+    },
   }
 
-  // 点击创建用户
-  const addUser = () =>{
-    modalFormRef.current.setVisible(true);
+  // 更新角色状态
+  const updateUserOrRoleStatus = (type, number, id) => {
+    console.log(type, id)
+    dispatch({
+      type: 'Rights/updateUserOrRoleStatus',
+      payload: {
+        type, 
+        name: number == 1 ? 'enable' : 'disable',
+        id
+      },
+      callback: ()=> {
+        // 更新当前列表状态
+        let tableList = _.cloneDeep(dataSource);
+        const index = tableList.findIndex(item => id == item.id);
+        const item = tableList[index];
+        tableList.splice(index, 1, {
+          ...item,
+          ...{state: number == 1 ? 0 : 1}
+        });
+        dispatch({
+          type: 'Rights/save',
+          payload:{dataSource: tableList}
+        })
+      }
+    })
   }
+
+  // 点击打开用户编辑模态框
+  const openUserModal = (type, values) =>{
+    setTitle(type == 'create' ? '创建' : '编辑');
+    dispatch({type: 'Rights/save',payload:{permissionIds: []}});
+    
+    modalFormRef.current.setVisible(true);
+    if(!values) return;
+
+    // 处理编辑用户回显逻辑
+    dispatch({
+      type: 'Rights/getRuleDetailsById',
+      payload: {
+        id: values.id
+      }
+    })
+
+    values.businessId = values.businessId.toString()
+    console.log(values)
+    setFormValues(values);
+  }
+
   // 创建modal配置
   const modalFormProps = {
-    title: '创建角色',
+    title: title+'角色',
     footer: null,
+    onCancel: () =>{
+      modalFormRef.current.setModalStatus(false, ()=>{
+        setItemOptions([])
+        setFormValues({})
+      });
+    },
     /**表单参数*/ 
     formProps: {
       className: styles['form-contaner'],
       layout: 'horizontal',
       okText: "保存",
       dataSource: [
-        { label: '角色名', name: 'params1', required: true},
-         {
+        { label: '角色名', name: 'roleName', required: true},
+        {
           label: '业务线',
           type: 'SELECT',
-          name:'params211',
+          name:'businessId',
           required: true,
-          placeholder:'请选择',
-          map: { all: '聚合分发', key1: '选项1', key2: '选项2' }
+          map: business,
         },
         {
           label: '分配权限',
@@ -143,7 +250,8 @@ function RolePage(props) {
           itemRender: getFieldDecorator => (
             <div className="">
               {
-                getFieldDecorator('roles', {
+                getFieldDecorator('permissionIds', {
+                  initialValue: permissionIds || [],
                   rules: [{ required: true, message: `请选择权限` }],
                 })(
                   <TreeSelect 
@@ -162,49 +270,29 @@ function RolePage(props) {
             </div>
           )
         },
-        // {
-        //   label: '审核设置',
-        //   type: 'CHECKBOX',
-        //   name:'setting',
-        //   required: true,
-        //   initialValue: ["list"],
-        //   map: { 'list': '查询', 'add': '新增', 'change': '修改', 'del': '删除'}
-        // },
-        // {
-        //   label: '审核队列',
-        //   type: 'CHECKBOX',
-        //   name:'/queue',
-        //   required: true,
-        //   initialValue: ["1"],
-        //   map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        // },
-        // {
-        //   label: '审核检索',
-        //   type: 'CHECKBOX',
-        //   name:'/search',
-        //   required: true,
-        //   initialValue: ["1"],
-        //   map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        // },
-        // {
-        //   label: '审核统计',
-        //   type: 'CHECKBOX',
-        //   name:'/statistics',
-        //   required: true,
-        //   initialValue: ["1"],
-        //   map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        // },
-        // {
-        //   label: '权限管理',
-        //   type: 'CHECKBOX',
-        //   name:'/rights',
-        //   required: true,
-        //   initialValue: ["1"],
-        //   map: { 1: '查询', 2: '新增', 3: '修改', 4: '删除'}
-        // },
       ],
+      formValues:formValues,
       onSearch: (formValues)=>{
-        console.log('formValues', formValues)
+        // console.log('formValues', formValues)
+        setBtnLoading(true);
+        dispatch({
+          type: 'Rights/addUserOrRole',
+          payload: {
+            ...formValues,
+            name: 'role',
+            type: title == '创建'? 'add' : 'edit',
+          },
+          callback: (res) => {
+            setBtnLoading(false);
+            if(res == 200){
+              modalFormRef.current.setModalStatus(false, ()=>{
+                setItemOptions([])
+                setFormValues({})
+              });
+              return
+            }
+          }
+        })
       }
     }
   }
@@ -213,7 +301,7 @@ function RolePage(props) {
   return (
     <div>
       <BaseForm {...searchFormProps}>
-        <AuthButton perms={'role:add'}  ghost type="primary" onClick={()=>addUser()}>创建角色</AuthButton>
+        <AuthButton perms={'role:add'}  ghost type="primary" onClick={()=>openUserModal('create')}>创建角色</AuthButton>
       </BaseForm>
       <BaseTable {...tableProps}></BaseTable>
       <ModalForm {...modalFormProps} ref={modalFormRef}></ModalForm>

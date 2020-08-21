@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-24 10:51:22
- * @LastEditTime: 2020-08-18 10:49:32
+ * @LastEditTime: 2020-08-20 18:58:14
  */ 
 
 
@@ -136,5 +136,17 @@ export const ExObject = {
   //获取随机第一个
   getFirstValue (data){
     return Object.keys(data)[0]
+  },
+  // 去掉对象中value==空的元素
+  getValidParams (params){
+    for(let key in params){
+      if(!params[key]){
+        console.log(key)
+        delete params[key]
+      } 
+    }
+
+    return params;
   }
 }
+

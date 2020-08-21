@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-19 18:57:01
+ * @LastEditTime: 2020-08-20 09:35:04
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -269,6 +269,7 @@ function QueueDetails(props) {
             {
               getFieldDecorator('params5', {
                 rules: [{ required: true, message: `请选择` }],
+                initialValue: '无',
               })(
                 renderSelect(getRules(configRule), { 
                   style: {width: '160px'},

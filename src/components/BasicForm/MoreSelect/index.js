@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-07 10:21:51
- * @LastEditTime: 2020-08-19 17:34:15
+ * @LastEditTime: 2020-08-20 10:08:18
  */ 
 import React, {useState, useEffect} from 'react';
 import {Form, Select, Row, Col} from 'antd';
@@ -27,12 +27,18 @@ function MoreSelect(props) {
   } = props;
 
   useEffect(()=>{
-    initSelect()
-  },[initSelect, category])
+    initSelect();
+
+    return () => {}
+  },[category, initSelect])
 
   const initSelect = () => {
     // console.log('category',category)
     let categoryArr = category && category.split('/') || [];
+    if(_.isEmpty(categoryArr)){
+      resetFields(['firstCategoryId','secondCategoryId', 'thirdCategoryId']);
+      return;
+    }
     for(var i in categoryArr){
       (function(i){
         switch(i){

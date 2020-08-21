@@ -3,14 +3,17 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-18 19:43:59
+ * @LastEditTime: 2020-08-20 19:17:25
  */ 
-import React from 'react';
+import React, {useEffect} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import { Form, Select, Button } from 'antd';
 import { BaseTable } from '@components/BasicTable';
 import wrapAuth from '@components/WrapAuth';
+
+import {contentType, queueType} from '@config/constants';
+import { ExObject } from '@utils/utils.js';
 
 import styles from './index.module.less';
 
@@ -21,13 +24,33 @@ const { Option } = Select;
 function AuditQueue(props) {
   const {
     dispatch,
+    User: {
+      business
+    },
     Queue: {table, pagination}, 
     form: {getFieldDecorator},
   } = props;
 
-  // 搜索
-  const handleSubmit = () => {
+  useEffect(()=>{
+    dispatch({
+      type: 'Queue/init',
+      payload: {
+        bname: ExObject.getFirstValue(business),
+        type: 1
+      }
+    })
+  }, [business, dispatch])
+  
 
+  // 搜索
+  const handleSubmit = e => {
+    e.preventDefault();
+    console.log(props.form.getFieldsValue())
+    let payload = props.form.getFieldsValue()
+    dispatch({
+      type: 'Queue/init',
+      payload,
+    })
   }
 
   // 审核详情页
@@ -74,38 +97,41 @@ function AuditQueue(props) {
     <div>
       <Form layout="inline" onSubmit={handleSubmit}>
         <Form.Item>
-          {getFieldDecorator('role', {
-            initialValue: '0',
+          {getFieldDecorator('bname', {
+            initialValue: ExObject.getFirstValue(business),
           })(
            <Select style={{ width: '160px' }}>
-              <Option value="0">聚合分发</Option>
-              <Option value="1">视频</Option>
-              <Option value="2">音频</Option>
-              <Option value="3">图集</Option>
+              {
+                Object.keys(business).map((item,index) =>{
+                  return <Option key={item} value={item}>{business[item]}</Option>
+                })
+              }
             </Select>
           )}
         </Form.Item>
         <Form.Item>
-          {getFieldDecorator('username', {
-            initialValue: '0',
+          {getFieldDecorator('type', {
+            initialValue: '1',
           })(
            <Select style={{ width: '160px' }}>
-              <Option value="0">图文</Option>
-              <Option value="1">视频</Option>
-              <Option value="2">音频</Option>
-              <Option value="3">图集</Option>
+              {
+                Object.keys(contentType).map((item,index) =>{
+                  return <Option key={item} value={item}>{contentType[item]}</Option>
+                })
+              }
             </Select>
           )}
         </Form.Item>
         <Form.Item >
-          {getFieldDecorator('password', {
-            initialValue: '0',
+          {getFieldDecorator('queueType', {
+            initialValue: '',
           })(
             <Select style={{ width: '160px' }}>
-              <Option value="0">全部</Option>
-              <Option value="1">先审后发</Option>
-              <Option value="2">先发后审</Option>
-              <Option value="3">免审</Option>
+              {
+                Object.keys(queueType).map((item,index) =>{
+                  return <Option key={item} value={item}>{queueType[item]}</Option>
+                })
+              }
             </Select>
           )}
         </Form.Item>
@@ -119,8 +145,8 @@ function AuditQueue(props) {
   )
 }
 
-function mapStateToProps({Queue}){
-  return {Queue}
+function mapStateToProps({User, Queue}){
+  return {User, Queue}
 }
 
-export default connect(mapStateToProps)(Form.create({})(AuditQueue))
+export default Form.create({})(connect(mapStateToProps)(Form.create({})(AuditQueue)))
