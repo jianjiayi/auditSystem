@@ -58,7 +58,6 @@ export default function request(url, options) {
   const getValidParams = (params) =>{
     for(let key in params){
       if(!params[key]){
-        console.log(key)
         delete params[key]
       } 
     }

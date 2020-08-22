@@ -3,14 +3,20 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-18 10:26:06
+ * @LastEditTime: 2020-08-22 13:33:40
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import {Form, Select, Input, Button } from 'antd';
+import _ from 'lodash';
+
 import { BaseForm, MoreSelect } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
+import { renderSelect } from '@components/BasicForm/BaseForm'; 
+
+import { ExArray, ExObject } from '@utils/utils.js';
+import {contentType, auditStatus, runningStatus, queueType, dateFormat} from '@config/constants';
 
 import styles from './index.module.less';
 
@@ -18,6 +24,7 @@ import wrapAuth from '@components/WrapAuth';
 const AuthButton = wrapAuth(Button);
 
 const { Option } = Select;
+const InputGroup = Input.Group;
 
 function AuditSearch(props) {
   
@@ -37,7 +44,9 @@ function AuditSearch(props) {
       business
     },
     Search:{
-      table
+      loading,
+      dataSource, 
+      pagination,
     },
     form: {getFieldDecorator, getFieldValue, setFieldsValue},
   } = props;
@@ -46,7 +55,9 @@ function AuditSearch(props) {
   useEffect(()=>{
     dispatch({
       type: 'Search/init',
-      payload: {}
+      payload: {
+        businessId: formRef.current.getFieldValue('businessId'),
+      }
     })
   }, [])
 
@@ -91,16 +102,16 @@ function AuditSearch(props) {
       {
         label: '业务线',
         type: 'SELECT',
-        name:'params1',
-        initialValue: '0',
-        map: business
+        name:'businessId',
+        initialValue: ExObject.getFirstValue(business),
+        map: business,
       },
       {
         label: '内容类型',
         type: 'SELECT',
-        name:'params2',
-        initialValue: '0',
-        map: { 0: '图文', 1: '视频', 2: '音频', 3: '图集' }
+        name:'newsType',
+        initialValue: '',
+        map: contentType
       },
       {
         label: '内容分类',
@@ -127,17 +138,17 @@ function AuditSearch(props) {
         label: '审核状态',
         type: 'SELECT',
         name:'params5',
-        initialValue: '0',
-        map: { 0: '全部', 1: '待审核', 2: '审核通过', 3: '审核未通过' }
+        initialValue: '',
+        map: auditStatus
       },
       {
         label: '是否上架',
         type: 'SELECT',
         name:'params6',
-        initialValue: '0',
-        map: { 0: '全部', 1: '上架', 2: '下架' }
+        initialValue: '',
+        map: runningStatus
       },
-      { label: '入审时间', name: 'params7', type: 'DATATIME_START_END'},
+      { label: '入审时间', name: 'datatime', type: 'DATATIME_START_END'},
       { label: '来源', name: 'params8'},
       { label: '采集源ID', name: 'params9'},
       { label: '采集源', name: 'params10'},
@@ -147,38 +158,58 @@ function AuditSearch(props) {
         name:'params11',
         placeholder:'选择状态',
         itemRender: getFieldDecorator => (
-          <div  type="flex">
+          <InputGroup compact>
             {
-              getFieldDecorator('isInclude', {
+              getFieldDecorator('inputKey', {
                 initialValue: 'title'
               })(
-                <Select 
-                  style={{width: '160px'}}
-                  onChange={(e)=>{
-                      console.log('change',e);
-                      setParams(e)
-                    } 
-                  } 
-                >
-                  <Option value={'title'}>内容标题</Option>
-                  <Option value={'ID'}>内容ID</Option>
-                </Select>
+                renderSelect({'title': '标题', 'id': 'ID'}, {style: {width: '160px'},})
               )
             }
             {
-              getFieldDecorator(params, {
+              getFieldDecorator('inputValue', {
                 placeholder:'请输入',
                 initialValue: ''
               })(
-                <Input style={{width: '300px', marginLeft: '15px'}} />
+                <Input style={{width: '300px'}} />
               )
             }
-          </div>
+          </InputGroup>
         )
       },
     ],
+    onReset : () =>{
+       dispatch({
+        type: 'Statistics/init',
+        payload: {
+          type: 'category',
+          businessId: formRef.current.getFieldValue('businessId'),
+        }
+      })
+    },
     onSearch: (formValues)=>{
+      // 整理时间
+      if(!_.isEmpty(formValues.datatime)){
+        formValues.startTime = formValues.datatime[0].format(dateFormat);
+        formValues.endTime = formValues.datatime[1].format(dateFormat);
+      }
+      delete formValues.datatime;
+
+      // 整理标题和Id的key&value
+      let inputKey = formRef.current.getFieldValue('inputKey');
+      let inputValue = formRef.current.getFieldValue('inputValue');
+      formValues[inputKey] = formValues[inputValue];
+      delete formValues.inputKey;
+      delete formValues.inputValue;
+      
       console.log('formValues', formValues)
+      dispatch({
+        type: 'Statistics/getStatisticQuery',
+        payload: {
+          ...formValues,
+          type: 'category'
+        }
+      })
     }
   }
 
@@ -267,7 +298,21 @@ function AuditSearch(props) {
         }
       },
     ],
-    ...table,
+    loading,
+    dataSource, 
+    pagination,
+    onPageChg: (page) => {
+      // console.log(page)
+      dispatch({
+        type: 'Statistics/getStatisticQuery',
+        payload:{
+          type: 'category',
+          pageNum: page.current,
+          pageSize: page.pageSize,
+          businessId: formRef.current.getFieldValue('businessId'),
+        }
+      })
+    },
   }
 
   return (

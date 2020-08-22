@@ -3,7 +3,7 @@
  * @version:
  * @Author: big bug
  * @Date: 2019-11-19 10:39:54
- * @LastEditTime: 2020-08-22 10:13:11
+ * @LastEditTime: 2020-08-22 13:35:48
  */
 import React, {useImperativeHandle, useRef, forwardRef} from 'react';
 import { Form,Button } from 'antd';
@@ -45,7 +45,7 @@ function BaseForm(props, ref) {
     renderItem= renderFormItem,
   } = props;
 
-  console.log(dataSource)
+  // console.log(dataSource)
 
   // 向父组件暴露的方法
   useImperativeHandle(ref, () => ({

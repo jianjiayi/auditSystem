@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-22 14:55:34
- * @LastEditTime: 2020-08-17 20:12:16
+ * @LastEditTime: 2020-08-22 13:40:10
  */ 
 import React, { useState } from 'react';
 import { connect } from 'dva';
@@ -91,7 +91,7 @@ function BaseLayout(props) {
   
   // 定义额外的高亮条件
   let pathname = location.pathname;
-  const hightPath = ['/setting','/queue','/statistics/personnel/','/search'];
+  const hightPath = ['/setting','/queue','/statistics/personnel','/search'];
   let selectedKeys = [];
   for(let i in hightPath){
     if(pathname.includes(hightPath[i]) ){

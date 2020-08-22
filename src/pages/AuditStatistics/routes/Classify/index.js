@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-22 10:17:34
+ * @LastEditTime: 2020-08-22 11:30:52
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -24,6 +24,7 @@ import wrapAuth from '@components/WrapAuth';
 const AuthButton = wrapAuth(Button);
 
 const { Option } = Select;
+const InputGroup = Input.Group;
 
 // const dateFormat = 'YYYY-MM-DD';
 
@@ -101,7 +102,7 @@ function AuditStatistics(props) {
         name:'params11',
         placeholder:'选择状态',
         itemRender: getFieldDecorator => (
-          <div  type="flex">
+          <InputGroup compact>
             {
               getFieldDecorator('orderField', {
                 initialValue: ''
@@ -116,7 +117,7 @@ function AuditStatistics(props) {
                 renderSelect(orderTypeMap, {style: {width: '160px'},})
               )
             }
-          </div>
+          </InputGroup>
         )
       },
     ],

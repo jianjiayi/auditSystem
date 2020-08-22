@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-18 10:24:49
+ * @LastEditTime: 2020-08-22 11:27:31
  */ 
 import * as api from '../service/index.js';
 
@@ -11,45 +11,19 @@ export default {
   namespace: 'Search',
   
   state: {
-    isLogin: false,
-    // 表单信息
-    table: {
-      // 数据源
-      dataSource: [
-        {
-          key: '1',
-          name: 'John Brown',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-        },
-        {
-          key: '2',
-          name: 'Jim Green',
-          age: 42,
-          address: 'London No. 1 Lake Park',
-        },
-        {
-          key: '3',
-          name: 'Joe Black',
-          age: 32,
-          address: 'Sidney No. 1 Lake Park',
-        },
-        {
-          key: '4',
-          name: 'Disabled User',
-          age: 99,
-          address: 'Sidney No. 1 Lake Park',
-        },
-      ],
-      // 分页信息
-      pagination: {
-          showSizeChanger: true,
-          showQuickJumper: true,
-          showTotal: total => `共 ${total} 条`,
-          pageSize: 10,
-          current: 1,
-          total: null
-      },
+    loading: false,
+    // 查询条件
+    query: {},
+    // 文章列表
+    dataSource: [],
+    // 分页信息
+    pagination: {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      showTotal: total => `共 ${total} 条`,
+      pageSize: 10,
+      current: 1,
+      total: null
     },
   },
 
@@ -60,17 +34,38 @@ export default {
       yield put({type: 'Global/getFirstCategory'});
       yield put({type: 'save',payload: { loading: false}})
     },
-    *login({ payload }, { call, put }){
-      const { code, data } = yield call(api.login, {});
-      if(code == 0){
-        yield put({
+    // 获取审核列表
+    *getStatisticQuery({payload}, {call, put, select}){
+      yield put({type: 'save',payload: { query: {}, loading: true}})
+
+      const {query, pagination} = yield select(({ Search }) => Search);
+      // 合并参数
+      const params = {
+        ...query,
+        pageNum: 1,
+        pageSize: pagination.pageSize,
+        ...payload,
+      };
+      
+      const {code, data} = yield call(api.getStatisticQuery, params);
+      
+      if(code == 200 && data){
+         yield put({
           type: 'save',
           payload: {
-            isLogin: true
+            loading: false,
+            query: params,
+            dataSource: data.data || [],
+            pagination: {
+              ...pagination,
+              total: data.totalSize,
+              current: data.pageNum,
+              pageSize: params.pageSize
+            }
           }
         })
       }
-    }
+    },
   },
 
   reducers: {

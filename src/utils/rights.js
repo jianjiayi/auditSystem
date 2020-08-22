@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-08-17 13:33:42
- * @LastEditTime: 2020-08-18 09:39:23
+ * @LastEditTime: 2020-08-22 13:37:58
  */
 import _ from 'lodash';
 
@@ -105,6 +105,9 @@ export const getSliderMenusList = (dataPermissions, sliderMenus) =>{
 // 获取当前路由下的所有按钮权限
 export const getNowRoutePermission = (pathname, dataPermissions) => {
   if(pathname == '/setting'){
+    pathname = pathname+'/'
+  }
+  if(pathname == '/statistics/personnel'){
     pathname = pathname+'/'
   }
 
