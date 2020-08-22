@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-21 15:00:59
+ * @LastEditTime: 2020-08-22 10:39:26
  */ 
 import * as api from '../service/index.js';
 import _ from 'lodash';
@@ -33,6 +33,7 @@ export default {
   effects: {
     // 初始化
     *init({payload}, {call, put}){
+      yield put({type: 'reset'});
       yield put({type: 'getUserOrRoleQuery', payload});
     },
 
@@ -102,7 +103,7 @@ export default {
     *getUserOrRoleQuery({payload}, {call, put, select}){
       yield put({type: 'save',payload: { query: {}, loading: true}})
 
-      const {query, pagination} = yield select(({ Settings }) => Settings);
+      const {query, pagination} = yield select(({ Rights }) => Rights);
       // 合并参数
       const params = {
         ...query,
@@ -124,7 +125,7 @@ export default {
               ...pagination,
               total: data.totalSize,
               current: data.pageNum,
-              pageSize: data.pageSize
+              pageSize: params.pageSize
             }
           }
         })
@@ -134,6 +135,26 @@ export default {
   },
 
   reducers: {
+    reset(state){
+    return {
+        loading: false,
+        permissionIds: [], // 当前角色拥有的权限
+        roleList: {}, //所有角色
+        // 查询条件
+        query: {},
+        // 文章列表
+        dataSource: [],
+        // 分页信息
+        pagination: {
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: total => `共 ${total} 条`,
+          pageSize: 10,
+          current: 1,
+          total: null
+        },
+      }
+    },
     save(state, action){
       return {...state, ...action.payload}
     }

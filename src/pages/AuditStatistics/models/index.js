@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-07-20 10:15:33
+ * @LastEditTime: 2020-08-22 10:39:05
  */ 
 import * as api from '../service/index.js';
 
@@ -11,81 +11,116 @@ export default {
   namespace: 'Statistics',
   
   state: {
-    isLogin: false,
-    // 表单信息
-    table: {
-      // 数据源
-      dataSource: [
-        {
-          key: '1',
-          name: 'John',
-          age: 32,
-          address: 'New York No. 1 Lake Park',
-        },
-        {
-          key: '2',
-          name: 'John2',
-          age: 42,
-          address: 'London No. 1 Lake Park',
-        },
-        {
-          key: '3',
-          name: 'John1',
-          age: 32,
-          address: 'Sidney No. 1 Lake Park',
-        },
-        {
-          key: '4',
-          name: 'John',
-          age: 99,
-          address: 'Sidney No. 1 Lake Park',
-        },
-        {
-          key: '5',
-          name: 'John2',
-          age: 42,
-          address: 'London No. 1 Lake Park',
-        },
-        {
-          key: '6',
-          name: 'John1',
-          age: 32,
-          address: 'Sidney No. 1 Lake Park',
-        },
-        {
-          key: '7',
-          name: 'John',
-          age: 36,
-          address: '111111New York No. 1 Lake Park11111',
-        },
-      ],
-      // 分页信息
-      pagination: {
+    loading: false,
+    // 查询条件
+    query: {},
+    // 文章列表
+    dataSource: [],
+    // 分页信息
+    pagination: {
+      showSizeChanger: true,
+      showQuickJumper: true,
+      showTotal: total => `共 ${total} 条`,
+      pageSize: 10,
+      current: 1,
+      total: null
+    },
+  },
+
+  effects: {
+    // 初始化
+    *init({payload}, {call, put}){
+      yield put({type: 'reset'})
+      yield put({type: 'Global/getFirstCategory'});
+      yield put({type: 'getStatisticQuery', payload});
+    },
+    // 获取分类或人员列表
+    *getStatisticQuery({payload}, {call, put, select}){
+      yield put({type: 'save',payload: { query: {}, loading: true}})
+
+      const {query, pagination} = yield select(({ Statistics }) => Statistics);
+      // 合并参数
+      const params = {
+        ...query,
+        pageNum: 1,
+        pageSize: pagination.pageSize,
+        ...payload,
+      };
+      
+      const {code, data} = yield call(api.getStatisticQuery, params);
+      
+      if(code == 200 && data){
+         yield put({
+          type: 'save',
+          payload: {
+            loading: false,
+            query: params,
+            dataSource: data.data || [],
+            pagination: {
+              ...pagination,
+              total: data.totalSize,
+              current: data.pageNum,
+              pageSize: params.pageSize
+            }
+          }
+        })
+      }
+    },
+
+
+    // 获取人员明细列表
+    *getPersoneDetailQuery({payload}, {call, put, select}){
+      yield put({type: 'reset'})
+
+      const {query, pagination} = yield select(({ Statistics }) => Statistics);
+      // 合并参数
+      const params = {
+        ...query,
+        pageNum: 1,
+        pageSize: pagination.pageSize,
+        ...payload,
+      };
+      
+      const {code, data} = yield call(api.getPersoneDetailQuery, params);
+      
+      if(code == 200 && data){
+         yield put({
+          type: 'save',
+          payload: {
+            loading: false,
+            query: params,
+            dataSource: data.data || [],
+            pagination: {
+              ...pagination,
+              total: data.totalSize,
+              current: data.pageNum,
+              pageSize: params.pageSize
+            }
+          }
+        })
+      }
+    },
+  },
+
+  reducers: {
+    reset(state){
+      return {
+        loading: false,
+        // 查询条件
+        query: {},
+        // 文章列表
+        dataSource: [],
+        // 分页信息
+        pagination: {
           showSizeChanger: true,
           showQuickJumper: true,
           showTotal: total => `共 ${total} 条`,
           pageSize: 10,
           current: 1,
           total: null
-      },
-    },
-  },
-
-  effects: {
-    *login({ payload }, { call, put }){
-      const { code, data } = yield call(api.login, {});
-      if(code == 0){
-        yield put({
-          type: 'save',
-          payload: {
-            isLogin: true
-          }
-        })
+        },
       }
-    }
-  },
-
-  reducers: {
+    },
     save(state, action){
       return {...state, ...action.payload}
     }

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-08-10 09:09:10
+ * @LastEditTime: 2020-08-21 16:18:27
  */ 
 import request from '@http';
 
@@ -15,4 +15,12 @@ export async function queryArt(params){
     method: 'get',
   })
   
+}
+
+// 领取队列
+export async function getNewsGetTask(params){
+  return request(`/audit/news/getTask`, {
+    method: 'POST',
+    body: params
+  })
 }

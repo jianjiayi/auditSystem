@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-20 17:45:30
+ * @LastEditTime: 2020-08-22 10:38:15
  */ 
 import * as api from '../service/index.js';
 
@@ -30,6 +30,7 @@ export default {
   effects: {
     // 初始化
     *init({payload}, {call, put}){
+      yield put({type: 'reset'});
       yield put({type: 'getQueue'});
       yield put({type: 'QDetails/getRuleInfo'});
       yield put({type: 'QDetails/getContentSource'});
@@ -59,7 +60,7 @@ export default {
               ...pagination,
               total: data.totalSize,
               current: data.pageNum,
-              pageSize: data.pageSize
+              pageSize: params.pageSize
             }
           }
         })
@@ -68,6 +69,24 @@ export default {
   },
 
   reducers: {
+    reset(state){
+      return {
+        loading: false,
+        // 查询条件
+        query: {},
+        // 文章列表
+        dataSource: [],
+        // 分页信息
+        pagination: {
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: total => `共 ${total} 条`,
+          pageSize: 10,
+          current: 1,
+          total: null
+        },
+      }
+    },
     save(state, action){
       return {...state, ...action.payload}
     }

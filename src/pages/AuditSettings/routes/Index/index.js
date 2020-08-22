@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-20 20:52:20
+ * @LastEditTime: 2020-08-22 10:23:26
  */ 
 import React, {Fragment, useState, useEffect, useRef } from 'react';
 import { connect } from 'dva';
@@ -99,6 +99,12 @@ function AuditSettings(props) {
       { label: '更新人', name: 'updateBy'},
       { label: '队列名称', name: 'name'},
     ],
+    onReset : () =>{
+      dispatch({
+        type: 'Settings/init',
+        payload: {}
+      })
+    },
     onSearch: (formValues)=>{
       if(!_.isEmpty(formValues.updateTime)){
         formValues.updateTime_start = formValues.updateTime[0].format(dateFormat);

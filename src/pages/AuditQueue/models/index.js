@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-20 19:17:59
+ * @LastEditTime: 2020-08-21 15:58:45
  */ 
 import * as api from '../service/index.js';
 
@@ -33,7 +33,7 @@ export default {
           type: 'save',
           payload: {
             loading: false,
-            dataSource: data.data || [],
+            dataSource: data || [],
           }
         })
       }

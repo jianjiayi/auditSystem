@@ -3,14 +3,20 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-18 09:59:55
+ * @LastEditTime: 2020-08-22 10:17:34
  */ 
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import { Select, Input, Button } from 'antd';
+import _ from 'lodash';
+
 import { BaseForm, ModalForm } from '@components/BasicForm';
-import { BaseTable } from '@components/BasicTable'
+import { BaseTable } from '@components/BasicTable';
+import { renderSelect } from '@components/BasicForm/BaseForm'; 
+
+import { ExArray, ExObject } from '@utils/utils.js';
+import {contentType, queueType, rightStatus, orderFieldMap, orderTypeMap, dateFormat} from '@config/constants';
 
 import styles from './index.module.less';
 
@@ -19,19 +25,47 @@ const AuthButton = wrapAuth(Button);
 
 const { Option } = Select;
 
+// const dateFormat = 'YYYY-MM-DD';
+
 function AuditStatistics(props) {
-  const modalFormRef = useRef(null);
+  const formRef = useRef(null);
+  // 存放分类
+  const [categoryMap,setCategoryMap] = useState({});
   // 搜索标题、ID参数名称
   const [params, setParams] = useState('default');
   
   const {
+    dispatch,
     User: {
       business
     },
+    Global: {
+      firstCategory,
+    },
     Statistics: {
-      table
+      loading,
+      dataSource, 
+      pagination,
     }
   } = props;
+
+  useEffect(()=>{
+    dispatch({
+      type: 'Statistics/init',
+      payload: {
+        type: 'category',
+        businessId: formRef.current.getFieldValue('businessId'),
+      }
+    })
+  }, [dispatch])
+
+  useEffect(()=>{
+    let mapObj = {};
+    firstCategory.map(item=>{
+      mapObj[item.id.toString()] = item.name
+    })
+    setCategoryMap(mapObj);
+  },[firstCategory])
 
   // 多条件搜索配置
   const searchFormProps = {
@@ -42,63 +76,74 @@ function AuditStatistics(props) {
       {
         label: '业务线',
         type: 'SELECT',
-        name:'params0',
-        initialValue: '0',
-        map: business
+        name:'businessId',
+        initialValue: ExObject.getFirstValue(business),
+        map: business,
       },
       {
         label: '类型',
         type: 'SELECT',
-        name:'params1',
-        initialValue: '0',
-        map: { 0: '图文', 1: '选项1', 2: '选项2' }
+        name:'newsType',
+        initialValue: '',
+        map: contentType
       },
       {
         label: '分类',
         type: 'SELECT',
-        name:'params2',
-        initialValue: '0',
-        map: { 0: '全部', 1: '选项1', 1: '选项2' }
+        name:'categoryId',
+        initialValue: '',
+        map: {'': '全部', ...categoryMap}
       },
-      { label: '时间', name: 'params5', type: 'DATATIME'},
-     {
-        label: '',
+      { label: '时间', name: 'datatime', type: 'DATATIME_START_END'},
+      {
+        label: '排序',
         type: 'SELECT',
         name:'params11',
         placeholder:'选择状态',
         itemRender: getFieldDecorator => (
           <div  type="flex">
             {
-              getFieldDecorator('isInclude', {
-                initialValue: 'default'
+              getFieldDecorator('orderField', {
+                initialValue: ''
               })(
-                <Select 
-                  style={{width: '160px'}}
-                  onChange={(e)=>{
-                      console.log('change',e);
-                      setParams(e)
-                    } 
-                  } 
-                >
-                  <Option value={'default'}>默认</Option>
-                  <Option value={'title'}>标题</Option>
-                </Select>
+                renderSelect(orderFieldMap, {style: {width: '160px'},})
               )
             }
             {
-              params== 'title' && getFieldDecorator(params, {
-                placeholder:'请输入',
-                initialValue: ''
+              getFieldDecorator('orderType', {
+                initialValue: 'desc'
               })(
-                <Input style={{width: '300px', marginLeft: '15px'}} />
+                renderSelect(orderTypeMap, {style: {width: '160px'},})
               )
             }
           </div>
         )
       },
     ],
+    onReset : () =>{
+       dispatch({
+        type: 'Statistics/init',
+        payload: {
+          type: 'category',
+          businessId: formRef.current.getFieldValue('businessId'),
+        }
+      })
+    },
     onSearch: (formValues)=>{
+      if(!_.isEmpty(formValues.datatime)){
+        formValues.startTime = formValues.datatime[0].format(dateFormat);
+        formValues.endTime = formValues.datatime[1].format(dateFormat);
+      }
+      delete formValues.datatime;
+      
       console.log('formValues', formValues)
+      dispatch({
+        type: 'Statistics/getStatisticQuery',
+        payload: {
+          ...formValues,
+          type: 'category'
+        }
+      })
     }
   }
 
@@ -110,44 +155,58 @@ function AuditStatistics(props) {
     columns: [
       {
         title: '时间',
-        dataIndex: 'name',
-        render: text => <a>{text}</a>,
+        dataIndex: 'dt',
+        render: text => <span>{text}</span>,
       },
       {
         title: '分类',
         align: 'center',
-        dataIndex: 'age1',
+        dataIndex: 'categoryName',
       },
       {
         title: '入审量',
         align: 'center',
-        dataIndex: 'address',
+        dataIndex: 'entryQueueCount',
       },
       {
         title: '审核量',
         align: 'center',
-        dataIndex: 'age2',
+        dataIndex: 'auditCount',
       },
       {
         title: '审核通过量',
         align: 'center',
         width: '160px',
-        dataIndex: 'address3',
+        dataIndex: 'auditPassedCount',
       },
     ],
-    ...table,
+    loading,
+    dataSource, 
+    pagination,
+    onPageChg: (page) => {
+      // console.log(page)
+      dispatch({
+        type: 'Statistics/getStatisticQuery',
+        payload:{
+          type: 'category',
+          pageNum: page.current,
+          pageSize: page.pageSize,
+          businessId: formRef.current.getFieldValue('businessId'),
+        }
+      })
+    },
   }
 
   return (
     <div>
-      <BaseForm {...searchFormProps}></BaseForm>
+      <BaseForm {...searchFormProps} wrappedComponentRef={formRef}></BaseForm>
       <BaseTable {...tableProps}></BaseTable>
     </div>
   )
 }
 
-function mapStateToProps({User, Statistics}){
-  return {User, Statistics}
+function mapStateToProps({User, Global, Statistics}){
+  return {User, Global, Statistics}
 }
 
 export default connect(mapStateToProps)(AuditStatistics)

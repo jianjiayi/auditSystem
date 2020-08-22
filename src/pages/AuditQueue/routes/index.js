@@ -3,20 +3,22 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-20 19:17:25
+ * @LastEditTime: 2020-08-22 10:42:26
  */ 
 import React, {useEffect} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import { Form, Select, Button } from 'antd';
+import { message, Form, Select, Button } from 'antd';
+import _ from 'lodash';
+
 import { BaseTable } from '@components/BasicTable';
-import wrapAuth from '@components/WrapAuth';
 
 import {contentType, queueType} from '@config/constants';
 import { ExObject } from '@utils/utils.js';
 
 import styles from './index.module.less';
 
+import wrapAuth from '@components/WrapAuth';
 const AuthButton = wrapAuth(Button);
 
 const { Option } = Select;
@@ -27,17 +29,18 @@ function AuditQueue(props) {
     User: {
       business
     },
-    Queue: {table, pagination}, 
+    Queue: { 
+      loading,
+      dataSource, 
+    }, 
     form: {getFieldDecorator},
   } = props;
 
   useEffect(()=>{
+    let payload = props.form.getFieldsValue();
     dispatch({
       type: 'Queue/init',
-      payload: {
-        bname: ExObject.getFirstValue(business),
-        type: 1
-      }
+      payload,
     })
   }, [business, dispatch])
   
@@ -45,24 +48,34 @@ function AuditQueue(props) {
   // 搜索
   const handleSubmit = e => {
     e.preventDefault();
-    console.log(props.form.getFieldsValue())
-    let payload = props.form.getFieldsValue()
+    let payload = props.form.getFieldsValue();
     dispatch({
       type: 'Queue/init',
       payload,
     })
   }
 
-  // 审核详情页
+  // 领审
   const goDetails = (id)=>{
-    router.push(
-      {
-        pathname:'/queue/cdetails',
-        query:{
-          id: id,
+    let formValues = props.form.getFieldsValue();
+    let params = {
+      id,
+      formValues,
+    }
+    dispatch({
+      type: 'CDetails/getNewsGetTask',
+      payload: params,
+      callback: (data) =>{
+        if(_.isEmpty(data)){
+          return message.error('当前队列没有文章可以领取');
         }
+
+        dispatch({type: 'CDetails/save', payload: {query: params}});
+        sessionStorage.setItem('$QUERY', params);
+        router.push({pathname:'/queue/cdetails'});
       }
-    );
+    })
+    
   }
 
   const tableProps = {
@@ -73,31 +86,32 @@ function AuditQueue(props) {
     columns: [
       {
         title: '名称',
-        dataIndex: 'title',
+        dataIndex: 'queueName',
         width: 150,
         render: text => <b>{text}</b>,
       },
       {
         title: '数量',
-        dataIndex: 'total',
+        dataIndex: 'queueLen',
         align: 'center',
         width: 150,
       },
       {
         title: '操作',
         render(r) {
-          return (<AuthButton perms={'queue:receive'} onClick={()=>{goDetails(r.id)}}>领取</AuthButton>);
+          return (<AuthButton perms={'queue:receive'} onClick={()=>{goDetails(r.queueId)}}>领取</AuthButton>);
         }
       },
     ],
-    ...table,
+    loading,
+    dataSource,
   }
 
   return (
     <div>
       <Form layout="inline" onSubmit={handleSubmit}>
         <Form.Item>
-          {getFieldDecorator('bname', {
+          {getFieldDecorator('bid', {
             initialValue: ExObject.getFirstValue(business),
           })(
            <Select style={{ width: '160px' }}>
@@ -111,7 +125,7 @@ function AuditQueue(props) {
         </Form.Item>
         <Form.Item>
           {getFieldDecorator('type', {
-            initialValue: '1',
+            initialValue: 'NEWS',
           })(
            <Select style={{ width: '160px' }}>
               {
@@ -145,8 +159,8 @@ function AuditQueue(props) {
   )
 }
 
-function mapStateToProps({User, Queue}){
-  return {User, Queue}
+function mapStateToProps({User, Queue, CDetails}){
+  return {User, Queue, CDetails}
 }
 
 export default Form.create({})(connect(mapStateToProps)(Form.create({})(AuditQueue)))

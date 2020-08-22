@@ -3,14 +3,21 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-18 10:00:39
+ * @LastEditTime: 2020-08-22 10:18:19
  */ 
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
 import { Select, Input, Button } from 'antd';
+import _ from 'lodash';
+
+
 import { BaseForm, ModalForm } from '@components/BasicForm';
-import { BaseTable } from '@components/BasicTable'
+import { BaseTable } from '@components/BasicTable';
+import { renderSelect } from '@components/BasicForm/BaseForm';
+
+import { ExArray, ExObject } from '@utils/utils.js';
+import {contentType, queueType, rightStatus, orderFieldMap, orderTypeMap, dateFormat} from '@config/constants';
 
 import styles from './index.module.less';
 
@@ -20,18 +27,31 @@ const AuthButton = wrapAuth(Button);
 const { Option } = Select;
 
 function AuditStatistics(props) {
-  const modalFormRef = useRef(null);
+  const formRef = useRef(null);
   // 搜索标题、ID参数名称
   const [params, setParams] = useState('default');
   
   const {
+    dispatch,
     User: {
       business
     },
     Statistics: {
-      table
-    }
-    } = props;
+      loading,
+      dataSource, 
+      pagination,
+    },
+  } = props;
+
+  useEffect(()=>{
+    dispatch({
+      type: 'Statistics/init',
+      payload: {
+        type: 'person',
+        businessId: formRef.current.getFieldValue('businessId'),
+      }
+    })
+  }, [dispatch])
 
   // 多条件搜索配置
   const searchFormProps = {
@@ -42,60 +62,71 @@ function AuditStatistics(props) {
       {
         label: '业务线',
         type: 'SELECT',
-        name:'params0',
-        initialValue: '0',
-        map: business
+        name:'businessId',
+        initialValue: ExObject.getFirstValue(business),
+        map: business,
       },
       {
         label: '类型',
         type: 'SELECT',
-        name:'params1',
-        initialValue: '0',
-        map: { 0: '图文', 1: '选项1', 2: '选项2' }
+        name:'newsType',
+        initialValue: '',
+        map: contentType
       },
       {
         label: '人员',
-        name:'params2',
+        name:'user',
       },
-      { label: '时间', name: 'params5', type: 'DATATIME'},
-     {
-        label: '',
+      { label: '时间', name: 'datatime', type: 'DATATIME_START_END'},
+      {
+        label: '排序',
         type: 'SELECT',
         name:'params11',
         placeholder:'选择状态',
         itemRender: getFieldDecorator => (
           <div  type="flex">
             {
-              getFieldDecorator('isInclude', {
-                initialValue: 'default'
+              getFieldDecorator('orderField', {
+                initialValue: ''
               })(
-                <Select 
-                  style={{width: '160px'}}
-                  onChange={(e)=>{
-                      console.log('change',e);
-                      setParams(e)
-                    } 
-                  } 
-                >
-                  <Option value={'default'}>默认</Option>
-                  <Option value={'title'}>标题</Option>
-                </Select>
+                renderSelect(orderFieldMap, {style: {width: '160px'},})
               )
             }
             {
-              params== 'title' && getFieldDecorator(params, {
-                placeholder:'请输入',
-                initialValue: ''
+              getFieldDecorator('orderType', {
+                initialValue: 'desc'
               })(
-                <Input style={{width: '300px', marginLeft: '15px'}} />
+                renderSelect(orderTypeMap, {style: {width: '160px'},})
               )
             }
           </div>
         )
       },
     ],
+    onReset : () =>{
+       dispatch({
+        type: 'Statistics/init',
+        payload: {
+          type: 'person',
+          businessId: formRef.current.getFieldValue('businessId'),
+        }
+      })
+    },
     onSearch: (formValues)=>{
+      if(!_.isEmpty(formValues.datatime)){
+        formValues.startTime = formValues.datatime[0].format(dateFormat);
+        formValues.endTime = formValues.datatime[1].format(dateFormat);
+      }
+      delete formValues.datatime;
+      
       console.log('formValues', formValues)
+      dispatch({
+        type: 'Statistics/getStatisticQuery',
+        payload: {
+          ...formValues,
+          type: 'person'
+        }
+      })
     }
   }
 
@@ -107,49 +138,62 @@ function AuditStatistics(props) {
     columns: [
       {
         title: '时间',
-        dataIndex: 'name',
-        render: text => <a>{text}</a>,
+        dataIndex: 'dt',
+        render: text => <span>{text}</span>,
       },
       {
         title: '人员',
         align: 'center',
-        dataIndex: 'age1',
+        dataIndex: 'auditorName',
       },
       {
         title: '领审量',
         align: 'center',
-        dataIndex: 'address',
+        dataIndex: 'takeCount',
       },
       {
         title: '审核量',
         align: 'center',
-        dataIndex: 'age2',
+        dataIndex: 'auditCount',
       },
       {
         title: '审核通过量',
         align: 'center',
-        width: '160px',
-        dataIndex: 'address3',
+        dataIndex: 'auditPassedCount',
       },
       {
         title: '操作',
         width: '100px',
         align: 'center',
         render(r) {
-          return (<AuthButton perms={'statistics:person:select'} type="primary" size="small" onClick={()=>goDetails(r.id)}>明细</AuthButton>);
+          return (<AuthButton perms={'statistics:person:select'} type="primary" size="small" onClick={()=>goDetails(r.auditorName)}>明细</AuthButton>);
         }
       },
     ],
-    ...table,
+    loading,
+    dataSource, 
+    pagination,
+    onPageChg: (page) => {
+      // console.log(page)
+      dispatch({
+        type: 'Statistics/getStatisticQuery',
+        payload:{
+          type: 'person',
+          pageNum: page.current,
+          pageSize: page.pageSize,
+          businessId: formRef.current.getFieldValue('businessId'),
+        }
+      })
+    },
   }
 
   // 审核详情页
-  const goDetails = (id)=>{
+  const goDetails = (username)=>{
     router.push(
       {
         pathname:'/statistics/personnel/details',
         query:{
-          id: id,
+          user: username,
         }
       }
     );
@@ -157,7 +201,7 @@ function AuditStatistics(props) {
 
   return (
     <div>
-      <BaseForm {...searchFormProps}></BaseForm>
+      <BaseForm {...searchFormProps} wrappedComponentRef={formRef}></BaseForm>
       <BaseTable {...tableProps}></BaseTable>
     </div>
   )

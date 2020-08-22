@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-21 15:21:24
+ * @LastEditTime: 2020-08-22 10:20:20
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -89,6 +89,14 @@ function RolePage(props) {
       { label: '更新人', name: 'updateUser'},
       { label: '更新时间', name: 'datatime', type: 'DATATIME_START_END'},
     ],
+    onReset : () =>{
+      dispatch({
+        type: 'Rights/init',
+        payload: {
+          type: 'role'
+        }
+      })
+    },
     onSearch: (formValues)=>{
       if(!_.isEmpty(formValues.datatime)){
         formValues.startTime = formValues.datatime[0].format(dateFormat);
@@ -165,6 +173,7 @@ function RolePage(props) {
       dispatch({
         type: 'Rights/getUserOrRoleQuery',
         payload:{
+          type: 'role',
           pageNum: page.current,
           pageSize: page.pageSize
         }

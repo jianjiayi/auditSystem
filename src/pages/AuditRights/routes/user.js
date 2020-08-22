@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-21 15:28:07
+ * @LastEditTime: 2020-08-22 10:19:59
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -100,8 +100,16 @@ function UserRights(props) {
       { label: '真实姓名', name: 'name'},
       { label: '用户名', name: 'username'},
     ],
+    onReset : () =>{
+      dispatch({
+        type: 'Rights/init',
+        payload: {
+          type: 'user'
+        }
+      })
+    },
     onSearch: (formValues)=>{
-     if(!_.isEmpty(formValues.datatime)){
+      if(!_.isEmpty(formValues.datatime)){
         formValues.startTime = formValues.datatime[0].format(dateFormat);
         formValues.endTime = formValues.datatime[1].format(dateFormat);
       }

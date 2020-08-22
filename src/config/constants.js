@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-28 17:35:04
- * @LastEditTime: 2020-08-21 14:08:11
+ * @LastEditTime: 2020-08-22 09:15:08
  */ 
 // 上传文件路径
 export const UPLOAD_FILE_URL = '';
@@ -24,7 +24,7 @@ export const userSetMenu = [
 export const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 // 内容类型
-export const contentType =  { '': '全部', 1: '图文', 2: '视频', 3: '音频', 4: '图集' };
+export const contentType =  { '': '全部', 'NEWS': '图文', 'VIDEO': '视频', 'AUDIO': '音频', 'IMAGE': '图集' };
 
 // 队列机制
 export const queueType = { '': '全部', 1: '先审后发', 2: '先发后审', 3: '免审' };
@@ -40,3 +40,12 @@ export const rightStatus = { '': '全部', 0: '离线', 1: '在线', 2: '注销'
 
 // 角色状态 
 export const roleStatus = { '': '全部', 0: '有效', 1: '失效'};
+
+// 统计排序
+export const orderFieldMap = { '': '全部', 'dt': '时间', 'entry_queue_count': '入审量', 'audit_count': '审核量', 'audit_passed_count': '审核通过量'};
+
+// 统计排序
+export const orderTypeMap = { 'desc': '降序', 'asc': '升序'};
+
+// 审核结果
+export const auditStatus = { '': '全部', 'INIT': '待审', 'PENDING': '已领取', 'PASS': '通过', 'REJECT': '删除'};
