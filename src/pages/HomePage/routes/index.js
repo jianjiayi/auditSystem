@@ -3,98 +3,122 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:06:57
- * @LastEditTime: 2020-08-10 16:02:10
+ * @LastEditTime: 2020-08-24 16:19:53
  */ 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'dva';
-import {Button} from 'antd';
+import _ from 'lodash';
+
+import { BaseForm } from '@components/BasicForm';
 import PageLoading from '@components/PageLoading';
 import TextCountUp from '@components/TextCountUp';
 
-import DemoCharts from '@components/Charts/demo.js';
-// import Bar from '@components/Charts/Bar';
-// import WordCloud from '@components/Charts/WordCloud';
+import PieChart from '@components/Charts/Pie';
 import echarts from 'echarts/lib/echarts';
+
+import { ExObject } from '@utils/utils.js';
+import {contentType, colorList} from '@config/constants';
 
 import styles from './index.module.less';
 
 function HomePage(props) {
-  const {DataView} = props;
+  const formRef = useRef(null);
+
+  const {
+    dispatch,
+    User: {
+      business
+    },
+    DataView:{
+      loading,
+      dataSource,
+    },
+  } = props;
+
+  useEffect(()=>{
+    let businessId = formRef.current.getFieldValue('businessId');
+    if(!businessId) return;
+    dispatch({
+      type: 'DataView/init',
+      payload: {
+        businessId,
+      }
+    })
+  }, [dispatch, business])
+
+  // 多条件搜索配置
+  const searchFormProps = {
+    className: styles['form-contaner'],
+    layout: 'inline',
+    dataSource: [
+      {
+        label: '业务线',
+        type: 'SELECT',
+        name:'businessId',
+        initialValue: ExObject.getFirstValue(business),
+        map: business,
+      },
+    ],
+    onSearch: (formValues)=>{
+      
+      dispatch({
+        type: 'DataView/getStatisticCount',
+        payload: {
+          ...formValues,
+        }
+      })
+    }
+  }
 
   
   let TextCountUpProps = {
-    datasource:DataView.datasource
+    dataSource,
   }
 
-  var colorArray = [
-    {
-        top: '#ffa800', //黄
-        bottom: 'rgba(11,42,84,.3)'
-    }, {
-        top: '#1ace4a', //绿
-        bottom: 'rgba(11,42,84, 0.3)'
-    },
-    {
-        top: '#4bf3ff', //蓝
-        bottom: 'rgba(11,42,84,.3)'
-    }, {
-        top: '#4f9aff', //深蓝
-        bottom: 'rgba(11,42,84,.3)'
-    },
-    {
-        top: '#b250ff', //粉
-        bottom: 'rgba(11,42,84,.3)'
-    }
-  ],
-  option = {
-    xAxis: {
-      data: colorArray
-    },
-    yAxis: {
-      data: ['first', 'two', 'three', 'four', 'five']
+  const option = {
+    color: colorList,
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b} : {c} ({d}%)'
     },
     series: [{
-      type: 'bar',
-      barWidth:20,
+      name: '统计',
+      type: 'pie',
+      // radius: [30, 110],
+      center: ['50%', '50%'],
+      // roseType: 'radius',
       label: {
         show: true,
-        position: 'top',
-        textStyle:{
-          color:'#ffffff'
+        formatter: '{b} : {c} ({d}%)',
+      },
+      emphasis: {
+        label: {
+          show: true
         }
       },
-      itemStyle:{
-        normal:{
-          color:  new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-            offset: 0,
-            color: 'rgba(89,208,207,1)'
-          },{
-            offset: 1,
-            color: 'rgba(0,28,189,0)'
-          }])
-        }
-      },
-      animationDelay: function (idx) {
-        return idx * 900;
-      },
-      data: [60, 132, 89, 134, 60]
-    }],
-  };
+      data: dataSource,
+    }]
+  }
   console.log(option)
+
+  const pieChartsProps = {
+    option,
+    width: '800px',
+    height: '500px'
+  }
   return (
-    <PageLoading loading={false}>
-      <div className={styles.container}>
+    <div className={styles.container}>
+      <BaseForm {...searchFormProps} wrappedComponentRef={formRef}></BaseForm>
+      <PageLoading loading={loading}>
         <TextCountUp {...TextCountUpProps}></TextCountUp>
-        {/* <Bar></Bar>
-        <WordCloud></WordCloud> */}
-        <DemoCharts></DemoCharts>
-      </div>
-    </PageLoading>
+        <PieChart {...pieChartsProps}></PieChart>
+      </PageLoading>
+    </div>
   )
 }
 
-function mapStateToProps({DataView}){
-  return {DataView}
+function mapStateToProps({User,DataView}){
+  return {User,DataView}
 }
 
 export default connect(mapStateToProps)(HomePage)

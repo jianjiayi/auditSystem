@@ -3,11 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-14 17:48:18
+ * @LastEditTime: 2020-08-24 15:22:00
  */ 
-import React, {useImperativeHandle, forwardRef} from 'react';
-import {Form, Checkbox, Radio, Input, Tag, Button} from 'antd';
+import React, {useState, useRef, useImperativeHandle, forwardRef} from 'react';
+import {Form, Checkbox, Radio, Input, Tag, Button, Row, Col, Icon} from 'antd';
 import classNames from 'classnames';
+import _ from 'lodash';
 import { MoreSelect } from '@components/BasicForm'
 
 import styles from './index.module.less';
@@ -32,8 +33,14 @@ const options = [
 
 
 function SectionAction(props, ref) {
+  // 存储标签
+  const [tags, setTags] = useState([]);
+  const [inputVisible, setInputVisible] = useState(false);
+  const saveInputRef = useRef(null);
+
   const {
     className, 
+    curArt,
     dispatch,
     category, //分类
     Global: {
@@ -44,11 +51,13 @@ function SectionAction(props, ref) {
     form: {getFieldDecorator, getFieldValue, setFieldsValue}, 
   } = props;
 
+  console.log('curArt',curArt)
+
   /**三级分类参数*/ 
   const moreSelectProps = {
-    size: 'default',
-    style: { width: '420px' },
-    category, //分类
+    size: 'small',
+    style: { width: '320px' },
+    category: category[0], //分类
     firstCategory,
     secondCategory,
     thirdCategory,
@@ -132,6 +141,37 @@ function SectionAction(props, ref) {
     )
   }
 
+
+  // 删除标签tags
+  const deleteTagClose = (removedTag) => {
+    let tagsList = _.cloneDeep(tags);
+    _.pull(tagsList, removedTag);
+    setTags(tagsList);
+  }
+  // 保存标签
+  const handleInputConfirm = () => {
+    let inputValue = saveInputRef.current.state.value;
+    if(!inputValue)return false;
+
+    if (inputValue && tags.indexOf(inputValue) === -1) {
+      setTags([...tags, inputValue])
+    }
+    console.log(tags);
+    dispatch({
+      type: 'CDetails/getSaveTags',
+      payload: {
+
+      },
+      callback: () =>{
+        setInputVisible(false)
+      }
+    })
+  };
+  // 取消
+  const handleInputCancel = () => {
+    setInputVisible(false)
+  }
+
   // 审核打标
   const getMarkTpl = () =>{
     return (
@@ -147,20 +187,47 @@ function SectionAction(props, ref) {
           )}
         </Form.Item>
         <Form.Item>
-          {getFieldDecorator('hot', {
-            // initialValue: curArt.title
-          })(
-            <Checkbox.Group style={{ width: '100%' }}>
-              <Checkbox value="A">热点</Checkbox>
-              <Checkbox value="C">大事件</Checkbox>
-            </Checkbox.Group>
-          )}
+          <Row type="flex" justify="start">
+            <Col>
+              {getFieldDecorator('hotValue', {
+                initialValue: [curArt.hotValue] || 0
+              })(<Checkbox.Group><Checkbox value={1}>热点</Checkbox></Checkbox.Group>)}
+            </Col>
+            <Col>
+              {getFieldDecorator('bigEvent', {
+                initialValue: [curArt.bigEvent] || false
+              })(<Checkbox.Group><Checkbox value={true}>大事件</Checkbox></Checkbox.Group>)}
+            </Col>
+          </Row>
         </Form.Item>
         <Form.Item label="标签">
           {getFieldDecorator('tags', {
-            // initialValue: curArt.title
+            initialValue: curArt.bigEvent || [],
           })(
-            <Input placeholder="请输入标题"/>
+            <div>
+              {tags.map((tag, index) => {
+                const tagElem = (
+                  <Tag key={index+tag} closable onClose={() => deleteTagClose(tag)}>{tag}</Tag>
+                );
+                return tagElem;
+              })}
+              {inputVisible && (
+                <div>
+                  <Input
+                    ref={saveInputRef}
+                    type="text"
+                    size="small"
+                  />
+                  <Button size="small" type="primary" onClick={() => handleInputConfirm()}>保存</Button>
+                  <Button size="small" onClick={() => handleInputCancel()}>取消</Button>
+                </div>
+              )}
+              {!inputVisible && (
+                <Tag onClick={()=>{setInputVisible(true)}} style={{ background: '#fff', borderStyle: 'dashed' }}>
+                  <Icon type="plus" /> 新增
+                </Tag>
+              )}
+            </div>
           )}
         </Form.Item>
       </div>

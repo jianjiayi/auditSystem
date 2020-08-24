@@ -3,10 +3,13 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-02 10:00:50
- * @LastEditTime: 2020-08-10 09:37:17
+ * @LastEditTime: 2020-08-24 15:35:27
  */ 
 import React from 'react';
-import { VideoPlayer } from '@components/Media'
+import { VideoPlayer } from '@components/Media';
+
+import { ExTime } from '@utils/utils.js';
+
 import styles from './index.module.less';
 
 function Video(props) {
@@ -24,8 +27,11 @@ function Video(props) {
       <div className={styles.normal}>
         <p className={styles.title}>{curArt.title}</p>
         <p className={styles.source}>
-            {curArt.pubTime && <span>{curArt.pubTime}</span>}
-            <span> 来源：{curArt.source}</span>
+            {curArt.createtime && <span>{ExTime.formatDate(curArt.createtime)}</span>}
+            {
+              curArt.origin.length > 5 && <br/>
+            }
+            <span> 来源：{curArt.origin}</span>
         </p>
         <div className={styles['content-detail']} dangerouslySetInnerHTML={textHtml}></div>
       </div>

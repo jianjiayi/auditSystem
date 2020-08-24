@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-22 10:18:56
+ * @LastEditTime: 2020-08-22 13:42:17
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -14,7 +14,7 @@ import { BaseForm, ModalForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
 
 import { ExArray, ExObject } from '@utils/utils.js';
-import {contentType, auditStatus, orderFieldMap, orderTypeMap, dateFormat} from '@config/constants';
+import {contentType, auditResult, orderFieldMap, orderTypeMap, dateFormat} from '@config/constants';
 
 import styles from './index.module.less';
 
@@ -72,7 +72,7 @@ function AuditStatistics(props) {
         type: 'SELECT',
         name:'auditStatus',
         initialValue: '',
-        map: auditStatus
+        map: auditResult
       },
       { label: '时间', name: 'datatime', type: 'DATATIME_START_END'},
       { label: '标题', name: 'title',},
@@ -147,7 +147,7 @@ function AuditStatistics(props) {
         align: 'center',
         width: '260px',
         dataIndex: 'auditStatus',
-        render: text => <span>{auditStatus[text]}</span>,
+        render: text => <span>{auditResult[text]}</span>,
       },
     ],
     loading,

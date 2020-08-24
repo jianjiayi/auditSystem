@@ -3,19 +3,29 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-14 16:29:32
+ * @LastEditTime: 2020-08-24 15:55:26
  */ 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'dva';
 import debounce from 'lodash.debounce';
+
+
 import Content from './content';
 import Operate from './operate';
 import PageLoading from '@components/PageLoading';
 
+import useDebounce from '@utils/useDebounce';
+
 import styles from './index.module.less';
 
 function ContentDetails(props) {
-  const { CDetails: {loading}, dispatch } = props;
+  const { 
+    history,
+    dispatch,
+    CDetails: {
+      loading,
+    }, 
+  } = props;
 
   useEffect(()=>{
     dispatch({
@@ -30,17 +40,18 @@ function ContentDetails(props) {
   }
   const operateProps = {
     className: styles.action,
+    history,
   }
 
   const pageProps = {
     className: styles.container,
-    onClick: ()=> debounce(()=>{
-      console.log('点击了')
-    },1000)
+    onClick: useDebounce(v => {
+      // alert('22222')
+    },2000)
   }
 
   return (
-    <PageLoading loading = {loading}>
+    <PageLoading loading = {false}>
       <div {...pageProps}>
         <Content {...contentProps}></Content>
         <Operate {...operateProps}></Operate>

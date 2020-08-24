@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-17 20:46:03
+ * @LastEditTime: 2020-08-24 16:43:40
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -15,43 +15,51 @@ import _ from 'lodash';
 import {AudioPlayer, VideoPlayer } from '@components/Media';
 import Ueditor from '@components/Editor';
 
+import { ExTime } from '@utils/utils.js';
+
 import styles from './index.module.less';
 
 import wrapAuth from '@components/WrapAuth';
 const AuthButton = wrapAuth(Button);
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
-const layout = {
-  labelCol: {
-    span: 8
-  },
-  wrapperCol: {
-    span: 14
-  }
-};
-const layout1 = {
-  labelCol: {
-    span: 4
-  },
-  wrapperCol: {
-    span: 16
-  }
-};
+
 const formItemLayout = {
   labelAlign: 'left',
-  labelCol: { span: 2 },
-  wrapperCol: { span: 12 },
+  labelCol: { span: 3 },
+  wrapperCol: { span: 20 },
 };
 
 function Content(props) {
-  const [isEdit, setIsEdit] = useState(false);
-  const {className, CDetails, form: {getFieldDecorator, validateFields}, dispatch} = props;
-  console.log(props)
-  const { curArt } = CDetails;
-  
   // 临时保存编辑器修改后的文章详情
-  const [editorText, setEditorText] = useState(curArt.text || '');
+  const [editorText, setEditorText] = useState('');
 
+
+  const {
+    className, 
+    CDetails, 
+    form: {
+      getFieldDecorator, 
+      validateFields,
+      resetFields
+    }, 
+    dispatch
+  } = props;
+
+  const { curArt, isEdit, queueContentId } = CDetails;
+
+  useEffect(()=>{
+    setEditorText(curArt.content)
+  },[curArt.content])
+
+  
+
+  const changeIsEdit = (status) => {
+    if(!status){
+      resetFields(['title', 'date', 'source']);
+    }
+    dispatch({type: 'CDetails/save',payload: { isEdit: status}})
+  }
 
   // 保存函数
   const handelSaveArt = e => {
@@ -59,13 +67,25 @@ function Content(props) {
     validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
-        values.text  = editorText;
+        values.content  = editorText;
+        if(!_.isEmpty(values.datetime)){
+          let time = values.datetime.format(dateFormat);
+          values.createtime = new Date(time.replace(/-/g, '/')).getTime()
+        }
+        delete values.datetime;
+
+        const { id, ...rest} = values;
+
         dispatch({
-          type: '',
+          type: 'CDetails/getNewsSaveContent',
           payload: {
-            
+            data: {
+              content: rest,
+              id: queueContentId
+            },
           }
         })
+        changeIsEdit(false);
       }
     });
   }
@@ -84,45 +104,38 @@ function Content(props) {
               <h2 className={styles.title}>{curArt.title}</h2>
             )}
           </Form.Item>
-          <Form.Item label="ID">
+          <Form.Item label="&nbsp;&nbsp;&nbsp;ID">
             {getFieldDecorator('id', {
-              initialValue: curArt.cardId,
-              rules: [{ required: true}],
+              initialValue: curArt.id,
             })(
-              <span>{curArt.cardId}</span>
+              <span>{curArt.id}</span>
             )}
           </Form.Item>
-          <Row>
-            <Col span={6}>
-              <Form.Item label="来源" {...layout}>
-                {getFieldDecorator('source', {
-                  initialValue: curArt.source,
-                   rules: [{ required: true, message: `请输入来源` }],
-                })(
-                  isEdit? <Input placeholder="请输入来源"/> :
-                  <span className={styles.title}>{curArt.source}</span>
-                )}
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item label="时间" {...layout1}>
-                {getFieldDecorator('date', {
-                  initialValue: moment(curArt.pubTime),
-                  rules: [{ required: true, message: `请选择时间` }],
-                })(
-                  isEdit? <DatePicker showTime format={dateFormat}/> :
-                  <span className={styles.title}>{curArt.pubTime}</span>
-                )}
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item label="来源">
+            {getFieldDecorator('origin', {
+              initialValue: curArt.origin,
+                rules: [{ required: true, message: `请输入来源` }],
+            })(
+              isEdit? <Input placeholder="请输入来源"/> :
+              <span className={styles.title}>{curArt.origin}</span>
+            )}
+          </Form.Item>
+          <Form.Item label="时间">
+            {getFieldDecorator('datetime', {
+              initialValue: moment(curArt.createtime),
+              rules: [{ required: true, message: `请选择时间` }],
+            })(
+              isEdit? <DatePicker showTime format={dateFormat}/> :
+              <span className={styles.title}>{ExTime.formatDate(curArt.createtime)}</span>
+            )}
+          </Form.Item>
         </div>
         <div className={styles['button-box']}>
-          {!isEdit && <AuthButton perms={'news:edit'} type="primary" size="small" onClick={()=>{setIsEdit(!isEdit)}}>修改</AuthButton>}
+          {!isEdit && <AuthButton perms={'news:edit'} type="primary" size="small" onClick={()=>{changeIsEdit(true)}}>修改</AuthButton>}
           {isEdit && 
             <div className={styles['button-group']}>
               <Button type="primary" size="small" type="primary" htmlType="submit">确定</Button>
-              <Button size="small" onClick={()=>{setIsEdit(!isEdit)}}>取消</Button>
+              <Button size="small" onClick={()=>{changeIsEdit(false)}}>取消</Button>
             </div>
           }
         </div>
@@ -170,9 +183,9 @@ function Content(props) {
   ]
 
   // 正文
-  const textHtml = {__html:getContentHtml(curArt.text,list)};
+  const textHtml = {__html:getContentHtml(curArt.content,list)};
   const UeditorProps = {
-    initialContent: curArt.text || '',
+    initialContent: curArt.content || '',
     onContentChange: (values) => {
       // console.log(values)
       setEditorText(values);
@@ -192,9 +205,9 @@ function Content(props) {
     return (
       <div className={styles['content-container']}>
 
-        {curArt.type == '4' && <AudioPlayer {...audioProps}></AudioPlayer>}
+        {curArt.newsType == 'AUDIO' && <AudioPlayer {...audioProps}></AudioPlayer>}
 
-        {curArt.type == '3' && 
+        {curArt.newsType == 'VIDEO' && 
           <div>
             <h2 className={styles.title}>视频详情 : </h2>
             <VideoPlayer {...videoProps}></VideoPlayer>
@@ -202,7 +215,7 @@ function Content(props) {
         }
 
         {
-          curArt.type == '2' && 
+          (curArt.newsType == 'NEWS' || curArt.newsType == 'IMAGE') && 
           <div className="">
             <h2 className={styles.title}>文章详情 : </h2>
             {isEdit && <div><Ueditor {...UeditorProps}></Ueditor></div>}

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-22 10:42:26
+ * @LastEditTime: 2020-08-24 16:33:55
  */ 
 import React, {useEffect} from 'react';
 import { connect } from 'dva';
@@ -22,6 +22,7 @@ import wrapAuth from '@components/WrapAuth';
 const AuthButton = wrapAuth(Button);
 
 const { Option } = Select;
+delete contentType[''];
 
 function AuditQueue(props) {
   const {
@@ -59,19 +60,21 @@ function AuditQueue(props) {
   const goDetails = (id)=>{
     let formValues = props.form.getFieldsValue();
     let params = {
-      id,
-      formValues,
+      businessId: formValues.bid,
+      queue: id,
+      type: formValues.type,
     }
     dispatch({
       type: 'CDetails/getNewsGetTask',
       payload: params,
       callback: (data) =>{
+        console.log('data',data)
         if(_.isEmpty(data)){
           return message.error('当前队列没有文章可以领取');
         }
 
         dispatch({type: 'CDetails/save', payload: {query: params}});
-        sessionStorage.setItem('$QUERY', params);
+        sessionStorage.setItem('$QUERY', JSON.stringify(params));
         router.push({pathname:'/queue/cdetails'});
       }
     })
@@ -99,7 +102,7 @@ function AuditQueue(props) {
       {
         title: '操作',
         render(r) {
-          return (<AuthButton perms={'queue:receive'} onClick={()=>{goDetails(r.queueId)}}>领取</AuthButton>);
+          return (<AuthButton key={r.id} perms={'queue:receive'} onClick={()=>{goDetails(r.queueId)}}>领取</AuthButton>);
         }
       },
     ],

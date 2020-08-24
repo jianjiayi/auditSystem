@@ -3,17 +3,18 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-22 13:33:40
+ * @LastEditTime: 2020-08-22 15:36:19
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import {Form, Select, Input, Button } from 'antd';
+import {message, Form, Select, Input, Button } from 'antd';
 import _ from 'lodash';
 
 import { BaseForm, MoreSelect } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
 import { renderSelect } from '@components/BasicForm/BaseForm'; 
+import ViewRecord from './components/ViewRecord.js';
 
 import { ExArray, ExObject } from '@utils/utils.js';
 import {contentType, auditStatus, runningStatus, queueType, dateFormat} from '@config/constants';
@@ -29,8 +30,7 @@ const InputGroup = Input.Group;
 function AuditSearch(props) {
   
   const formRef = useRef(null);
-  // 搜索标题、ID参数名称
-  const [params, setParams] = useState('title');
+  const viewRecordRef = useRef(null);
 
   const {
     dispatch,
@@ -213,19 +213,6 @@ function AuditSearch(props) {
     }
   }
 
-
-  // 审核详情页
-  const goDetails = (id)=>{
-    router.push(
-      {
-        pathname:'/search/cdetails',
-        query:{
-          id: id,
-        }
-      }
-    );
-  }
-
    // 列表配置
   const tableProps = {
     // 类型
@@ -292,8 +279,8 @@ function AuditSearch(props) {
           return (
             <div className={styles.tableaction}>
               <AuthButton perms={'news:get'} type="primary" size="small" onClick={()=>goDetails(r.id)}>领审</AuthButton>
-              <AuthButton perms={'queue:add'} size="small" type="dashed" onClick={()=>{console.log(r.id)}}>加队列</AuthButton>
-              <AuthButton perms={'history:select'} size="small" onClick={()=>{console.log(r.id)}}>操作记录</AuthButton>
+              <AuthButton perms={'queue:add'} size="small" type="dashed" onClick={()=>openAddQueueModal(r.id)}>加队列</AuthButton>
+              <AuthButton perms={'history:select'} size="small" onClick={()=>getViewRecord(r.id)}>操作记录</AuthButton>
             </div>);
         }
       },
@@ -315,6 +302,41 @@ function AuditSearch(props) {
     },
   }
 
+  // 领审操作
+  const goDetails = (id)=>{
+    let params = {
+      id
+    }
+    
+    dispatch({
+      type: 'CDetails/getNewsGetTask',
+      payload: params,
+      callback: (data) =>{
+        if(_.isEmpty(data)){
+          return message.error('当前队列没有文章可以领取');
+        }
+
+        dispatch({type: 'CDetails/save', payload: {query: params}});
+        sessionStorage.setItem('$QUERY', params);
+        router.push({pathname:'/queue/cdetails'});
+      }
+    })
+  }
+
+  // 加队列操作
+  const openAddQueueModal = (id) => {
+
+  }
+
+  // 查看操作记录
+  const getViewRecord = (data) => {
+    viewRecordRef.current.setVisible(true)
+  }
+  const recordProps = {
+    footer: null,
+    dataSource: {}
+  } 
+
   return (
     <div>
       <BaseForm {...searchFormProps}  wrappedComponentRef={formRef}></BaseForm>
@@ -324,6 +346,7 @@ function AuditSearch(props) {
           <AuthButton perms={'news:audit'} type="danger" onClick={() =>{}}>未通过</AuthButton>
         </div>
       </BaseTable>
+      <ViewRecord {...recordProps} ref={viewRecordRef}></ViewRecord>
     </div>
   )
 }

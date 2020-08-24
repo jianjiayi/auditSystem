@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-08-21 16:18:27
+ * @LastEditTime: 2020-08-24 15:08:27
  */ 
 import request from '@http';
 
@@ -24,3 +24,36 @@ export async function getNewsGetTask(params){
     body: params
   })
 }
+
+// 保存当前文章
+export async function getNewsSaveContent(params){
+  return request(`/audit/news/save/content`, {
+    method: 'POST',
+    body: params
+  })
+}
+
+// 保存标签
+export async function getSaveTags(params){
+  return request(`/audit/news/save/content`, {
+    method: 'POST',
+    body: params
+  })
+}
+
+// 跳过当前待审文章
+export async function getNewsSkip(params){
+  return request(`/audit/news/skip`, {
+    method: 'POST',
+    body: params
+  })
+}
+
+// 退出当前领取队列接口
+export async function getNewsExit(params){
+  return request(`/audit/news/exit`, {
+    method: 'POST',
+    body: params
+  })
+}
+

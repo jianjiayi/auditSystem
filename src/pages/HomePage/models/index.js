@@ -3,79 +3,47 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-07-03 17:24:37
+ * @LastEditTime: 2020-08-22 15:04:51
  */ 
 import * as api from '../service/index.js';
+import  { statisticCount } from '@config/constants';
 
 export default {
   namespace: 'DataView',
   
   state: {
-    isLogin: false,
-    datasource:[
-      {
-        text: '昨日审核图文',
-        value: '63004'
-      },
-      {
-        text: '昨日审核图文',
-        value: '564963'
-      },
-      {
-        text: '昨日审核图文',
-        value: '63004'
-      },
-      {
-        text: '昨日审核图文',
-        value: '564963'
-      },
-      {
-        text: '昨日审核图文',
-        value: '63004'
-      },
-      {
-        text: '昨日审核图文',
-        value: '564963'
-      },
-      {
-        text: '昨日审核图文',
-        value: '63004'
-      },
-      {
-        text: '昨日审核图文',
-        value: '564963'
-      },
-      {
-        text: '昨日审核图文',
-        value: '63004'
-      },
-      {
-        text: '昨日审核图文',
-        value: '564963'
-      },
-      {
-        text: '昨日审核图文',
-        value: '63004'
-      },
-      {
-        text: '昨日审核图文',
-        value: '564963'
-      },
-    ]
+    loading: false,
+    // 查询条件
+    query: {},
+    // 文章列表
+    dataSource: [],
   },
 
   effects: {
-    *'init'({ payload }, { call, put }){
-      const { code, data } = yield call(api.login, {});
-      if(code == 0){
+    *init({ payload }, { call, put }){
+      yield put({type: 'save',payload: {loading: true}})
+      yield put({type: 'getStatisticCount', payload});
+    },
+    *getStatisticCount({payload}, {call, put, select}){
+      const {code, data} = yield call(api.getStatisticCount, payload);
+      
+      if(code == 200 && data){
+        let arr = []
+        for(let key in data){
+          arr.push({
+            name: statisticCount[key],
+            value: data[key].toString(),
+          })
+        }
         yield put({
           type: 'save',
           payload: {
-            isLogin: true
-          }
+            loading: false,
+            dataSource: arr,
+          },
         })
       }
-    }
+    },
   },
 
   reducers: {

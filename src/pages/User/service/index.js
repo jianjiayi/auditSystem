@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-08-20 19:38:54
+ * @LastEditTime: 2020-08-24 16:29:23
  */ 
 import request from '@http';
 
@@ -21,6 +21,7 @@ export async function getCurrentUser(params ={}){
     method: 'GET',
   })
 }
+
 
 // 获取用户业务线
 export async function getBusiness(params ={}){

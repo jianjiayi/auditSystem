@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-21 09:37:49
+ * @LastEditTime: 2020-08-24 16:29:16
  */ 
 import * as api from '../service/index.js';
 import _ from 'lodash';
@@ -35,14 +35,18 @@ export default {
         yield put({type: 'getBusiness'});
         yield put({type: 'getRoleAndPermission'});
         yield put({type: 'save',payload: { loading: false}})
+
+        // 回调函数
+        callback()
       }  
 
       // sessionStorage.setItem('$isLogin', true);
       // yield put({type: 'save', payload:{isLogin: true}});
       
-      // 回调函数
-      callback()
+      
     },
+
+
     // 获取当前用户信息
     *getCurrentUser({ payload, callback }, { call, put }){
       const {code ,data} = yield call(api.getCurrentUser, {});
@@ -52,6 +56,8 @@ export default {
         sessionStorage.setItem('$user', JSON.stringify(data));
       }
     },
+
+
     // 获取用户业务线
     *getBusiness({ payload, callback }, { call, put }){
       const {code ,data} = yield call(api.getBusiness, {});
@@ -65,6 +71,8 @@ export default {
         sessionStorage.setItem('$business', JSON.stringify(map));
       }
     },
+
+
     // 获取用户角色和权限
     *getRoleAndPermission({ payload, callback }, { call, put }){
       const {code ,data} = yield call(api.getRoleAndPermission, {});
@@ -74,6 +82,8 @@ export default {
         sessionStorage.setItem('$authority', JSON.stringify(data));
       }
     },
+
+
     // 退出登录
     *logout({ payload, callback }, { call, put }){
       // 清除用户信息
