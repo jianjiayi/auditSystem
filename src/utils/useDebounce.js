@@ -12,7 +12,7 @@ function useDebounce(fn, delay) {
    const { current } = useRef({ fn, timer: null });
     useEffect(function () {
       current.fn = fn;
-    }, [fn]);
+    }, [current.fn, fn]);
   
     return useCallback(function f(...args) {
       args[0].persist() // 这里需要这样设置是因为会警告

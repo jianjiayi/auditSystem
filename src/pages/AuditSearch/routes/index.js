@@ -3,12 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-22 15:36:19
+ * @LastEditTime: 2020-08-27 10:58:34
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import {message, Form, Select, Input, Button } from 'antd';
+import {message, Modal, Tag, Tooltip, Form, Select, Input, Button } from 'antd';
 import _ from 'lodash';
 
 import { BaseForm, MoreSelect } from '@components/BasicForm';
@@ -17,7 +17,7 @@ import { renderSelect } from '@components/BasicForm/BaseForm';
 import ViewRecord from './components/ViewRecord.js';
 
 import { ExArray, ExObject } from '@utils/utils.js';
-import {contentType, auditStatus, runningStatus, queueType, dateFormat} from '@config/constants';
+import {contentType, auditStatus, auditResult, runningStatus, queueType, dateFormat} from '@config/constants';
 
 import styles from './index.module.less';
 
@@ -28,7 +28,7 @@ const { Option } = Select;
 const InputGroup = Input.Group;
 
 function AuditSearch(props) {
-  
+  const tableRef = useRef(null);
   const formRef = useRef(null);
   const viewRecordRef = useRef(null);
 
@@ -44,7 +44,9 @@ function AuditSearch(props) {
       business
     },
     Search:{
+      query,
       loading,
+      queueMap,
       dataSource, 
       pagination,
     },
@@ -53,13 +55,29 @@ function AuditSearch(props) {
 
 
   useEffect(()=>{
+    const params = formRef.current.getFieldsValue();
+    let query = JSON.parse(sessionStorage.getItem('$QUERY_FROM_SEARCH')) || {};//获取缓存中查询条件
+    console.log(query)
     dispatch({
       type: 'Search/init',
       payload: {
-        businessId: formRef.current.getFieldValue('businessId'),
+        ...params,
+        ...query
       }
     })
-  }, [])
+
+
+    // router.setRouteLeaveHook(
+    //   props.route,
+    //   routerWillLeave
+    // )
+
+  }, [dispatch]);
+
+
+  const routerWillLeave = (nextLocation) =>{
+    console.log('nextLocation', nextLocation)
+  }
 
 
   /**三级分类参数*/ 
@@ -105,12 +123,23 @@ function AuditSearch(props) {
         name:'businessId',
         initialValue: ExObject.getFirstValue(business),
         map: business,
+        onChange: (e)=>{
+          console.log('e',e)
+          if(!e) return;
+          
+          dispatch({
+            type: 'Search/getQueue',
+            payload: {
+              bid: e
+            }
+          })
+        }
       },
       {
         label: '内容类型',
         type: 'SELECT',
-        name:'newsType',
-        initialValue: '',
+        name:'type',
+        initialValue: 'NEWS',
         map: contentType
       },
       {
@@ -130,28 +159,28 @@ function AuditSearch(props) {
       {
         label: '所属队列',
         type: 'SELECT',
-        name:'params4',
-        initialValue: '0',
-        map: { 0: '全部', 1: '选项1', 2: '选项2' }
+        name:'queue',
+        initialValue: '',
+        map: { '': '全部', ...queueMap }
       },
       {
         label: '审核状态',
         type: 'SELECT',
-        name:'params5',
+        name:'resultStatus',
         initialValue: '',
-        map: auditStatus
+        map: auditResult
       },
       {
         label: '是否上架',
         type: 'SELECT',
-        name:'params6',
+        name:'status',
         initialValue: '',
         map: runningStatus
       },
       { label: '入审时间', name: 'datatime', type: 'DATATIME_START_END'},
-      { label: '来源', name: 'params8'},
-      { label: '采集源ID', name: 'params9'},
-      { label: '采集源', name: 'params10'},
+      { label: '来源', name: 'source'},
+      { label: '采集源ID', name: 'crawlSourceId'},
+      { label: '采集源', name: 'crawlSource'},
       {
         label: '',
         type: 'SELECT',
@@ -178,16 +207,18 @@ function AuditSearch(props) {
         )
       },
     ],
+    formValues: JSON.parse(sessionStorage.getItem('$QUERY_FROM_SEARCH')) || query,
     onReset : () =>{
+      const params = formRef.current.getFieldsValue();
        dispatch({
         type: 'Statistics/init',
-        payload: {
-          type: 'category',
-          businessId: formRef.current.getFieldValue('businessId'),
-        }
+        payload: { ...params }
       })
     },
     onSearch: (formValues)=>{
+      // 取消table选中的数据
+      tableRef.current.setSelectedRowKeys(null);
+      
       // 整理时间
       if(!_.isEmpty(formValues.datatime)){
         formValues.startTime = formValues.datatime[0].format(dateFormat);
@@ -204,13 +235,28 @@ function AuditSearch(props) {
       
       console.log('formValues', formValues)
       dispatch({
-        type: 'Statistics/getStatisticQuery',
+        type: 'Search/getNewsList',
         payload: {
-          ...formValues,
-          type: 'category'
+          ...formValues
         }
       })
     }
+  }
+
+
+  // 格式化所属队列
+  const getQueueText = (data) =>{
+    let str = ''
+    if(!_.isEmpty(data)){
+      data.map(item=>{
+        str += item.name + ","
+      })
+    }
+    let text = str.length > 20 ? str.slice(0, 20) + '...': str;
+
+    return <Tooltip title={str}>
+      <a>{text}</a>
+    </Tooltip>
   }
 
    // 列表配置
@@ -221,65 +267,73 @@ function AuditSearch(props) {
     columns: [
       {
         title: '标题',
-        dataIndex: 'name',
-        render: text => <a>{text}</a>,
+        dataIndex: 'title',
+        align: 'center',
+        render: text => <Tooltip title={text}>
+                          <a>{text.length > 15 ? text.slice(0, 15) + '...': text}</a>
+                        </Tooltip>,
       },
       {
         title: 'ID',
         align: 'center',
         dataIndex: 'id',
+        render: text => <span>{text}</span>,
       },
       {
         title: '分类',
         align: 'center',
-        dataIndex: 'address1',
+        dataIndex: 'categorys',
       },
       {
         title: '来源',
         align: 'center',
-        dataIndex: 'age',
+        dataIndex: 'source',
       },
       {
         title: '采集源ID',
         align: 'center',
-        dataIndex: 'address2',
+        dataIndex: 'crawlSourceId',
       },
       {
         title: '所属队列',
         align: 'center',
-        dataIndex: 'age3',
+        dataIndex: 'queues',
+        render: text => getQueueText(text),
       },
       {
         title: '封面图',
         align: 'center',
-        dataIndex: 'age4',
+        dataIndex: 'cover',
       },
       {
         title: '审核状态',
+        width: '80px',
         align: 'center',
-        width: '160px',
-        dataIndex: 'age5',
+        dataIndex: 'status',
+        render: text => <span>{text}</span>,
       },
       {
         title: '是否上架',
         align: 'center',
-        width: '160px',
-        dataIndex: 'age6',
+        width: '80px',
+        dataIndex: 'resultStatus',
+        render: text => <span>{text}</span>,
       },
       {
         title: '入审时间',
         align: 'center',
-        dataIndex: 'age7',
+        align: 'center',
+        dataIndex: 'createTime',
       },
       {
         title: '操作',
-        width: '240px',
+        width: '40px',
         align: 'center',
         render(r) {
           return (
             <div className={styles.tableaction}>
-              <AuthButton perms={'news:get'} type="primary" size="small" onClick={()=>goDetails(r.id)}>领审</AuthButton>
-              <AuthButton perms={'queue:add'} size="small" type="dashed" onClick={()=>openAddQueueModal(r.id)}>加队列</AuthButton>
+              <AuthButton perms={'news:get'} type="primary" size="small" onClick={()=>goDetails(r)}>领审</AuthButton>
+              <AuthButton perms={'queue:add'} size="small" type="dashed" onClick={()=>openAddQueueModal(r)}>加队列</AuthButton>
               <AuthButton perms={'history:select'} size="small" onClick={()=>getViewRecord(r.id)}>操作记录</AuthButton>
             </div>);
         }
@@ -291,41 +345,73 @@ function AuditSearch(props) {
     onPageChg: (page) => {
       // console.log(page)
       dispatch({
-        type: 'Statistics/getStatisticQuery',
+        type: 'Search/getNewsList',
         payload:{
-          type: 'category',
           pageNum: page.current,
           pageSize: page.pageSize,
-          businessId: formRef.current.getFieldValue('businessId'),
         }
       })
+
+      tableRef.current.setSelectedRowKeys(null);
+      tableRef.current.setSelectedRows(null);
     },
   }
 
   // 领审操作
-  const goDetails = (id)=>{
+  const goDetails = (data)=>{
+    console.log(data)
+    const {businessId,id, queues, type} = data;
+    let {queueType,id: queue} = queues[0]
     let params = {
-      id
+      routersource: 'search',
+      businessId,
+      id,
+      queue,
+      queueType,
+      type
     }
-    
+
+    console.log(params);
     dispatch({
       type: 'CDetails/getNewsGetTask',
       payload: params,
       callback: (data) =>{
         if(_.isEmpty(data)){
-          return message.error('当前队列没有文章可以领取');
+          return message.error('当前文章不可以领取');
         }
 
         dispatch({type: 'CDetails/save', payload: {query: params}});
-        sessionStorage.setItem('$QUERY', params);
-        router.push({pathname:'/queue/cdetails'});
+        // sessionStorage.setItem('$QUERY', params);
+        sessionStorage.setItem('$QUERY', JSON.stringify(params));
+        sessionStorage.setItem('$QUERY_FROM_SEARCH', JSON.stringify(query));
+        router.push({pathname:'/search/cdetails'});
       }
     })
   }
 
   // 加队列操作
-  const openAddQueueModal = (id) => {
-
+  const openAddQueueModal = (data) => {
+    const {businessId, id, type} = data;
+    dispatch({
+      type: 'Search/getNewsReAduit',
+      payload:{
+        businessId,
+        id,
+        type,
+      },
+      callback: (code,data)=>{
+        if(code == 200){
+          if(data == 1){
+            message.success('加入复审队列成功');
+          }else{
+            message.warning('该文章已经在复审队列，请勿重复添加');
+          }
+        }else{
+          message.error('加入复审队列失败');
+        }
+        
+      }
+    })
   }
 
   // 查看操作记录
@@ -337,13 +423,81 @@ function AuditSearch(props) {
     dataSource: {}
   } 
 
+
+  // 批量审核操作
+  const batchAudit = (status) => {
+    let pass = status;
+    // console.log(tableRef.current.selectedRows)
+    let selectedRows = tableRef.current.selectedRows; //获取选中的列表
+    if(_.isEmpty(selectedRows)) return message.error('请勾选文章列表后在操作');
+
+    // 处理选中文章数据
+    let paramsList = [];
+    selectedRows.map(item=>{
+      let id = item.id;
+      let firstQueue = item.queues[0];
+      let queueInfo = {
+        bid: firstQueue.bid,
+        id: firstQueue.id,
+        queueType: firstQueue.queueType,
+        type: firstQueue.type
+      };
+      paramsList.push({id, queueInfo})
+    })
+
+    // console.log(paramsList)
+
+    dispatch({
+      type: 'Search/batchAudit',
+      payload: {
+        pass,
+        paramsList
+      },
+      callback: (data) => {
+        tableRef.current.setSelectedRowKeys(null);
+        tableRef.current.setSelectedRows(null);
+
+        if(pass && _.isEmpty(data._2) || !pass && _.isEmpty(data._1)) return;
+        
+        // 温馨提示
+        Modal.warning({
+          title: '温馨提示',
+          content: (
+            <div>
+              {
+                pass ?
+                <div className="">
+                  <p>以下文章id没有操作成功</p>
+                  {
+                    data._2.map((item,index)=>{
+                      return <Tag key={item}>{item}</Tag>
+                    })
+                  }
+                </div>:
+                <div className="">
+                  <p>以下文章id没有操作成功</p>
+                  {
+                    data._1.map((item,index)=>{
+                      return <Tag key={item}>{item}</Tag>
+                    })
+                  }
+                </div>
+              }
+            </div>
+          ),
+          onOk() {},
+        });
+      }
+    })
+  }
+
   return (
     <div>
       <BaseForm {...searchFormProps}  wrappedComponentRef={formRef}></BaseForm>
-      <BaseTable {...tableProps}>
+      <BaseTable {...tableProps} ref= {tableRef}>
         <div className={styles['right-button']}>
-          <AuthButton perms={'news:audit'} type="primary" onClick={()=>{}}>通过</AuthButton>
-          <AuthButton perms={'news:audit'} type="danger" onClick={() =>{}}>未通过</AuthButton>
+          <AuthButton perms={'news:audit'} type="primary" onClick={()=> batchAudit(true)}>通过</AuthButton>
+          <AuthButton perms={'news:audit'} type="danger" onClick={() => batchAudit(false)}>未通过</AuthButton>
         </div>
       </BaseTable>
       <ViewRecord {...recordProps} ref={viewRecordRef}></ViewRecord>

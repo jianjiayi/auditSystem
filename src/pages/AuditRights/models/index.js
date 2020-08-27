@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:58:26
- * @LastEditTime: 2020-08-22 10:39:26
+ * @LastEditTime: 2020-08-26 17:15:15
  */ 
 import * as api from '../service/index.js';
 import _ from 'lodash';
@@ -15,6 +15,7 @@ export default {
     loading: false,
     permissionIds: [], // 当前角色拥有的权限
     roleList: {}, //所有角色
+    permissionDataList: [],// 审核系统所有权限
     // 查询条件
     query: {},
     // 文章列表
@@ -131,7 +132,21 @@ export default {
         })
       }
     },
-    
+
+
+    // 获取系统所有的用户权限
+    *getPermissionList({payload}, {call, put}){
+      const {code, data} = yield call(api.getPermissionList, payload);
+      
+      if(code == 200 && data){
+        yield put({
+          type: 'save',
+          payload: {
+            permissionDataList: data
+          }
+        })
+      }
+    },
   },
 
   reducers: {

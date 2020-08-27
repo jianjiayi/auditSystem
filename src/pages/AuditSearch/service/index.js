@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-08-22 15:12:08
+ * @LastEditTime: 2020-08-27 10:15:55
  */ 
 import request from '@http';
 
@@ -15,25 +15,27 @@ export async function getNewsList(params){
   })
 }
 
-// 批量审核接口
-export async function getNewsList1(params){
-  return request(`/audit/news/list`, {
+// 队列查询接口
+export async function getQueue(params){
+  return request(`/audit/queue/query`, {
     method: 'POST',
     body: params
   })
 }
 
-// 领审接口
-export async function getNewsList2(params){
-  return request(`/audit/news/list`, {
+// 批量审核接口
+export async function getNewsBatch(params){
+  const {pass, paramsList, ...rest} = params;
+  return request(`/audit/news/batch?pass=${pass}`, {
     method: 'POST',
-    body: params
+    body: paramsList
   })
 }
+
 
 // 加队列接口
-export async function getNewsList3(params){
-  return request(`/audit/news/list`, {
+export async function getNewsReAduit(params){
+  return request(`/audit/news/reAudit`, {
     method: 'POST',
     body: params
   })

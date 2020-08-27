@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-08-21 15:20:04
+ * @LastEditTime: 2020-08-26 16:03:45
  */ 
 import request from '@http';
 
@@ -50,6 +50,14 @@ export async function getRuleListByBusiness(params){
 // 根据id获取角色详情
 export async function getRuleDetailsById(params){
   return request(`/audit/role/detail?id=${params.id}`, {
+    method: 'GET',
+  })
+}
+
+
+// 获取系统所有权限
+export async function getPermissionList(params){
+  return request(`/audit/permission/list`, {
     method: 'GET',
   })
 }

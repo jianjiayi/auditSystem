@@ -3,10 +3,11 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-28 17:35:04
- * @LastEditTime: 2020-08-22 14:49:56
+ * @LastEditTime: 2020-08-26 18:04:00
  */ 
+import { BASEURL } from '@/config';
 // 上传文件路径
-export const UPLOAD_FILE_URL = '';
+export const UPLOAD_FILE_URL = BASEURL+ '/audit/file/upload/image';
 
 // 个人中心按钮配置
 export const userSetMenu = [
@@ -64,7 +65,7 @@ export const roleStatus = { '': '全部', 0: '有效', 1: '失效'};
 export const auditStatus = { '' : '全部', 1: '待审核', 2: '审核通过', 3: '审核未通过' };
 
 // 上架状态
-export const runningStatus = { '' : '全部', 1: '上架', 2: '下架' };
+export const runningStatus = { '' : '全部', 'ONLINE': '上架', 'OFFLINE': '下架' };
 
 // 统计排序
 export const orderFieldMap = { '': '全部', 'dt': '时间', 'entry_queue_count': '入审量', 'audit_count': '审核量', 'audit_passed_count': '审核通过量'};

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-15 16:10:41
- * @LastEditTime: 2020-08-18 22:05:32
+ * @LastEditTime: 2020-08-26 15:25:26
  */ 
 import React, {useState, useImperativeHandle, forwardRef, useRef} from 'react';
 import {Modal} from 'antd';
@@ -35,18 +35,24 @@ function ModalTable(props, ref) {
     cancelText: "取消",
     destroyOnClose: true,
     onOk: () =>{
-      const data = tableRef.current.selectedRowKeys || [];
+      const data = tableRef.current.selectedRows || [];
       !_.isEmpty(data) && data.map(item=>{
         const {id, word} = item;
         item = { id, word}
       })
       // console.log(tableRef.current.selectedRowKeys);
+
+      tableRef.current.setSelectedRowKeys(null);
+      tableRef.current.setSelectedRows(null);
+      
       setVisible(!visible);
       handleSubmit(name,data);
     },
     onCancel: () =>{
       setVisible(!visible);
-      tableRef.current.cancelSelected()
+      // tableRef.current.cancelSelected()
+      tableRef.current.setSelectedRowKeys(null);
+      tableRef.current.setSelectedRows(null);
     },
   }
 

@@ -3,13 +3,13 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-24 15:22:00
+ * @LastEditTime: 2020-08-25 10:08:23
  */ 
 import React, {useState, useRef, useImperativeHandle, forwardRef} from 'react';
-import {Form, Checkbox, Radio, Input, Tag, Button, Row, Col, Icon} from 'antd';
+import {message, Form, Checkbox, Radio, Input, Tag, Button, Row, Col, Icon} from 'antd';
 import classNames from 'classnames';
 import _ from 'lodash';
-import { MoreSelect } from '@components/BasicForm'
+import { MoreSelect2 } from '@components/BasicForm'
 
 import styles from './index.module.less';
 
@@ -51,8 +51,6 @@ function SectionAction(props, ref) {
     form: {getFieldDecorator, getFieldValue, setFieldsValue}, 
   } = props;
 
-  console.log('curArt',curArt)
-
   /**三级分类参数*/ 
   const moreSelectProps = {
     size: 'small',
@@ -62,9 +60,10 @@ function SectionAction(props, ref) {
     secondCategory,
     thirdCategory,
     onSelect: (values) => {
-      let arr = Object.values(values);
-      arr = arr.filter((item,index)=>item != undefined)
-      setFieldsValue({'category':arr.join('/')})
+      console.log(values)
+      // let arr = Object.values(values);
+      // arr = arr.filter((item,index)=>item != undefined)
+      // setFieldsValue({'category':arr.join('/')})
     },
     selectFirstCategory: (id) =>{
       dispatch({
@@ -92,9 +91,9 @@ function SectionAction(props, ref) {
         })(
           <div className={styles.category}>
             <div className={styles['more-select']}>
-              <MoreSelect {...moreSelectProps}></MoreSelect>
+              <MoreSelect2 {...moreSelectProps}></MoreSelect2>
             </div>
-            <Button icon='delete' type="link">删除</Button>
+            {/* <Button icon='delete' type="link">删除</Button> */}
           </div>
         )}
       </Form.Item>
@@ -153,6 +152,10 @@ function SectionAction(props, ref) {
     let inputValue = saveInputRef.current.state.value;
     if(!inputValue)return false;
 
+    if(calcStrLength(inputValue) > 10){
+      return message.error('您输入的文字过长，最多可输入50个字');
+    }
+
     if (inputValue && tags.indexOf(inputValue) === -1) {
       setTags([...tags, inputValue])
     }
@@ -170,6 +173,20 @@ function SectionAction(props, ref) {
   // 取消
   const handleInputCancel = () => {
     setInputVisible(false)
+  }
+
+  // 标签文字长度校验
+  const calcStrLength = (value) => {
+    return Math.ceil(calcByteLength(value) / 2);
+  }
+  const calcByteLength = (s) => {
+    return s.replace(/[^\x00-\xff]/g, 'aa').length;
+  }
+  const validateTextLength  = (rule, value, callback) => {
+    if (calcStrLength(value) > 10) {
+      callback('您输入的文字过长，最多可输入50个字'); // 校验未通过
+    }
+    callback(); // 校验通过
   }
 
   // 审核打标
@@ -219,6 +236,7 @@ function SectionAction(props, ref) {
                     size="small"
                   />
                   <Button size="small" type="primary" onClick={() => handleInputConfirm()}>保存</Button>
+                  &nbsp;&nbsp;&nbsp;&nbsp;
                   <Button size="small" onClick={() => handleInputCancel()}>取消</Button>
                 </div>
               )}

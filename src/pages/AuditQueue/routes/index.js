@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-24 16:33:55
+ * @LastEditTime: 2020-08-27 11:04:31
  */ 
 import React, {useEffect} from 'react';
 import { connect } from 'dva';
@@ -43,7 +43,7 @@ function AuditQueue(props) {
       type: 'Queue/init',
       payload,
     })
-  }, [business, dispatch])
+  }, [business, dispatch, props.form])
   
 
   // 搜索
@@ -57,11 +57,12 @@ function AuditQueue(props) {
   }
 
   // 领审
-  const goDetails = (id)=>{
+  const goDetails = (name, id)=>{
     let formValues = props.form.getFieldsValue();
     let params = {
       businessId: formValues.bid,
       queue: id,
+      queueName: name,
       type: formValues.type,
     }
     dispatch({
@@ -102,7 +103,7 @@ function AuditQueue(props) {
       {
         title: '操作',
         render(r) {
-          return (<AuthButton key={r.id} perms={'queue:receive'} onClick={()=>{goDetails(r.queueId)}}>领取</AuthButton>);
+          return (<AuthButton key={r.id} perms={'queue:receive'} onClick={()=>{goDetails(r.queueName,r.queueId)}}>领取</AuthButton>);
         }
       },
     ],

@@ -3,11 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-09 09:41:19
- * @LastEditTime: 2020-07-09 16:50:28
+ * @LastEditTime: 2020-08-26 18:40:24
  */
-import React, {useState, useImperativeHandle, forwardRef, useRef} from 'react';
+import React, {useState, useEffect, useImperativeHandle, forwardRef, useRef} from 'react';
 import {Modal, Radio, Button, Icon} from 'antd';
 import classNames from 'classnames';
+import _ from 'lodash';
 // 图片懒加载
 import LazyImgComponent from '@components/LazyImgComponent';
 import UploadCoverImg from '@components/UploadCoverImg';
@@ -17,14 +18,33 @@ import styles from './index.module.less';
 function ButonCoverImg(props, ref) {
   const uploadCoverModal = useRef(null);
   const [visible, setVisible] = useState(false);// modal状态
+  const [dataList, setDataList] = useState([]); //封面图存贮
   const [coverType, setCoverType] = useState(props.type || 3); //1：单图。3：三图
+  // 当期选中图片key
+  const [indexKey, setIndexKey] = useState(null);
+  
+  
   const {
     title, 
     fileList, 
     disabled, 
-    onChangeDel=()=>{}, 
+    dispatch,
+    setCoverImages=()=>{}, 
     ...rest
   } = props;
+
+
+  useEffect(() =>{
+    setDataList(fileList);
+  }, [fileList]);
+
+  useEffect(() =>{
+    if(coverType == 3){
+      setDataList(fileList);
+    }else{
+      setDataList([fileList[0]]);
+    }
+  }, [coverType, fileList])
 
   // 向父组件暴露的方法
   useImperativeHandle(ref, () => {
@@ -39,7 +59,11 @@ function ButonCoverImg(props, ref) {
     centered: true,
     okText: "确认",
     cancelText: "取消",
-    // onOk: () =>{this.handleOk},
+    onOk: () =>{
+      // console.log(dataList)
+      setCoverImages(dataList);
+      setVisible(false)
+    },
     onCancel: () =>{setVisible(false)},
     ...rest,
   }
@@ -51,25 +75,42 @@ function ButonCoverImg(props, ref) {
   }
 
   const UploadCoverImgProps = {
-    maxLength: 3,
+    maxLength: 1,
     upload: {
       fileList,
       acceptType: ["jpg","png","jpeg","gif"],
       maxFileSize: 5,
-      successUpload: () => {console.log('success')}
+      successUpload: (data) => {
+        console.log(data)
+        let src = data[0].response.data.fileUrl;
+        console.log(src)
+         let List = _.cloneDeep(dataList);
+        List.splice(indexKey,1, src);
+        setDataList(List);
+        console.log('success')
+      }
     },
-    imagesData: {
-      dataSource: [],
-      doubleClickImage: (item) => {
-        console.log(item)
-      },
-      pagination: {
-        defaultCurrent: 1,
-        total: 500,
-        onChange: (value)=>{console.log(value)}
-      },
+    getImages: (src) =>{
+      let List = _.cloneDeep(dataList);
+      List.splice(indexKey,1, src[0]);
+      setIndexKey(null);
+      setDataList(List);
     }
   }
+
+  // 打开前上传图片modal
+  const openUploadModal = (index, item) => {
+    setIndexKey(index);
+    dispatch({
+      type:'Images/save',
+      payload:{
+        visible: true
+      }
+    })
+  }
+
+
+
   return (
     <div>
       <Button {...buttonProps}>{title}</Button>
@@ -83,26 +124,31 @@ function ButonCoverImg(props, ref) {
         <div className={styles['img-container']}>
           <ul className={styles['img-list']}>
             {
-              fileList.length > 0 && fileList.map((item, index) =>{
-                return <li className={styles.item} key = {index}>
-                  <LazyImgComponent 
-                    hover = {true}
-                    src = {item.image}
-                    onDelete = {()=> onChangeDel(index, item)}
-                    className = {styles['img-item']}>
-                  </LazyImgComponent>
+              dataList.length > 0 && dataList.map((item, index) =>{
+                return <li className={`${styles.item}`} key = {index} onClick={()=>openUploadModal(index,item)}>
+                  <img 
+                    src = {item}
+                    className = {styles['img-item']}/>
                 </li>
               })
             }
           </ul>
 
           {/* 修改封面组件 */}
-          <UploadCoverImg {...UploadCoverImgProps} ref={uploadCoverModal}>
-            {
+          <UploadCoverImg {...UploadCoverImgProps}>
+            {/* {
               coverType !== fileList.length && 
               <div 
                 className="ant-upload ant-upload-select ant-upload-select-picture-card" 
-                onClick={()=>{uploadCoverModal.current.setVisible(true)}}>
+                onClick={()=>{
+                  dispatch({
+                    type:'Images/save',
+                    payload:{
+                      visible: true
+                    }
+                  })
+                }}
+              >
                 <span tabIndex="0" className="ant-upload" role="button">
                   <div>
                     <Icon type="plus" />
@@ -110,7 +156,7 @@ function ButonCoverImg(props, ref) {
                   </div>
                 </span>
               </div>
-            }
+            } */}
           </UploadCoverImg>
         </div>
       </Modal>

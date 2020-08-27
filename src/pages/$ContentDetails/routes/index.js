@@ -3,10 +3,11 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-24 15:55:26
+ * @LastEditTime: 2020-08-24 17:46:38
  */ 
 import React, { useState, useEffect } from 'react';
 import { connect } from 'dva';
+import { Spin } from 'antd';
 import debounce from 'lodash.debounce';
 
 
@@ -24,6 +25,7 @@ function ContentDetails(props) {
     dispatch,
     CDetails: {
       loading,
+      actionLoading,
     }, 
   } = props;
 
@@ -55,6 +57,9 @@ function ContentDetails(props) {
       <div {...pageProps}>
         <Content {...contentProps}></Content>
         <Operate {...operateProps}></Operate>
+        {actionLoading && <div className={styles.loading}>
+          <Spin size="large"></Spin>
+        </div>}
       </div>
     </PageLoading>
   )

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-22 10:20:20
+ * @LastEditTime: 2020-08-27 19:11:43
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -14,6 +14,7 @@ import _ from 'lodash';
 import { BaseForm, ModalForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
 import { getTreeData }  from '@utils/rights.js';
+import TreeCom from './components/index';
 
 import { ExArray, ExObject } from '@utils/utils.js';
 import {contentType, queueType, roleStatus, dateFormat} from '@config/constants';
@@ -47,6 +48,7 @@ function RolePage(props) {
     Rights: {
       loading,
       permissionIds,
+      permissionDataList,
       roleList,
       dataSource, 
       pagination,
@@ -60,7 +62,30 @@ function RolePage(props) {
         type: 'role'
       }
     })
-  }, [dispatch])
+    dispatch({
+      type: 'Rights/getPermissionList',
+      payload: {}
+    })
+  }, [dispatch]);
+
+
+  // 处理权限
+  const compoundPermission = (userList, dataList) =>{
+    console.log(userList, dataList)
+    if(_.isEmpty(userList)) return dataList;
+
+    let List = _.cloneDeep(dataList);
+    userList.map(v=>{
+      const curIndex = List.findIndex(item => v == item.permissionId);
+      List.splice(curIndex, 1, {
+        ...List[curIndex],
+        ...{checked: 'true'}
+      });
+      console.log(List)
+    })
+    // console.log(List)
+    return List;
+  }
 
   // 多条件搜索配置
   const searchFormProps = {
@@ -229,6 +254,14 @@ function RolePage(props) {
     setFormValues(values);
   }
 
+  // 处理tree选中问题
+  const onCheckTree = (checkedKeys) => {
+    console.log(checkedKeys)
+
+    modalFormRef.current.updateFormValues('permissionIds',checkedKeys)
+  }
+  
+
   // 创建modal配置
   const modalFormProps = {
     title: title+'角色',
@@ -263,17 +296,24 @@ function RolePage(props) {
                   initialValue: permissionIds || [],
                   rules: [{ required: true, message: `请选择权限` }],
                 })(
-                  <TreeSelect 
-                      allowClear
-                      showSearch
-                      treeDefaultExpandAll={true}
-                      showCheckedStrategy={TreeSelect.SHOW_ALL}
-                      placeholder="选择权限"
-                      dropdownStyle={{maxHeight: 300, overflow: 'auto'}}
-                      treeData={getTreeData(authority.permissions)}
-                      multiple={true}
-                      treeCheckable={true}
-                  />
+                  <TreeCom 
+                    onCheckTreeFun = {onCheckTree}
+                    permissionDataList={permissionDataList} 
+                    userPermission={permissionIds}>
+                  </TreeCom>
+                  // <TreeSelect 
+                  //     allowClear
+                  //     showSearch
+                  //     treeDefaultExpandAll={true}
+                  //     showCheckedStrategy={TreeSelect.SHOW_ALL}
+                  //     placeholder="选择权限"
+                  //     checkStrictly = {'true'}
+                  //     dropdownStyle={{maxHeight: 300, overflow: 'auto'}}
+                  //     onSelect = {(checkedKeys, info)=>onCheckTree(checkedKeys, info)}
+                  //     treeData={getTreeData(permissionDataList || [])}
+                  //     multiple={true}
+                  //     treeCheckable={true}
+                  // />
                 )
               }
             </div>
@@ -283,6 +323,8 @@ function RolePage(props) {
       formValues:formValues,
       onSearch: (formValues)=>{
         // console.log('formValues', formValues)
+        // 处理路由权限判断选择的路由权限是否
+
         setBtnLoading(true);
         dispatch({
           type: 'Rights/addUserOrRole',
@@ -313,6 +355,8 @@ function RolePage(props) {
         <AuthButton perms={'role:add'}  ghost type="primary" onClick={()=>openUserModal('create')}>创建角色</AuthButton>
       </BaseForm>
       <BaseTable {...tableProps}></BaseTable>
+      {/* <TreeList permissionDataList={compoundPermission(permissionIds,permissionDataList)} onSlectPermission={()=>{}}></TreeList> */}
+      {/* <TreeCom  permissionDataList={permissionDataList} userPermission={permissionIds}></TreeCom> */}
       <ModalForm {...modalFormProps} ref={modalFormRef}></ModalForm>
     </div>
   )

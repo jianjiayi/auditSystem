@@ -3,34 +3,48 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:17:06
- * @LastEditTime: 2020-07-09 15:25:54
+ * @LastEditTime: 2020-08-26 19:04:22
  */ 
-import React, {useState, useImperativeHandle, forwardRef} from 'react';
-import {Modal, Tabs, Upload,Pagination, message, Button, Icon} from 'antd';
+import React, {useState, useEffect} from 'react';
+import {Modal, Tabs, Upload,Pagination, Radio, Checkbox, message, Button, Icon} from 'antd';
+
+import { connect } from 'dva';
+
 import { UPLOAD_FILE_URL } from '@config/constants.js';
+import PageLoading from '@components/PageLoading';
 import LazyImgComponent from '@components/LazyImgComponent';
+
 import styles from './index.module.less';
 
 const { Dragger } = Upload;
 const { TabPane } = Tabs;
 
 function UploadCoverImg(props, ref) {
-  const [fileList, setFileList] = useState(props.upload.fileList || []);
-  const [visible, setVisible] = useState(false);// modal状态
-
-  // 向父组件暴露的方法
-  useImperativeHandle(ref, () => {
-    return {
-      setVisible, //设置modal状态
-    }
-  })
-  
+  const [tabsKey, setTabsKey] = useState('1');
+  const [fileList, setFileList] = useState([]);
+  const [imageList, setImageList] = useState([]);
   const {
+    dispatch, 
     maxLength, 
+    Images:{
+      visible,
+      loading,
+      dataSource,
+      pagination,
+    },
     upload:{ acceptType, maxFileSize, successUpload}, 
-    imagesData:{dataSource, doubleClickImage, pagination}, 
+    getImages, 
     ...rest
   } = props;
+
+  useEffect(()=>{
+    if(visible){
+      dispatch({
+        type: 'Images/getAuditImages',
+        payload: {}
+      })
+    }
+  },[dispatch, visible])
   
   const modalProps = {
     width: 900,
@@ -38,8 +52,31 @@ function UploadCoverImg(props, ref) {
     centered: true,
     okText: "确认",
     cancelText: "取消",
-    // onOk: () =>{this.handleOk},
-    onCancel: () =>{setVisible(false)},
+    destroyOnClose: true,
+    onOk: () =>{
+      if(tabsKey == '1'){ //本地上传
+        if(fileList.length == 0){
+          return message.error(`请上传图片`);
+        }
+        getImages(fileList);
+      }else{  //媒体库选择
+        if(imageList.length == 0){
+          return message.error(`请上传图片`);
+        }
+        getImages(imageList)
+      }
+      
+      dispatch({
+        type: 'Images/reset',
+        payload:{}
+      })
+    },
+    onCancel: () =>{
+      dispatch({
+        type: 'Images/reset',
+        payload:{}
+      })
+    },
     ...rest,
   }
 
@@ -66,29 +103,54 @@ function UploadCoverImg(props, ref) {
   const uploadProps = {
     name: 'file',
     multiple: true,
-    showUploadList: false,
+    showUploadList: true,
     action: UPLOAD_FILE_URL,
     beforeUpload,
+    onRemove: file => {
+      console.log(file)
+      setFileList([]);
+    },
     onChange: (info) => {
       const { status } = info.file;
       if (status !== 'uploading') {
         console.log(info.file, info.fileList);
       }
       if (status === 'done') {
-        // message.success(`${info.file.name} file uploaded successfully.`);
-        successUpload(info.fileList)
+        setFileList([info.file.response.data.fileUrl]);
       } else if (status === 'error') {
         message.error(`${info.file.name} file upload failed.`);
       }
     },
   }
 
+  // 分页组件
   const paginationProps = {
     size: "small", 
-    showSizeChanger: true,
-    defaultCurrent: 2,
-    total: 500,
     ...pagination,
+    onShowSizeChange: (current, pageSize)=>{
+      dispatch({
+        type: 'Images/getAuditImages',
+        payload:{
+          pageNo: current,
+          pageSize: pageSize,
+        }
+      })
+    },
+    onChange: (page) => {
+      dispatch({
+        type: 'Images/getAuditImages',
+        payload:{
+          pageNo: page,
+          pageSize: pagination.pageSize,
+        }
+      })
+    },
+  }
+
+  // 选择图片
+  const onChangeImage = (e) =>{
+    // console.log(e.target.value)
+    setImageList([e.target.value])
   }
 
 
@@ -96,7 +158,7 @@ function UploadCoverImg(props, ref) {
     <div>
       {props.children}
       <Modal {...modalProps}>
-        <Tabs type="card">
+        <Tabs type="card" onChange={(key)=>{setTabsKey(key)}}>
         
           <TabPane tab="本地上传" key="1">
             <Dragger {...uploadProps}>
@@ -111,19 +173,23 @@ function UploadCoverImg(props, ref) {
           </TabPane>
 
           <TabPane tab="媒体库选择" key="2">
-            <ul className={styles['img-container']}>
-              {
-                dataSource.length > 0 && dataSource.map((item, index) =>{
-                  return <li className={styles.item} key = {index} onDoubleClick={()=>doubleClickImage(item)}>
-                    <LazyImgComponent 
-                      src = {item.image}
-                      className = {styles['img-item']}>
-                    </LazyImgComponent>
-                  </li>
-                })
-              }
-            </ul>
-            <Pagination {...paginationProps}/>
+            <Radio.Group onChange={onChangeImage}>
+              <ul className={styles['img-container']}>
+                  {
+                    dataSource.length > 0 && dataSource.map((item, index) =>{
+                      return <li className={styles.item} key = {item.id}>
+                        <img 
+                          src = {item.image_url}
+                          className = {styles['img-item']}/>
+                          <Radio className={styles.selectbtn} value={item.image_url}></Radio>
+                      </li>
+                    })
+                  }
+              </ul>
+            </Radio.Group>
+            <div className={styles.pagination}>
+              <Pagination {...paginationProps}/>
+            </div>
           </TabPane>
         </Tabs>
       </Modal>
@@ -131,6 +197,10 @@ function UploadCoverImg(props, ref) {
   )
 }
 
-UploadCoverImg = forwardRef(UploadCoverImg);
+// UploadCoverImg = forwardRef(UploadCoverImg);
 
-export default UploadCoverImg;
+function mapStateToProps({Images}){
+  return {Images}
+}
+
+export default connect(mapStateToProps)(UploadCoverImg);

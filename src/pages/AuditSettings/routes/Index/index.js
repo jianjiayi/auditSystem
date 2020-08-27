@@ -3,12 +3,12 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-22 10:23:26
+ * @LastEditTime: 2020-08-25 14:31:54
  */ 
 import React, {Fragment, useState, useEffect, useRef } from 'react';
 import { connect } from 'dva';
 import router from 'umi/router';
-import { Button } from 'antd';
+import { Modal, Button } from 'antd';
 import { BaseForm } from '@components/BasicForm';
 import { BaseTable } from '@components/BasicTable';
 import ViewRules from './components/viewRules.js';
@@ -23,6 +23,8 @@ import styles from './index.module.less';
 const AuthButton = wrapAuth(Button);
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+
+const { confirm } = Modal;
 
 function AuditSettings(props) {
 
@@ -184,7 +186,7 @@ function AuditSettings(props) {
         align: 'center',
         width: '160px',
         dataIndex: 'status',
-        render: text => <span>{queueStatus[text || '']}</span>,
+        render: text => <span>{text == 0 ? '停用' : '启用'}</span>,
       },
       {
         title: '操作',
@@ -194,7 +196,9 @@ function AuditSettings(props) {
           return (
             <div className={styles.tableaction}>
               <AuthButton perms={'setting:edit'} type="primary" size="small"onClick={()=>goDetails({id: r.id,action: 'update'})}>修改</AuthButton>
-              <AuthButton perms={'setting:edit'} size="small" onClick={()=>{console.log(r.id)}}>停用</AuthButton>
+              <AuthButton perms={'setting:edit'} size="small" onClick={()=>updateQueueStatus(r)}>
+                {r.status != 1 ? '停用' : '开启'}
+              </AuthButton>
               <AuthButton perms={'setting:add'} size="small" onClick={()=>goDetails({id: r.id,action: 'copy'})}>复制</AuthButton>
             </div>
           );
@@ -214,6 +218,48 @@ function AuditSettings(props) {
         }
       })
     },
+  }
+
+  // 更新队列状态
+  const  updateQueueStatus = (data) => {
+    console.log(data)
+    const {id, bid, queueType, name, type, keepDays, status} = data;
+    if(status == 0){
+      confirm({
+        title: '提示',
+        content: '是否确认开启队列',
+        onOk() {
+          return updateQueueAsyncFun({id, bid, queueType, name, type, keepDays}, status)
+        },
+        onCancel() {},
+      });
+    }else{
+      updateQueueAsyncFun({id, bid, queueType, name, type, keepDays}, status)
+    }
+  }
+
+  const updateQueueAsyncFun = (params, status) =>{
+    dispatch({
+      type: 'Settings/updateQueueStatus',
+      payload: {
+        typename: status == 1 ? 'close': 'reOpen',
+        ...params
+      },
+      callback: ()=> {
+        // 更新当前列表状态
+        let tableList = _.cloneDeep(dataSource);
+        const index = tableList.findIndex(item => params.id == item.id);
+        const item = tableList[index];
+        tableList.splice(index, 1, {
+          ...item,
+          ...{status: status == 1 ? 0 : 1}
+        });
+        dispatch({
+          type: 'Settings/save',
+          payload:{dataSource: tableList}
+        })
+      }
+    })
   }
 
 

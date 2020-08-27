@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-21 15:34:18
+ * @LastEditTime: 2020-08-25 20:51:19
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -15,6 +15,8 @@ import { BaseForm, MoreSelect } from '@components/BasicForm';
 import { ModalTable } from '@components/BasicTable';
 import PageLoading from '@components/PageLoading';
 import _ from 'lodash';
+
+import {contentType} from '@config/constants';
 
 import {getRulesItem, getRules, getDenyWordsKey, isShowInclude} from './config';
 import {
@@ -243,7 +245,7 @@ function QueueDetails(props) {
         name:'type',
         required: true,
         placeholder:'选择类型',
-        map: { 1: '图文', 2: '视频', 3: '音频', 4: '图集' }
+        map: contentType
       },
       { label: '队列名称', name: 'name', required: true,},
       {
@@ -336,7 +338,15 @@ function QueueDetails(props) {
       })
       formValues.ruleJson = JSON.stringify(ruleJson);
       
-      console.log('formValues', formValues)
+      // 判断是否更新
+      let  action= location.query.action || '';
+      console.log('location.query.action',location.query.action)
+      if(action != 'update'){
+        console.log('action',action)
+        delete formValues.id;
+      }
+      
+      console.log('formValues', formValues);
       setBtnLoading(true);
       dispatch({
         type: 'QDetails/saveQueue',

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-07 10:21:51
- * @LastEditTime: 2020-08-22 16:38:43
+ * @LastEditTime: 2020-08-25 15:50:29
  */ 
 import React, {useState, useEffect} from 'react';
 import {Form, Select, Row, Col} from 'antd';
@@ -14,6 +14,7 @@ const { Option } = Select;
 
 
 function MoreSelect(props) {
+
   const {
     style = {},
     category,
@@ -44,24 +45,27 @@ function MoreSelect(props) {
         switch(i){
           case '0':
             setFieldsValue({'firstCategoryId':categoryArr[i]});
-            onSelectFirstCategory(categoryArr[i])
+            onSelectFirstCategory(categoryArr[i]);
             break;
           case '1':
             setFieldsValue({'secondCategoryId':categoryArr[i]});
-            onSelectSecondCategory(categoryArr[i])
+            onSelectSecondCategory(categoryArr[i]);
             break;
           case '2':
-            setFieldsValue({'thirdCategoryId':categoryArr[i]})
+            setFieldsValue({'thirdCategoryId':categoryArr[i]});
             break;
         }
       })(i);
     }
+
     console.log(getFieldsValue())
   }
 
+  
+
   const selectProps = {
     size: props.size || 'small',
-    // allowClear: true,
+    allowClear: true,
     // showSearch: true,
     notFoundContent: null,
     filterOption: false,
@@ -95,6 +99,7 @@ function MoreSelect(props) {
 
   return (
     <Row type="flex" justify="space-between" style={style}>
+      
       <Col span={7}>
         {
           getFieldDecorator('firstCategoryId', {

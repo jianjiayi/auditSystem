@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-08-17 13:33:42
- * @LastEditTime: 2020-08-22 13:37:58
+ * @LastEditTime: 2020-08-27 09:18:12
  */
 import _ from 'lodash';
 
@@ -21,6 +21,7 @@ export function getTreeData(dataPermissions){
       item['title'] = item.permissionName;
       item['value'] = item.permissionId;
       item['key'] = item.permissionId;
+      // item['checked'] = 'true';
 
       let children = data.filter((v)=> v.parentId == item.permissionId)
       if(children.length > 0){

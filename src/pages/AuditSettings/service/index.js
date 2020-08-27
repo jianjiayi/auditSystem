@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-08-19 14:18:11
+ * @LastEditTime: 2020-08-25 14:01:08
  */ 
 import request from '@http';
 import { ExParams } from '@utils/utils';
@@ -19,6 +19,14 @@ export async function getQueue(params){
 // 保存接口
 export async function saveQueue(params){
   return request(`/audit/queue/save`, {
+    method: 'POST',
+    body: params
+  })
+}
+
+// 更新队列状态接口队列接口
+export async function updateQueueStatus(params){
+  return request(`/audit/queue/${params.typename}`, {
     method: 'POST',
     body: params
   })

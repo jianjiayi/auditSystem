@@ -3,9 +3,9 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-24 15:58:58
+ * @LastEditTime: 2020-08-25 19:59:18
  */ 
-import React, { useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { connect } from 'dva';
 import {message, Modal, Button} from 'antd';
 import classNames from 'classnames';
@@ -22,6 +22,13 @@ const AuthButton = wrapAuth(Button);
 const { confirm } = Modal;
 
 function Operate(props) {
+  // 提交审核按钮状态
+  const [saveBtnLoading, setSaveBtnLoading] = useState(false);
+  // 跳过按钮状态
+  const [skipBtnLoading, setSkipBtnLoading] = useState(false);
+  // 退出按钮状态
+  const [exitBtnLoading, setExitBtnLoading] = useState(false);
+
   const {
     history,
     className, 
@@ -31,7 +38,7 @@ function Operate(props) {
   } = props;
   console.log(props)
 
-  const { curArt, isEdit, category, queueContentId } = CDetails
+  const { curArt, isEdit, category, query, queueContentId } = CDetails
 
   const coverRef = useRef(null);
   const actonRef = useRef(null);
@@ -69,7 +76,7 @@ function Operate(props) {
     current.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
-
+        setSaveBtnLoading(true);
         // 处理大事件和热点
         values['hotValue'] = values.hotValue[0];
         values['bigEvent'] = values.bigEvent[0];
@@ -84,7 +91,10 @@ function Operate(props) {
         
         dispatch({
           type: 'CDetails/getNewsSkip',
-          payload: {}
+          payload: {},
+          callback: () => {
+            setSaveBtnLoading(false);
+          }
         })
       }
     });
@@ -93,18 +103,23 @@ function Operate(props) {
 
   // 跳过操作
   const skipNowContent = () =>{
+    setSkipBtnLoading(true);
     dispatch({
       type: 'CDetails/getNewsSkip',
       payload: {
         data: {
           id: queueContentId
         }
+      },
+      callback: () => {
+        setSkipBtnLoading(false);
       }
     })
   }
 
   // 退出操作
   const exitQueue = () => {
+    setExitBtnLoading(true);
     confirm({
       title: '温馨提示',
       content: '确定退出吗',
@@ -114,7 +129,8 @@ function Operate(props) {
           type: 'CDetails/getNewsExit',
           payload: {},
           callback: () => {
-            history.goBack()
+            setExitBtnLoading(false);
+            history.goBack();
           }
         })
       },
@@ -132,9 +148,11 @@ function Operate(props) {
       <SectionAction {...sectionActionProps}></SectionAction>
       
       <div className={styles['button-group']}>
-        <AuthButton perms={'news:audit'} type="primary" onClick={()=>auditSubmit()}>确定</AuthButton>
-        <AuthButton perms={'news:skip'} onClick={()=>skipNowContent()}>跳过</AuthButton>
-        <Button type="primary" ghost onClick={()=>exitQueue()}>退出</Button>
+        <AuthButton loading={saveBtnLoading} perms={'news:audit'} type="primary" onClick={()=>auditSubmit()}>确定</AuthButton>
+        {
+          query.routersource != 'search'&&<AuthButton loading={skipBtnLoading} perms={'news:skip'} onClick={()=>skipNowContent()}>跳过</AuthButton>
+        }
+        <Button loading={exitBtnLoading} type="primary" ghost onClick={()=>exitQueue()}>退出</Button>
       </div>
     </div>
   )

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-04 11:20:51
+ * @LastEditTime: 2020-08-26 19:07:02
  */ 
 import React, {useState, useImperativeHandle, forwardRef, useRef} from 'react';
 import {Modal, Button} from 'antd';
@@ -20,13 +20,17 @@ function SectionCover(props, ref) {
   const coverModal = useRef(null);
   const [coverImg, setCoverImg] = useState('');
   
-  const {className, curArt} = props;
+  const {
+    className, 
+    curArt,
+    dispatch,
+  } = props;
   // 向父组件暴露的方法
   useImperativeHandle(ref, () => {
     return coverImg
   })
 
-  const imgSrc = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1594206524731&di=6def06b6063c7e2b4e081d43418dea0a&imgtype=0&src=http%3A%2F%2Fa0.att.hudong.com%2F64%2F76%2F20300001349415131407760417677.jpg'
+  const imgSrc = 'https://test-crawler.oss-cn-beijing.aliyuncs.com/image/202008/25/b2f9f9437d028502/8d06df607838f37e3e7f2d0ed7ac44f0.png'
   // 三图
   const coverImgProps = {
     title: '三图',
@@ -46,13 +50,11 @@ function SectionCover(props, ref) {
   // 修改封面图
   const ChangeImgModalProps = {
     title: '修改封面图',
-    fileList: [
-      {
-        image: imgSrc
-      }
-    ],
-    onChangeDel: (i, item) =>{
-      console.log(i, item)
+    fileList: [imgSrc, imgSrc, imgSrc],
+    dispatch,
+    setCoverImages: (data)=>{
+      console.log(data)
+      setCoverImg(data)
     }
   }
 

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-07-06 09:48:30
- * @LastEditTime: 2020-08-24 16:43:40
+ * @LastEditTime: 2020-08-27 18:23:26
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import { connect } from 'dva';
@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import {Form, Input, DatePicker, Button, Row, Col,} from 'antd';
 import moment from 'moment';
 import _ from 'lodash';
+import $ from  'jquery';
 
 import {AudioPlayer, VideoPlayer } from '@components/Media';
 import Ueditor from '@components/Editor';

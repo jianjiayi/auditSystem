@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-09 14:55:46
- * @LastEditTime: 2020-08-18 19:43:10
+ * @LastEditTime: 2020-08-25 16:41:33
  */ 
 import request from '@http';
 
@@ -38,6 +38,13 @@ export async function getSecondCategory(params){
 // 获取三级分类接口
 export async function getThirdCategory(params){
   return request(`/audit/categoryInfo?parentId=${params.id}`, {
+    method: 'GET',
+  })
+}
+
+// 获取图片库接口
+export async function getAuditImages(params){
+  return request(`/audit/images?pageNo=${params.pageNo}&pageSize=${params.pageSize}`, {
     method: 'GET',
   })
 }

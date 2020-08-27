@@ -3,7 +3,7 @@
  * @version: 
  * @Author: big bug
  * @Date: 2020-06-29 14:44:51
- * @LastEditTime: 2020-08-21 15:39:00
+ * @LastEditTime: 2020-08-27 19:22:36
  */ 
 import React, {useState, useEffect, useRef} from 'react';
 import {message, Form, Select, Input, InputNumber, Button, Row, Col } from 'antd';
@@ -15,6 +15,8 @@ import { BaseForm, MoreSelect } from '@components/BasicForm';
 import { ModalTable } from '@components/BasicTable';
 import PageLoading from '@components/PageLoading';
 import _ from 'lodash';
+
+import {contentType} from '@config/constants';
 
 import {getRulesItem, getRules, getDenyWordsKey, isShowInclude} from './config';
 import {
@@ -104,7 +106,7 @@ function QueueDetails(props) {
       formOptions = []
       setItemOptions([]);//组件销毁时候，清空配置数组
     }
-  }, []);
+  }, [dispatch]);
 
   // 处理规则配置回显
   useEffect(()=>{
@@ -262,7 +264,7 @@ function QueueDetails(props) {
         name:'type',
         required: true,
         placeholder:'选择类型',
-        map: { 1: '图文', 2: '视频', 3: '音频', 4: '图集' }
+        map: contentType
       },
       { label: '队列名称', name: 'name', required: true,},
       {
@@ -356,6 +358,12 @@ function QueueDetails(props) {
         delete formValues[option.name];
       })
       formValues.ruleJson = JSON.stringify(ruleJson);
+
+      // 判断是否更新
+      let  action= location.query.action || '';
+      if(action != 'update'){
+        delete formValues.id;
+      }
       
       console.log('formValues', formValues)
       setBtnLoading(true);
@@ -388,10 +396,15 @@ function QueueDetails(props) {
     // 临时保存已存在数据
     let oldData= formRef.current.getFieldValue(name) || [];
     console.log(oldData)
+    let selectedKeys = [];
+    oldData.map(item=>{
+      selectedKeys.push(item.id)
+    })
 
     setModalProps({
       name,
       title: label,
+      selectedKeys,
       handleSubmit: (name,data)=>{
         console.log(name,data)
         // 合并新老数据

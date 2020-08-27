@@ -46,7 +46,7 @@ function AuditStatistics(props) {
         businessId: formRef.current.getFieldValue('businessId'),
       }
     })
-  }, [dispatch])
+  }, [dispatch, location.query.user])
 
   // 多条件搜索配置
   const searchFormProps = {
